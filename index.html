@@ -1,908 +1,232 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Pacientes / Guias</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-        :root {
-            --bg-body: #f3f2f1;
-            --bg-list: #ffffff;
-            --bg-card: #ffffff;
-            --text-main: #201f1e;
-            --text-muted: #605e5c;
-            --border-light: #edebe9;
-            --border-card: #e1dfdd;
-            --primary: #0078d4;
-            --primary-hover: #106ebe;
-            --danger: #d13438;
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            margin: 0;
-            padding: 20px;
-            height: 100vh;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-        }
-
-        header {
-            margin-bottom: 20px;
-            background: white;
-            padding: 16px 24px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            flex-shrink: 0;
-        }
-
-        .header-title h1 {
-            margin: 0;
-            font-size: 22px;
-            font-weight: 600;
-            color: #323130;
-        }
-
-        .header-title p {
-            margin: 4px 0 0 0;
-            font-size: 13px;
-            color: var(--text-muted);
-        }
-
-        .actions-container {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-            flex-grow: 1;
-            justify-content: flex-end;
-        }
-        
-        .search-box {
-            position: relative;
-            width: 100%;
-            max-width: 350px;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 8px 12px 8px 32px;
-            border: 1px solid var(--border-card);
-            border-radius: 4px;
-            font-size: 14px;
-            box-sizing: border-box;
-            font-family: inherit;
-            transition: border-color 0.2s;
-        }
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        .search-box::before {
-            content: '🔍';
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 14px;
-            color: var(--text-muted);
-        }
-
-        .upload-btn-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-        }
-
-        .btn {
-            border: none;
-            color: white;
-            background-color: var(--primary);
-            padding: 8px 16px;
-            border-radius: 4px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            font-family: inherit;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .upload-btn-wrapper input[type=file] {
-            font-size: 100px;
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        /* Board layout */
-        #board {
-            display: flex;
-            overflow-x: auto;
-            overflow-y: hidden;
-            align-items: flex-start;
-            gap: 16px;
-            flex-grow: 1;
-            padding-bottom: 10px;
-        }
-
-        /* Scrollbars */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: transparent; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #c8c6c4; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #a19f9d; 
-        }
-
-        .list {
-            background-color: transparent;
-            width: 340px;
-            min-width: 340px;
-            max-height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .list-header {
-            font-weight: 600;
-            padding: 12px 4px;
-            font-size: 15px;
-            color: #323130;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .list-count {
-            background: #edebe9;
-            color: var(--text-muted);
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .list-cards {
-            overflow-y: auto;
-            padding: 4px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        /* Card Styles */
-        .card {
-            background-color: var(--bg-card);
-            border: 1px solid var(--border-card);
-            border-radius: 6px;
-            padding: 16px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-            transition: box-shadow 0.2s, border-color 0.2s;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .card:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-            border-color: #c8c6c4;
-        }
-
-        /* Nome padronizado */
-        .card-header {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .card-title {
-            font-weight: 600;
-            font-size: 15px;
-            color: #201f1e;
-            word-wrap: break-word;
-            line-height: 1.3;
-        }
-
-        .card-obs {
-            font-size: 12px;
-            color: var(--text-muted);
-            background: #f3f2f1;
-            padding: 6px 8px;
-            border-radius: 4px;
-            border-left: 3px solid #c8c6c4;
-            margin-top: 4px;
-        }
-
-        /* Etiquetas */
-        .labels-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
-        .label {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            line-height: 1;
-        }
-        
-        /* Etiquetas locais (Custom) */
-        .local-label {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 500;
-            color: #323130;
-            background-color: #e1dfdd;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            border: 1px solid #c8c6c4;
-            line-height: 1;
-        }
-
-        .local-label .remove-lbl {
-            cursor: pointer;
-            font-size: 10px;
-            opacity: 0.5;
-        }
-        .local-label .remove-lbl:hover {
-            opacity: 1;
-            color: var(--danger);
-        }
-
-        /* Add local label */
-        .add-local-label {
-            display: flex;
-            gap: 4px;
-            margin-top: 2px;
-        }
-
-        .add-local-label input {
-            flex: 1;
-            padding: 6px 8px;
-            font-size: 11px;
-            border: 1px dashed var(--border-card);
-            border-radius: 4px;
-            background: transparent;
-            transition: all 0.2s;
-        }
-        .add-local-label input:focus {
-            border-style: solid;
-            border-color: var(--primary);
-            outline: none;
-            background: white;
-        }
-
-        /* Descrição Original */
-        .desc-box {
-            font-size: 12px;
-            color: var(--text-muted);
-            white-space: pre-wrap;
-            line-height: 1.4;
-        }
-
-        /* Sessão de Atualizações (Comentários) */
-        .updates-section {
-            border-top: 1px solid var(--border-light);
-            padding-top: 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .updates-title {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .updates-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .update-item {
-            background: #f8f8f8;
-            border: 1px solid var(--border-light);
-            border-radius: 4px;
-            padding: 10px;
-            font-size: 12px;
-            position: relative;
-        }
-        .update-item-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 6px;
-            color: var(--text-muted);
-            font-size: 10px;
-            font-weight: 500;
-        }
-        .update-item-text {
-            color: #323130;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            line-height: 1.4;
-        }
-        .update-delete {
-            cursor: pointer;
-            color: var(--danger);
-            opacity: 0.5;
-            transition: opacity 0.2s;
-        }
-        .update-delete:hover {
-            opacity: 1;
-        }
-
-        .add-update-box {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-top: 4px;
-        }
-        .add-update-box textarea {
-            width: 100%;
-            box-sizing: border-box;
-            border: 1px solid var(--border-card);
-            border-radius: 4px;
-            padding: 8px;
-            font-family: inherit;
-            font-size: 12px;
-            resize: vertical;
-            min-height: 50px;
-            transition: border-color 0.2s;
-        }
-        .add-update-box textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        .btn-small {
-            align-self: flex-end;
-            background: #edebe9;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            color: #323130;
-            transition: all 0.2s;
-        }
-        .btn-small:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Empty State */
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            height: 100%;
-            color: var(--text-muted);
-            text-align: center;
-        }
-        .empty-state h2 {
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: #323130;
-        }
-        .empty-state p {
-            font-size: 14px;
-        }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Meu cantinho</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B7%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=Source+Sans+3:wght@400;600&display=swap">
+<style>
+:root{--bg:#eef1f4;--pn:#fff;--ink:#1b2a38;--mut:#5f6f7e;--ac:#0f5c6e;--ln:#d9e0e6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "Source Sans 3",system-ui,sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+header{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px max(20px,env(safe-area-inset-right)) 12px max(20px,env(safe-area-inset-left));background:var(--pn);border-bottom:1px solid var(--ln)}
+header h1{font-size:20px;margin-right:auto}
+header input[type=search]{width:240px;max-width:100%;padding:8px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg)}
+.btn{padding:8px 14px;border:1px solid var(--ln);border-radius:8px;background:var(--pn)}
+.btn.p{background:var(--ac);border-color:var(--ac);color:#fff}
+.app{display:grid;grid-template-columns:210px 1fr;gap:20px;padding:20px;max-width:1600px;margin:0 auto}
+nav{display:flex;flex-direction:column;gap:2px;align-self:start;position:sticky;top:calc(var(--hh,64px) + 12px)}
+nav button{display:flex;justify-content:space-between;gap:8px;padding:7px 10px;border:0;border-radius:8px;background:none;text-align:left}
+nav button.on{background:var(--ac);color:#fff}
+nav small{opacity:.7}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.mn{position:relative}.mn summary{list-style:none}.mn summary::-webkit-details-marker{display:none}
+.mp{position:absolute;right:0;top:calc(100% + 6px);display:flex;flex-direction:column;gap:6px;min-width:250px;padding:10px;background:var(--pn);border:1px solid var(--ln);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12)}.mp .btn{text-align:left}
+#lf{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px}
+#lp{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;padding:10px;background:var(--pn);border:1px solid var(--ln);border-radius:8px}#lp[hidden]{display:none}.sp0{flex:1 1 100%;color:var(--mut);margin-bottom:4px}
+.seg{display:inline-flex;border:1px solid var(--ln);border-radius:8px;overflow:hidden}.seg button{padding:5px 10px;border:0;background:var(--pn);font-size:14px}.seg .on{background:var(--ink);color:#fff}
+.sp{margin-left:auto}
+#list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,520px),1fr));gap:0 10px;align-content:start}.empty{grid-column:1/-1}
+.chip{padding:5px 11px;border:1px solid var(--ln);border-radius:99px;background:var(--pn);font-size:14px}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.row{display:grid;grid-template-columns:1fr auto;gap:2px 12px;width:100%;padding:11px 14px;margin-bottom:6px;border:1px solid var(--ln);border-left:5px solid var(--sc);border-radius:8px;background:var(--pn);text-align:left}
+.row b{font-weight:600}
+.row .st{color:var(--sc);font-weight:600;font-size:14px;text-align:right}
+.row .nt{grid-column:1/-1;color:var(--mut);font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lab{display:inline-block;margin:2px 4px 2px 0;padding:1px 8px;border:0;border-radius:4px;font-size:12px;font-weight:600}
+button.lab.off{opacity:.3}
+#dr{z-index:10;position:fixed;top:0;right:0;bottom:0;width:min(460px,100%);overflow:auto;padding:18px 18px calc(18px + env(safe-area-inset-bottom));background:var(--pn);border-left:1px solid var(--ln);box-shadow:-8px 0 24px rgba(0,0,0,.08)}
+#dr[hidden]{display:none}
+.dh{display:flex;gap:8px;margin-bottom:12px}
+.dh input{flex:1;font:700 20px "Bricolage Grotesque",sans-serif;border:0;border-bottom:1px solid var(--ln);padding:4px 0}
+.dh button{border:0;background:none;font-size:20px}
+#dr label{display:block;font-size:14px;color:var(--mut);margin-bottom:10px}
+#dr select,#dr input,#dr textarea{display:block;width:100%;margin-top:3px;padding:7px 9px;border:1px solid var(--ln);border-radius:8px;color:var(--ink);background:var(--pn)}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.g label:last-child{grid-column:1/-1}
+.q{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.q button{padding:3px 10px;border:1px dashed var(--mut);border-radius:99px;background:none;font-size:13px}
+.add{display:flex;gap:6px}.add input{flex:1}
+.hist{list-style:none;padding:0;margin:12px 0}
+.hist li{padding:8px 0;border-top:1px solid var(--ln);font-size:15px}
+.hist time{display:block;color:var(--mut);font-size:12px}
+.empty{padding:40px;text-align:center;color:var(--mut)}
+#tt{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);padding:10px 16px;border-radius:8px;background:var(--ink);color:#fff}
+#tt:empty{display:none}
+@media(max-width:900px){.app{grid-template-columns:1fr;gap:10px;padding:12px}nav{flex-direction:row;overflow-x:auto;position:sticky;top:var(--hh,60px);z-index:4;margin:0 -12px;padding:6px 12px;background:var(--bg)}nav button{white-space:nowrap;flex:none;gap:6px}}
+@media(max-width:600px){header{padding:10px max(12px,env(safe-area-inset-right)) 10px max(12px,env(safe-area-inset-left));gap:8px}header h1{font-size:17px}header input[type=search]{order:5;flex:1 1 100%;width:100%}.row{grid-template-columns:1fr}.row .st{text-align:left}#chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}.chip{flex:none;white-space:nowrap}#dr{width:100%;border-left:0}body.lock{overflow:hidden}.sp{margin-left:0;width:100%}.mp{right:auto;left:-140px}}
+@media(pointer:coarse){.btn,.chip,nav button,.q button,button.lab,.seg button{min-height:40px}}
+@media(prefers-reduced-motion:no-preference){#dr{animation:in .18s ease-out}@keyframes in{from{transform:translateX(40px);opacity:0}}}
+</style>
 </head>
 <body>
+<header>
+  <h1>Meu cantinho 🌷</h1>
+  <input type="search" id="q" placeholder="Buscar nome, anotação ou histórico">
+  <button class="btn p" data-a="new">Novo contato</button>
+  <details class="mn"><summary class="btn">Dados ▾</summary><div class="mp"><button class="btn" data-a="imp">Importar Trello ou backup</button><button class="btn" data-a="exp">Baixar backup completo (JSON)</button></div></details>
+  <input type="file" id="fi" accept=".json,application/json" hidden>
+</header>
+<div class="app"><nav id="rail" aria-label="Mês"></nav><main><div id="lf"></div><div id="lp" hidden></div><div class="chips" id="chips"></div><div id="list"></div></main></div>
+<aside id="dr" hidden aria-label="Detalhes do contato"></aside>
+<div id="tt" role="status" aria-live="polite"></div>
+<script>
+const S=[['triagem','Novo contato','#7b8794'],['docs','Cobrar documentos','#b7791f'],['guia','Guia a emitir/pagar','#2b6cb0'],['entrada','Dar entrada','#6b46c1'],['inss','Em análise','#0f766e'],['deferido','Deferido, a receber','#2f855a'],['fim','Finalizada','#4a5568'],['indef','Indeferido','#c53030']];
+const SN=Object.fromEntries(S.map(s=>[s[0],s]));
+const QK=['Enviou documentos','Faltando: ','Guia paga','Informou data: ','Retornou contato','Entrada feita','Sem resposta'];
+const MN='janeiro fevereiro marco abril maio junho julho agosto setembro outubro novembro dezembro'.split(' ');
+const ML=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const HEX={green:'#61bd4f',yellow:'#f2d600',orange:'#ff9f1a',red:'#eb5a46',purple:'#c377e0',blue:'#0079bf',sky:'#00c2e0',lime:'#51e898',pink:'#ff78cb',black:'#344563'};
+const KEY='sm_atendimentos_v1';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const now=()=>new Date().toISOString();
+const mlabel=k=>k?ML[+k.slice(5)-1]+' de '+k.slice(0,4):'Sem data';
+const mkey=t=>{const m=norm(t).match(/(janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro).*?(\d{4})/);return m?m[2]+'-'+String(MN.indexOf(m[1])+1).padStart(2,'0'):''};
+let db;try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+db=db||{cards:{},labels:{}};
+let st={mes:'*',et:'ativos',q:'',lb:[],mode:'e',lopen:false,open:null};
+let cur=[];
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast('Não foi possível salvar: '+e.message)}}
+let tm;function toast(m){$('#tt').textContent=m;clearTimeout(tm);tm=setTimeout(()=>$('#tt').textContent='',5000)}
+function ls(n){const [b,v]=(db.labels[n]||'black').split('_');const lt=v==='light',dk=v==='dark',h=HEX[b]||HEX.black;
+ return `background:color-mix(in srgb,${h} ${dk?'65%,#000':lt?'55%,#fff':'100%,#000'});color:${lt||['yellow','lime','sky'].includes(b)?'#1b2a38':'#fff'}`}
+const labs=a=>a.map(l=>`<span class="lab" style="${ls(l)}">${esc(l)}</span>`).join('');
+const fd=iso=>iso?new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'Pré-carga do Trello';
+const fs=s=>s?s.split('-').reverse().slice(0,2).join('/'):'';
 
-    <header>
-        <div class="header-title">
-            <h1>Gestão de Pacientes</h1>
-            <p>Importe dados do Trello, refine nomes e acompanhe o histórico</p>
-        </div>
-        <div class="actions-container">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="Buscar..." title="Buscar por nome, etiqueta ou observação..." oninput="filterCards()">
-            </div>
-            <div class="upload-btn-wrapper">
-                <button class="btn">
-                    Importar JSON
-                </button>
-                <input type="file" id="jsonInput" accept=".json" />
-            </div>
-        </div>
-    </header>
+// ---------- Importação do Trello ----------
+function parseName(raw){
+ const m=raw.match(/^(.*?)\s*(?:[-—–]\s+|\s[-—–]\s*|\()(.*)$/);
+ const nome=(m?m[1]:raw).trim(),extra=m?m[2].replace(/\)\s*$/,'').trim():'';
+ const sq=extra.match(/saque dia (\d{1,2})\/(\d{1,2})/i);let saque='';
+ if(sq){const t=Date.now();saque=[-1,0,1].map(o=>new Date(new Date().getFullYear()+o,+sq[2]-1,+sq[1])).sort((a,b)=>Math.abs(a-t)-Math.abs(b-t))[0].toLocaleDateString('sv')}
+ return{nome,extra,saque}}
+function stage(lab,ln){const h=x=>lab.some(l=>norm(l).includes(x)),n=norm(ln);
+ return h('finalizada')?'fim':h('indeferi')&&!h('deferido')?'indef':h('deferido')?'deferido':h('entrada ok')?'inss':h('guia paga')?'entrada':h('guia emitida')||h('guia agendada')?'guia':n.includes('aguardando deferimento')?'inss':n.startsWith('indeferidos')?'indef':n.startsWith('deferidos')?'deferido':n.includes('dar entrada')?'entrada':'triagem'}
+function importTrello(j){
+ const L={};j.lists.forEach(l=>L[l.id]=l.name);
+ (j.labels||[]).forEach(l=>{if(l.name)db.labels[l.name]=l.color});
+ let n=0,u=0;
+ for(const c of j.cards){
+  const ln=L[c.idList]||'';if(/introdu/i.test(ln))continue;
+  const lab=(c.labels||[]).map(l=>l.name).filter(Boolean),ex=db.cards[c.id];
+  if(ex){let ch=0;const nl=lab.filter(x=>!ex.tl.includes(x));
+   if(nl.length){ex.labels=[...new Set([...ex.labels,...nl])];ch=1}ex.tl=lab;
+   if(c.desc&&c.desc!==ex.td){ex.td=c.desc;ex.hist.unshift({d:now(),t:'Anotação atualizada no Trello: '+c.desc});ch=1}
+   u+=ch;continue}
+  const p=parseName(c.name),mes=mkey(ln),hist=[];
+  if(p.extra)hist.push({d:null,t:p.extra});
+  if(!mes&&ln)hist.push({d:null,t:'Lista no Trello: '+ln});
+  db.cards[c.id]={id:c.id,nome:p.nome,mes,etapa:stage(lab,ln),labels:lab,tl:lab,obs:c.desc||'',td:c.desc||'',saque:p.saque,hist,arq:!!c.closed};n++}
+ save();toast(`Importação concluída: ${n} novos, ${u} atualizados.`)}
+function load(file){const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);
+  if(Array.isArray(j.cards)&&j.lists)importTrello(j);
+  else if(j.app==='sm'&&confirm('Restaurar backup? Isso substitui os dados atuais deste navegador.')){db={cards:j.cards,labels:j.labels};save();toast('Backup restaurado.')}
+  else if(j.app!=='sm')toast('Arquivo não reconhecido.');
+  render()}catch(e){toast('Erro ao ler o arquivo: '+e.message)}};r.readAsText(file)}
 
-    <div id="board">
-        <div class="empty-state">
-            <h2>Nenhum dado carregado</h2>
-            <p>Clique em <b>Importar JSON</b> para carregar o seu arquivo de exportação (ex: <i>dados_trello.json</i>).</p>
-        </div>
-    </div>
+// ---------- Tela ----------
+const all=()=>Object.values(db.cards);
+const hit=c=>!st.q||norm([c.nome,c.obs,...c.hist.map(h=>h.t)].join(' ')).includes(norm(st.q));
+const inMes=c=>st.mes==='*'||c.mes===st.mes;
+function render(){
+ const cs=all(),act=c=>!c.arq&&c.etapa!=='fim';
+ const ks=[...new Set(cs.map(c=>c.mes))].sort((a,b)=>!a?1:!b?-1:a<b?-1:1);
+ $('#rail').innerHTML=`<button data-m="*" class="${st.mes==='*'?'on':''}">Todos os meses<small>${cs.filter(act).length}</small></button>`+
+  ks.map(k=>`<button data-m="${k}" class="${st.mes===k?'on':''}">${mlabel(k)}<small>${cs.filter(c=>c.mes===k&&act(c)).length}</small></button>`).join('');
+ const has=c=>!st.lb.length||(st.mode==='e'?st.lb.every(l=>c.labels.includes(l)):st.lb.some(l=>c.labels.includes(l)));
+ const pre=cs.filter(c=>inMes(c)&&hit(c)),base=pre.filter(has),cnt=f=>base.filter(f).length;
+ const ch=[['ativos','Em andamento',cnt(act)],...S.map(s=>[s[0],s[1],cnt(c=>c.etapa===s[0]&&!c.arq)]),['arq','Arquivados',cnt(c=>c.arq)]];
+ $('#chips').innerHTML=ch.map(x=>`<button class="chip ${st.et===x[0]?'on':''}" data-e="${x[0]}">${x[1]} · ${x[2]}</button>`).join('');
+ const ef=c=>st.et==='ativos'?act(c):st.et==='arq'?c.arq:c.etapa===st.et&&!c.arq;
+ const rows=base.filter(ef)
+  .sort((a,b)=>S.findIndex(s=>s[0]===a.etapa)-S.findIndex(s=>s[0]===b.etapa)||a.nome.localeCompare(b.nome,'pt'));
+ cur=rows;
+ const lc={},E=st.mode==='e';(E?rows:pre.filter(ef)).forEach(c=>c.labels.forEach(l=>lc[l]=(lc[l]||0)+1));
+ const lo=Object.keys(db.labels).filter(l=>lc[l]||st.lb.includes(l)).sort((a,b)=>(lc[b]||0)-(lc[a]||0)),lb=l=>`data-a="lbt" data-l="${esc(l)}" style="${ls(l)}"`;
+ $('#lf').innerHTML=`<button class="chip ${st.lopen?'on':''}" data-a="lbo" aria-expanded="${st.lopen}">Labels${st.lb.length?' ('+st.lb.length+')':''} ▾</button>`
+  +(st.lb.length>1?`<span class="seg" role="group" aria-label="Combinação de labels"><button class="${st.mode==='e'?'on':''}" data-a="lbm" data-v="e">Todas</button><button class="${st.mode==='o'?'on':''}" data-a="lbm" data-v="o">Qualquer uma</button></span>`:'')
+  +st.lb.map(l=>`<button class="lab" ${lb(l)}>${esc(l)} ✕</button>`).join('')
+  +(st.lb.length?'<button class="chip" data-a="lbx">Limpar labels</button>':'')
+  +`<button class="btn sp" data-a="csv">Exportar ${rows.length} (CSV)</button>`;
+ $('#lp').hidden=!st.lopen;$('#lp').innerHTML=`<small class="sp0">${E&&st.lb.length?'Só aparecem as labels que ocorrem junto com as selecionadas; o número é quantos contatos ficam ao adicioná-la.':'O número é quantos contatos têm a label nos filtros atuais.'}</small>`+lo.map(l=>`<button class="lab ${st.lb.includes(l)?'':'off'}" ${lb(l)}>${esc(l)} (${lc[l]||0})</button>`).join('')||'Nenhuma label nos contatos filtrados.';
+ $('#list').innerHTML=!cs.length?'<div class="empty"><h2>Nenhum contato ainda</h2><p>Use “Importar Trello / backup” para carregar o JSON exportado do Trello, ou crie um novo contato.</p></div>'
+  :rows.map(c=>{const s=SN[c.etapa]||S[0],last=c.hist[0];
+   return `<button class="row" style="--sc:${s[2]}" data-id="${c.id}"><span><b>${esc(c.nome)}</b> ${labs(c.labels)}</span><span class="st">${s[1]}${c.saque?' · pgto '+fs(c.saque):''}</span>${last?`<span class="nt">${esc(last.t)}</span>`:''}</button>`}).join('')||'<div class="empty">Nada por aqui com esses filtros.</div>'}
+function mopts(cur){const ks=new Set(['',cur]);all().forEach(c=>ks.add(c.mes));
+ for(let y=2026;y<=2027;y++)for(let m=1;m<=12;m++)ks.add(y+'-'+String(m).padStart(2,'0'));
+ return[...ks].sort((a,b)=>!a?1:!b?-1:a<b?-1:1).map(k=>`<option value="${k}" ${k===cur?'selected':''}>${mlabel(k)}</option>`).join('')}
+function drawer(id){
+ const c=db.cards[id],d=$('#dr');st.open=c?id:null;document.body.classList.toggle('lock',!!c);if(!c){d.hidden=true;return}d.hidden=false;
+ d.innerHTML=`<div class="dh"><input id="f-nome" value="${esc(c.nome)}" aria-label="Nome"><button data-a="close" aria-label="Fechar">✕</button></div>
+ <div class="g"><label>Mês<select id="f-mes">${mopts(c.mes)}</select></label>
+ <label>Etapa<select id="f-et">${S.map(s=>`<option value="${s[0]}" ${s[0]===c.etapa?'selected':''}>${s[1]}</option>`).join('')}</select></label>
+ <label>Data de pagamento<input type="date" id="f-saque" value="${c.saque||''}"></label></div>
+ <div>${Object.keys(db.labels).map(l=>`<button class="lab ${c.labels.includes(l)?'':'off'}" data-a="lab" data-l="${esc(l)}" style="${ls(l)}">${esc(l)}</button>`).join('')}</div>
+ <div class="add" style="margin:8px 0 0"><input id="f-nl" placeholder="Nova label"><select id="f-nc" style="width:auto">${[['green','Verde'],['yellow','Amarelo'],['orange','Laranja'],['red','Vermelho'],['purple','Roxo'],['blue','Azul'],['sky','Azul-claro'],['lime','Lima'],['pink','Rosa'],['black','Preto']].map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</select><button class="btn" data-a="nl">Criar</button></div>
+ <label style="margin-top:12px">Anotações<textarea id="f-obs" rows="3">${esc(c.obs)}</textarea></label>
+ <h3>Histórico</h3><div class="q">${QK.map(q=>`<button data-a="q" data-t="${esc(q)}">${esc(q.replace(/: $/,''))}</button>`).join('')}</div>
+ <div class="add"><input id="f-h" placeholder="O que aconteceu?"><button class="btn p" data-a="addh">Registrar</button></div>
+ <ul class="hist">${c.hist.map(h=>`<li><time>${fd(h.d)}</time>${esc(h.t)}</li>`).join('')}</ul>
+ <button class="btn" data-a="arq">${c.arq?'Restaurar contato':'Arquivar contato'}</button>`}
+const log=(c,t)=>c.hist.unshift({d:now(),t});
+function newCard(){const id='m'+Date.now().toString(36);
+ db.cards[id]={id,nome:'Novo contato',mes:/^\d/.test(st.mes)?st.mes:'',etapa:'triagem',labels:[],tl:[],obs:'',td:'',saque:'',hist:[{d:now(),t:'Contato criado'}],arq:false};
+ save();render();drawer(id);$('#f-nome').select()}
 
-    <script>
-        let trelloData = null;
-        let labelsMap = {};
-        let listsMap = {};
-
-        // Cores Trello convertidas
-        const trelloColors = {
-            green: '#61bd4f', green_dark: '#519839', green_light: '#b2d997',
-            yellow: '#f2d600', yellow_dark: '#d9b51c', yellow_light: '#f7eca5',
-            orange: '#ff9f1a', orange_dark: '#cd8313', orange_light: '#ffd69e',
-            red: '#eb5a46', red_dark: '#b04632', red_light: '#efb3ab',
-            purple: '#c377e0', purple_dark: '#89609e', purple_light: '#dfbfe8',
-            blue: '#0079bf', blue_dark: '#055a8c', blue_light: '#8bbdd9',
-            sky: '#00c2e0', sky_dark: '#0098b7', sky_light: '#8cdceb',
-            lime: '#51e898', lime_dark: '#4bbf6b', lime_light: '#aeeabf',
-            pink: '#ff78cb', pink_dark: '#c9558f', pink_light: '#ffbde5',
-            black: '#344563', black_dark: '#091e42', black_light: '#8993a4',
-            null: '#b3bac5'
-        };
-
-        // --- INDEXEDDB PARA CACHE DO ARQUIVO JSON ---
-        const DB_NAME = 'GestorTrelloDB';
-        const DB_VERSION = 1;
-        const STORE_NAME = 'trelloCache';
-        let db;
-
-        function initDB() {
-            const request = indexedDB.open(DB_NAME, DB_VERSION);
-            
-            request.onupgradeneeded = function(e) {
-                db = e.target.result;
-                if (!db.objectStoreNames.contains(STORE_NAME)) {
-                    db.createObjectStore(STORE_NAME);
-                }
-            };
-
-            request.onsuccess = function(e) {
-                db = e.target.result;
-                // Só tenta carregar do IndexedDB se a rede não tiver carregado os dados ainda
-                if (!trelloData) {
-                    loadJsonFromDB();
-                }
-            };
-
-            request.onerror = function(e) {
-                console.error("Erro no IndexedDB:", e.target.error);
-            };
-        }
-
-        function saveJsonToDB(json) {
-            if (!db) return;
-            const transaction = db.transaction([STORE_NAME], 'readwrite');
-            const store = transaction.objectStore(STORE_NAME);
-            store.put(json, 'latestData');
-        }
-
-        function loadJsonFromDB() {
-            if (!db) return;
-            const transaction = db.transaction([STORE_NAME], 'readonly');
-            const store = transaction.objectStore(STORE_NAME);
-            const request = store.get('latestData');
-            
-            request.onsuccess = function(e) {
-                const json = e.target.result;
-                // Se já carregou via rede (GitHub pages), não sobrescreve com o cache antigo
-                if (json && !trelloData) {
-                    processTrelloJson(json, false);
-                }
-            };
-        }
-
-        // Inicializa o banco de dados e tenta buscar do GitHub Pages
-        window.addEventListener('load', async () => {
-            initDB(); // Inicia o DB (que chamará o fallback loadJsonFromDB se precisar)
-
-            try {
-                // Tenta buscar o arquivo do servidor (GitHub Pages)
-                // Usamos cache: no-store para garantir que ele pegue a versão mais nova do repositório
-                const response = await fetch('./dados.json', { cache: 'no-store' });
-                
-                if (response.ok) {
-                    const json = await response.json();
-                    processTrelloJson(json, true); // Salva no IndexedDB como backup
-                } else {
-                    console.warn("Arquivo dados.json não encontrado no servidor (Status: " + response.status + ").");
-                }
-            } catch (err) {
-                console.warn("Não foi possível realizar o fetch de dados.json. Rodando localmente ou sem internet.");
-            }
-        });
-
-
-        // --- EVENTO DE IMPORTAÇÃO DE ARQUIVO MANUAL ---
-        document.getElementById('jsonInput').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const json = JSON.parse(e.target.result);
-                    processTrelloJson(json, true); // true = salvar no banco
-                } catch (err) {
-                    alert('Erro ao ler o arquivo JSON: ' + err.message);
-                }
-            };
-            reader.readAsText(file);
-        });
-
-        function processTrelloJson(json, saveToDb = false) {
-            if (!json || !json.lists || !json.cards) {
-                alert('O arquivo JSON importado não possui o formato esperado.');
-                return;
-            }
-
-            if (saveToDb) {
-                saveJsonToDB(json);
-            }
-
-            trelloData = json;
-            labelsMap = {};
-            listsMap = {};
-
-            json.lists.forEach(list => {
-                if (!list.closed) {
-                    listsMap[list.id] = list.name;
-                }
-            });
-
-            if (json.labels) {
-                json.labels.forEach(label => {
-                    labelsMap[label.id] = {
-                        name: label.name,
-                        color: label.color || 'null'
-                    };
-                });
-            }
-
-            renderBoard();
-            filterCards();
-        }
-
-        // Função que separa o Nome principal de anotações soltas na string (ex: "Nome — indicação")
-        function parseCardName(rawName) {
-            const match = rawName.match(/^(.*?)(?:\s*(?:-|—|–)\s*|\s*\()(.*)$/);
-            
-            if (match) {
-                let name = match[1].trim();
-                let obs = match[2].trim();
-                if (obs.endsWith(')')) {
-                    obs = obs.substring(0, obs.length - 1).trim();
-                }
-                return { name, obs };
-            }
-            return { name: rawName.trim(), obs: "" };
-        }
-
-        // --- LOCAL STORAGE MÉTODOS ---
-
-        function getLocalLabels(cardId) {
-            const saved = localStorage.getItem(`trello_local_labels_${cardId}`);
-            return saved ? JSON.parse(saved) : [];
-        }
-        function saveLocalLabels(cardId, labelsArray) {
-            localStorage.setItem(`trello_local_labels_${cardId}`, JSON.stringify(labelsArray));
-        }
-
-        function getUpdates(cardId) {
-            const saved = localStorage.getItem(`trello_updates_${cardId}`);
-            return saved ? JSON.parse(saved) : [];
-        }
-        function saveUpdates(cardId, updatesArray) {
-            localStorage.setItem(`trello_updates_${cardId}`, JSON.stringify(updatesArray));
-        }
-
-        // Migrar a anotação antiga (única string) para o novo formato de histórico de comentários
-        function migrateOldAnnotations(cardId) {
-            const oldId = `trello_annotation_${cardId}`;
-            const oldText = localStorage.getItem(oldId);
-            if (oldText && oldText.trim() !== "") {
-                const updates = getUpdates(cardId);
-                // Adiciona como a atualização mais antiga
-                updates.unshift({
-                    date: new Date().toLocaleString('pt-BR') + ' (Anotação Antiga)',
-                    text: oldText.trim()
-                });
-                saveUpdates(cardId, updates);
-                localStorage.removeItem(oldId); // Limpa para não migrar de novo
-            }
-        }
-
-        // --- RENDERIZAÇÃO ---
-
-        function renderBoard() {
-            const board = document.getElementById('board');
-            board.innerHTML = '';
-
-            if (!trelloData) return;
-
-            const cardsByList = {};
-            
-            Object.keys(listsMap).forEach(listId => {
-                cardsByList[listId] = [];
-            });
-
-            trelloData.cards.forEach(card => {
-                if (!card.closed && listsMap[card.idList]) {
-                    cardsByList[card.idList].push(card);
-                }
-            });
-
-            trelloData.lists.forEach(list => {
-                if (list.closed) return;
-
-                const listCards = cardsByList[list.id];
-                if (!listCards || listCards.length === 0) return;
-
-                const listEl = document.createElement('div');
-                listEl.className = 'list';
-                
-                const listHeader = document.createElement('div');
-                listHeader.className = 'list-header';
-                listHeader.innerHTML = `<span>${list.name}</span> <span class="list-count">${listCards.length}</span>`;
-                listEl.appendChild(listHeader);
-
-                const listCardsContainer = document.createElement('div');
-                listCardsContainer.className = 'list-cards';
-
-                listCards.forEach(card => {
-                    const cardEl = createCardElement(card);
-                    listCardsContainer.appendChild(cardEl);
-                });
-
-                listEl.appendChild(listCardsContainer);
-                board.appendChild(listEl);
-            });
-        }
-
-        function createCardElement(card) {
-            migrateOldAnnotations(card.id);
-
-            const cardEl = document.createElement('div');
-            cardEl.className = 'card';
-            
-            const { name, obs } = parseCardName(card.name);
-            let searchData = name.toLowerCase() + " " + obs.toLowerCase();
-
-            // CABEÇALHO (Nome + Obs Padronizada)
-            const headerDiv = document.createElement('div');
-            headerDiv.className = 'card-header';
-            
-            const titleEl = document.createElement('div');
-            titleEl.className = 'card-title';
-            titleEl.textContent = name;
-            headerDiv.appendChild(titleEl);
-
-            if (obs) {
-                const obsEl = document.createElement('div');
-                obsEl.className = 'card-obs';
-                obsEl.textContent = "Nota no título: " + obs;
-                headerDiv.appendChild(obsEl);
-            }
-            cardEl.appendChild(headerDiv);
-
-            // ETIQUETAS
-            const labelsContainer = document.createElement('div');
-            labelsContainer.className = 'labels-container';
-            cardEl.appendChild(labelsContainer);
-
-            if (card.idLabels && card.idLabels.length > 0) {
-                card.idLabels.forEach(labelId => {
-                    const labelInfo = labelsMap[labelId];
-                    if (labelInfo) {
-                        const lbl = document.createElement('span');
-                        lbl.className = 'label';
-                        const labelNameText = labelInfo.name || '';
-                        lbl.textContent = labelNameText === '' ? 'SEM NOME' : labelNameText; 
-                        lbl.style.backgroundColor = trelloColors[labelInfo.color] || trelloColors['null'];
-                        labelsContainer.appendChild(lbl);
-                        searchData += " " + labelNameText.toLowerCase();
-                    }
-                });
-            }
-
-            // UI Etiquetas Locais
-            const renderLocalLabelsUI = () => {
-                const oldLocals = labelsContainer.querySelectorAll('.local-label');
-                oldLocals.forEach(el => el.remove());
-                
-                const labels = getLocalLabels(card.id);
-                let localSearchStr = "";
-
-                labels.forEach(lblText => {
-                    const lblEl = document.createElement('span');
-                    lblEl.className = 'local-label';
-                    lblEl.innerHTML = `${lblText} <span class="remove-lbl" title="Remover Etiqueta">&#10005;</span>`;
-                    
-                    lblEl.querySelector('.remove-lbl').onclick = () => {
-                        const newLabels = labels.filter(l => l !== lblText);
-                        saveLocalLabels(card.id, newLabels);
-                        renderLocalLabelsUI();
-                        filterCards();
-                    };
-
-                    labelsContainer.appendChild(lblEl);
-                    localSearchStr += lblText.toLowerCase() + " ";
-                });
-                
-                cardEl.setAttribute('data-search', searchData + " " + localSearchStr);
-            };
-            renderLocalLabelsUI();
-
-            const addLocalLabelDiv = document.createElement('div');
-            addLocalLabelDiv.className = 'add-local-label';
-            const addInput = document.createElement('input');
-            addInput.type = 'text';
-            addInput.placeholder = 'Nova etiqueta... (Pressione Enter)';
-            
-            addInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    const newLabel = addInput.value.trim();
-                    if (newLabel) {
-                        const currentLabels = getLocalLabels(card.id);
-                        if (!currentLabels.includes(newLabel)) {
-                            currentLabels.push(newLabel);
-                            saveLocalLabels(card.id, currentLabels);
-                            renderLocalLabelsUI();
-                            addInput.value = '';
-                            filterCards();
-                        }
-                    }
-                }
-            });
-            addLocalLabelDiv.appendChild(addInput);
-            cardEl.appendChild(addLocalLabelDiv);
-
-            // DESCRIÇÃO (Se o card já veio com descrição do Trello)
-            if (card.desc && card.desc.trim() !== '') {
-                const descEl = document.createElement('div');
-                descEl.className = 'desc-box';
-                const limit = 200;
-                if (card.desc.length > limit) {
-                    descEl.textContent = card.desc.substring(0, limit) + '...';
-                    descEl.title = card.desc;
-                } else {
-                    descEl.textContent = card.desc;
-                }
-                cardEl.appendChild(descEl);
-            }
-
-            // SESSÃO DE HISTÓRICO DE ATUALIZAÇÕES
-            const updatesSection = document.createElement('div');
-            updatesSection.className = 'updates-section';
-            
-            const updatesTitle = document.createElement('div');
-            updatesTitle.className = 'updates-title';
-            updatesTitle.textContent = 'Histórico de Atualizações';
-            updatesSection.appendChild(updatesTitle);
-
-            const updatesList = document.createElement('div');
-            updatesList.className = 'updates-list';
-            updatesSection.appendChild(updatesList);
-
-            const renderUpdatesUI = () => {
-                updatesList.innerHTML = '';
-                const updates = getUpdates(card.id);
-                
-                // Mostrar do mais novo para o mais velho ou mais velho para mais novo?
-                // Mostrar em ordem original (push adiciona no final). Mais recentes embaixo.
-                updates.forEach((updateObj, index) => {
-                    const uItem = document.createElement('div');
-                    uItem.className = 'update-item';
-                    
-                    const uHeader = document.createElement('div');
-                    uHeader.className = 'update-item-header';
-                    uHeader.innerHTML = `<span>${updateObj.date}</span> <span class="update-delete" title="Apagar Registro">&#10005;</span>`;
-                    
-                    uHeader.querySelector('.update-delete').onclick = () => {
-                        if(confirm('Tem certeza que deseja apagar essa atualização do histórico?')) {
-                            updates.splice(index, 1);
-                            saveUpdates(card.id, updates);
-                            renderUpdatesUI();
-                        }
-                    };
-
-                    const uText = document.createElement('div');
-                    uText.className = 'update-item-text';
-                    uText.textContent = updateObj.text;
-
-                    uItem.appendChild(uHeader);
-                    uItem.appendChild(uText);
-                    updatesList.appendChild(uItem);
-                });
-                
-                // Rolar a lista para baixo automaticamente se tiver scroll
-                updatesList.scrollTop = updatesList.scrollHeight;
-            };
-
-            renderUpdatesUI();
-
-            const addUpdateBox = document.createElement('div');
-            addUpdateBox.className = 'add-update-box';
-            
-            const updateTextarea = document.createElement('textarea');
-            updateTextarea.placeholder = 'Escreva o que aconteceu de novo com essa pessoa...';
-            
-            const updateBtn = document.createElement('button');
-            updateBtn.className = 'btn-small';
-            updateBtn.textContent = 'Adicionar ao Histórico';
-
-            updateBtn.onclick = () => {
-                const text = updateTextarea.value.trim();
-                if (text) {
-                    const updates = getUpdates(card.id);
-                    // Formatar data bonitinha: DD/MM/AAAA às HH:MM
-                    const now = new Date();
-                    const dateStr = now.toLocaleDateString('pt-BR') + ' às ' + now.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-                    
-                    updates.push({ date: dateStr, text: text });
-                    saveUpdates(card.id, updates);
-                    renderUpdatesUI();
-                    updateTextarea.value = '';
-                }
-            };
-
-            addUpdateBox.appendChild(updateTextarea);
-            addUpdateBox.appendChild(updateBtn);
-            updatesSection.appendChild(addUpdateBox);
-
-            cardEl.appendChild(updatesSection);
-
-            return cardEl;
-        }
-
-        function filterCards() {
-            const query = document.getElementById('searchInput').value.toLowerCase();
-            const cards = document.querySelectorAll('.card');
-            
-            cards.forEach(card => {
-                const searchStr = card.getAttribute('data-search') || '';
-                if (searchStr.includes(query)) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
-    </script>
+document.addEventListener('click',e=>{
+ const mn=$('.mn');if(mn.open&&!e.target.closest('summary'))mn.open=false;
+ const t=e.target.closest('[data-a],[data-m],[data-e],[data-id]');if(!t)return;const D=t.dataset,c=db.cards[st.open];
+ if(D.m!==undefined){st.mes=D.m;render()}
+ else if(D.e){st.et=D.e;render()}
+ else if(D.id)drawer(D.id);
+ else if(D.a==='new')newCard();
+ else if(D.a==='imp')$('#fi').click();
+ else if(D.a==='lbo'){st.lopen=!st.lopen;render()}
+ else if(D.a==='lbt'){const i=st.lb.indexOf(D.l);i<0?st.lb.push(D.l):st.lb.splice(i,1);render()}
+ else if(D.a==='lbm'){st.mode=D.v;render()}
+ else if(D.a==='lbx'){st.lb=[];render()}
+ else if(D.a==='csv')exportCsv();
+ else if(D.a==='close'){drawer(null);}
+ else if(D.a==='exp')dl(JSON.stringify({app:'sm',v:1,...db}),'application/json','cantinho-backup-'+now().slice(0,10)+'.json');
+ else if(c&&D.a==='lab'){const i=c.labels.indexOf(D.l);i<0?c.labels.push(D.l):c.labels.splice(i,1);save();drawer(c.id);render()}
+ else if(c&&D.a==='q'){const i=$('#f-h');i.value=D.t;i.focus();if(!D.t.endsWith(': '))addh()}
+ else if(c&&D.a==='addh')addh();
+ else if(c&&D.a==='nl')addl();
+ else if(c&&D.a==='arq'){c.arq=!c.arq;log(c,c.arq?'Contato arquivado':'Contato restaurado');save();drawer(c.id);render()}});
+function dl(txt,type,name){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=name;a.click()}
+function exportCsv(){
+ const q=v=>{v=String(v??'');if(/^[=+@]/.test(v))v="'"+v;return'"'+v.replace(/"/g,'""')+'"'};
+ const H=['Nome','Mês','Etapa','Labels','Data de pagamento','Anotações','Último registro','Histórico completo'];
+ const L=cur.map(c=>[c.nome,mlabel(c.mes),(SN[c.etapa]||S[0])[1],c.labels.join(' | '),c.saque?c.saque.split('-').reverse().join('/'):'',c.obs,c.hist[0]?c.hist[0].t:'',c.hist.map(h=>(h.d?new Date(h.d).toLocaleString('pt-BR'):'Pré-carga')+': '+h.t).join('\n')]);
+ dl('\ufeff'+[H,...L].map(r=>r.map(q).join(';')).join('\r\n'),'text/csv;charset=utf-8',`cantinho-${st.mes==='*'?'todos':st.mes||'sem-data'}-${now().slice(0,10)}.csv`);
+ toast(cur.length+' contatos exportados.')}
+function addl(){const c=db.cards[st.open],n=$('#f-nl').value.trim();if(!c||!n)return;
+ const nome=Object.keys(db.labels).find(l=>norm(l)===norm(n))||n;if(!db.labels[nome])db.labels[nome]=$('#f-nc').value;
+ if(!c.labels.includes(nome))c.labels.push(nome);save();drawer(c.id);render()}
+function addh(){const c=db.cards[st.open],v=$('#f-h').value.trim();if(!c||!v)return;log(c,v);save();drawer(c.id);render()}
+document.addEventListener('keydown',e=>{if(e.target.id==='f-h'&&e.key==='Enter')addh();if(e.target.id==='f-nl'&&e.key==='Enter')addl();if(e.key==='Escape')drawer(null)});
+document.addEventListener('change',e=>{
+ if(e.target.id==='fi'){if(e.target.files[0])load(e.target.files[0]);e.target.value='';return}
+ const c=db.cards[st.open];if(!c)return;const v=e.target.value;
+ if(e.target.id==='f-nome')c.nome=v.trim()||c.nome;
+ else if(e.target.id==='f-obs')c.obs=v;
+ else if(e.target.id==='f-saque')c.saque=v;
+ else if(e.target.id==='f-mes'){log(c,`Mês: ${mlabel(c.mes)} → ${mlabel(v)}`);c.mes=v}
+ else if(e.target.id==='f-et'){log(c,`Etapa: ${SN[c.etapa][1]} → ${SN[v][1]}`);c.etapa=v}
+ else return;
+ save();render();if(/f-(mes|et)/.test(e.target.id))drawer(c.id)});
+$('#q').addEventListener('input',e=>{st.q=e.target.value;render()});
+new ResizeObserver(()=>document.documentElement.style.setProperty('--hh',$('header').offsetHeight+'px')).observe($('header'));
+render();
+</script>
 </body>
 </html>
