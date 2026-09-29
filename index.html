@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Pacientes / Guias</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-body: #f3f2f1;
+            --bg-list: #ffffff;
+            --bg-card: #ffffff;
+            --text-main: #201f1e;
+            --text-muted: #605e5c;
+            --border-light: #edebe9;
+            --border-card: #e1dfdd;
+            --primary: #0078d4;
+            --primary-hover: #106ebe;
+            --danger: #d13438;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            height: 100vh;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            margin-bottom: 20px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .header-title h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 600;
+            color: #323130;
+        }
+
+        .header-title p {
+            margin: 4px 0 0 0;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .actions-container {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-grow: 1;
+            justify-content: flex-end;
+        }
+        
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 350px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 8px 12px 8px 32px;
+            border: 1px solid var(--border-card);
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .search-box::before {
+            content: '🔍';
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .upload-btn-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .btn {
+            border: none;
+            color: white;
+            background-color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .upload-btn-wrapper input[type=file] {
+            font-size: 100px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Board layout */
+        #board {
+            display: flex;
+            overflow-x: auto;
+            overflow-y: hidden;
+            align-items: flex-start;
+            gap: 16px;
+            flex-grow: 1;
+            padding-bottom: 10px;
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c8c6c4; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a19f9d; 
+        }
+
+        .list {
+            background-color: transparent;
+            width: 340px;
+            min-width: 340px;
+            max-height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .list-header {
+            font-weight: 600;
+            padding: 12px 4px;
+            font-size: 15px;
+            color: #323130;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .list-count {
+            background: #edebe9;
+            color: var(--text-muted);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .list-cards {
+            overflow-y: auto;
+            padding: 4px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 6px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            transition: box-shadow 0.2s, border-color 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+            border-color: #c8c6c4;
+        }
+
+        /* Nome padronizado */
+        .card-header {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: #201f1e;
+            word-wrap: break-word;
+            line-height: 1.3;
+        }
+
+        .card-obs {
+            font-size: 12px;
+            color: var(--text-muted);
+            background: #f3f2f1;
+            padding: 6px 8px;
+            border-radius: 4px;
+            border-left: 3px solid #c8c6c4;
+            margin-top: 4px;
+        }
+
+        /* Etiquetas */
+        .labels-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .label {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            line-height: 1;
+        }
+        
+        /* Etiquetas locais (Custom) */
+        .local-label {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #323130;
+            background-color: #e1dfdd;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #c8c6c4;
+            line-height: 1;
+        }
+
+        .local-label .remove-lbl {
+            cursor: pointer;
+            font-size: 10px;
+            opacity: 0.5;
+        }
+        .local-label .remove-lbl:hover {
+            opacity: 1;
+            color: var(--danger);
+        }
+
+        /* Add local label */
+        .add-local-label {
+            display: flex;
+            gap: 4px;
+            margin-top: 2px;
+        }
+
+        .add-local-label input {
+            flex: 1;
+            padding: 6px 8px;
+            font-size: 11px;
+            border: 1px dashed var(--border-card);
+            border-radius: 4px;
+            background: transparent;
+            transition: all 0.2s;
+        }
+        .add-local-label input:focus {
+            border-style: solid;
+            border-color: var(--primary);
+            outline: none;
+            background: white;
+        }
+
+        /* Descrição Original */
+        .desc-box {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+
+        /* Sessão de Atualizações (Comentários) */
+        .updates-section {
+            border-top: 1px solid var(--border-light);
+            padding-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .updates-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .updates-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .update-item {
+            background: #f8f8f8;
+            border: 1px solid var(--border-light);
+            border-radius: 4px;
+            padding: 10px;
+            font-size: 12px;
+            position: relative;
+        }
+        .update-item-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+            font-size: 10px;
+            font-weight: 500;
+        }
+        .update-item-text {
+            color: #323130;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+        .update-delete {
+            cursor: pointer;
+            color: var(--danger);
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+        .update-delete:hover {
+            opacity: 1;
+        }
+
+        .add-update-box {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+        .add-update-box textarea {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid var(--border-card);
+            border-radius: 4px;
+            padding: 8px;
+            font-family: inherit;
+            font-size: 12px;
+            resize: vertical;
+            min-height: 50px;
+            transition: border-color 0.2s;
+        }
+        .add-update-box textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        .btn-small {
+            align-self: flex-end;
+            background: #edebe9;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            color: #323130;
+            transition: all 0.2s;
+        }
+        .btn-small:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            color: var(--text-muted);
+            text-align: center;
+        }
+        .empty-state h2 {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #323130;
+        }
+        .empty-state p {
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-title">
+            <h1>Gestão de Pacientes</h1>
+            <p>Importe dados do Trello, refine nomes e acompanhe o histórico</p>
+        </div>
+        <div class="actions-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar..." title="Buscar por nome, etiqueta ou observação..." oninput="filterCards()">
+            </div>
+            <div class="upload-btn-wrapper">
+                <button class="btn">
+                    Importar JSON
+                </button>
+                <input type="file" id="jsonInput" accept=".json" />
+            </div>
+        </div>
+    </header>
+
+    <div id="board">
+        <div class="empty-state">
+            <h2>Nenhum dado carregado</h2>
+            <p>Clique em <b>Importar JSON</b> para carregar o seu arquivo de exportação (ex: <i>dados_trello.json</i>).</p>
+        </div>
+    </div>
+
+    <script>
+        let trelloData = null;
+        let labelsMap = {};
+        let listsMap = {};
+
+        // Cores Trello convertidas
+        const trelloColors = {
+            green: '#61bd4f', green_dark: '#519839', green_light: '#b2d997',
+            yellow: '#f2d600', yellow_dark: '#d9b51c', yellow_light: '#f7eca5',
+            orange: '#ff9f1a', orange_dark: '#cd8313', orange_light: '#ffd69e',
+            red: '#eb5a46', red_dark: '#b04632', red_light: '#efb3ab',
+            purple: '#c377e0', purple_dark: '#89609e', purple_light: '#dfbfe8',
+            blue: '#0079bf', blue_dark: '#055a8c', blue_light: '#8bbdd9',
+            sky: '#00c2e0', sky_dark: '#0098b7', sky_light: '#8cdceb',
+            lime: '#51e898', lime_dark: '#4bbf6b', lime_light: '#aeeabf',
+            pink: '#ff78cb', pink_dark: '#c9558f', pink_light: '#ffbde5',
+            black: '#344563', black_dark: '#091e42', black_light: '#8993a4',
+            null: '#b3bac5'
+        };
+
+        // --- INDEXEDDB PARA CACHE DO ARQUIVO JSON ---
+        const DB_NAME = 'GestorTrelloDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'trelloCache';
+        let db;
+
+        function initDB() {
+            const request = indexedDB.open(DB_NAME, DB_VERSION);
+            
+            request.onupgradeneeded = function(e) {
+                db = e.target.result;
+                if (!db.objectStoreNames.contains(STORE_NAME)) {
+                    db.createObjectStore(STORE_NAME);
+                }
+            };
+
+            request.onsuccess = function(e) {
+                db = e.target.result;
+                // Só tenta carregar do IndexedDB se a rede não tiver carregado os dados ainda
+                if (!trelloData) {
+                    loadJsonFromDB();
+                }
+            };
+
+            request.onerror = function(e) {
+                console.error("Erro no IndexedDB:", e.target.error);
+            };
+        }
+
+        function saveJsonToDB(json) {
+            if (!db) return;
+            const transaction = db.transaction([STORE_NAME], 'readwrite');
+            const store = transaction.objectStore(STORE_NAME);
+            store.put(json, 'latestData');
+        }
+
+        function loadJsonFromDB() {
+            if (!db) return;
+            const transaction = db.transaction([STORE_NAME], 'readonly');
+            const store = transaction.objectStore(STORE_NAME);
+            const request = store.get('latestData');
+            
+            request.onsuccess = function(e) {
+                const json = e.target.result;
+                // Se já carregou via rede (GitHub pages), não sobrescreve com o cache antigo
+                if (json && !trelloData) {
+                    processTrelloJson(json, false);
+                }
+            };
+        }
+
+        // Inicializa o banco de dados e tenta buscar do GitHub Pages
+        window.addEventListener('load', async () => {
+            initDB(); // Inicia o DB (que chamará o fallback loadJsonFromDB se precisar)
+
+            try {
+                // Tenta buscar o arquivo do servidor (GitHub Pages)
+                // Usamos cache: no-store para garantir que ele pegue a versão mais nova do repositório
+                const response = await fetch('./dados.json', { cache: 'no-store' });
+                
+                if (response.ok) {
+                    const json = await response.json();
+                    processTrelloJson(json, true); // Salva no IndexedDB como backup
+                } else {
+                    console.warn("Arquivo dados.json não encontrado no servidor (Status: " + response.status + ").");
+                }
+            } catch (err) {
+                console.warn("Não foi possível realizar o fetch de dados.json. Rodando localmente ou sem internet.");
+            }
+        });
+
+
+        // --- EVENTO DE IMPORTAÇÃO DE ARQUIVO MANUAL ---
+        document.getElementById('jsonInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const json = JSON.parse(e.target.result);
+                    processTrelloJson(json, true); // true = salvar no banco
+                } catch (err) {
+                    alert('Erro ao ler o arquivo JSON: ' + err.message);
+                }
+            };
+            reader.readAsText(file);
+        });
+
+        function processTrelloJson(json, saveToDb = false) {
+            if (!json || !json.lists || !json.cards) {
+                alert('O arquivo JSON importado não possui o formato esperado.');
+                return;
+            }
+
+            if (saveToDb) {
+                saveJsonToDB(json);
+            }
+
+            trelloData = json;
+            labelsMap = {};
+            listsMap = {};
+
+            json.lists.forEach(list => {
+                if (!list.closed) {
+                    listsMap[list.id] = list.name;
+                }
+            });
+
+            if (json.labels) {
+                json.labels.forEach(label => {
+                    labelsMap[label.id] = {
+                        name: label.name,
+                        color: label.color || 'null'
+                    };
+                });
+            }
+
+            renderBoard();
+            filterCards();
+        }
+
+        // Função que separa o Nome principal de anotações soltas na string (ex: "Nome — indicação")
+        function parseCardName(rawName) {
+            const match = rawName.match(/^(.*?)(?:\s*(?:-|—|–)\s*|\s*\()(.*)$/);
+            
+            if (match) {
+                let name = match[1].trim();
+                let obs = match[2].trim();
+                if (obs.endsWith(')')) {
+                    obs = obs.substring(0, obs.length - 1).trim();
+                }
+                return { name, obs };
+            }
+            return { name: rawName.trim(), obs: "" };
+        }
+
+        // --- LOCAL STORAGE MÉTODOS ---
+
+        function getLocalLabels(cardId) {
+            const saved = localStorage.getItem(`trello_local_labels_${cardId}`);
+            return saved ? JSON.parse(saved) : [];
+        }
+        function saveLocalLabels(cardId, labelsArray) {
+            localStorage.setItem(`trello_local_labels_${cardId}`, JSON.stringify(labelsArray));
+        }
+
+        function getUpdates(cardId) {
+            const saved = localStorage.getItem(`trello_updates_${cardId}`);
+            return saved ? JSON.parse(saved) : [];
+        }
+        function saveUpdates(cardId, updatesArray) {
+            localStorage.setItem(`trello_updates_${cardId}`, JSON.stringify(updatesArray));
+        }
+
+        // Migrar a anotação antiga (única string) para o novo formato de histórico de comentários
+        function migrateOldAnnotations(cardId) {
+            const oldId = `trello_annotation_${cardId}`;
+            const oldText = localStorage.getItem(oldId);
+            if (oldText && oldText.trim() !== "") {
+                const updates = getUpdates(cardId);
+                // Adiciona como a atualização mais antiga
+                updates.unshift({
+                    date: new Date().toLocaleString('pt-BR') + ' (Anotação Antiga)',
+                    text: oldText.trim()
+                });
+                saveUpdates(cardId, updates);
+                localStorage.removeItem(oldId); // Limpa para não migrar de novo
+            }
+        }
+
+        // --- RENDERIZAÇÃO ---
+
+        function renderBoard() {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+
+            if (!trelloData) return;
+
+            const cardsByList = {};
+            
+            Object.keys(listsMap).forEach(listId => {
+                cardsByList[listId] = [];
+            });
+
+            trelloData.cards.forEach(card => {
+                if (!card.closed && listsMap[card.idList]) {
+                    cardsByList[card.idList].push(card);
+                }
+            });
+
+            trelloData.lists.forEach(list => {
+                if (list.closed) return;
+
+                const listCards = cardsByList[list.id];
+                if (!listCards || listCards.length === 0) return;
+
+                const listEl = document.createElement('div');
+                listEl.className = 'list';
+                
+                const listHeader = document.createElement('div');
+                listHeader.className = 'list-header';
+                listHeader.innerHTML = `<span>${list.name}</span> <span class="list-count">${listCards.length}</span>`;
+                listEl.appendChild(listHeader);
+
+                const listCardsContainer = document.createElement('div');
+                listCardsContainer.className = 'list-cards';
+
+                listCards.forEach(card => {
+                    const cardEl = createCardElement(card);
+                    listCardsContainer.appendChild(cardEl);
+                });
+
+                listEl.appendChild(listCardsContainer);
+                board.appendChild(listEl);
+            });
+        }
+
+        function createCardElement(card) {
+            migrateOldAnnotations(card.id);
+
+            const cardEl = document.createElement('div');
+            cardEl.className = 'card';
+            
+            const { name, obs } = parseCardName(card.name);
+            let searchData = name.toLowerCase() + " " + obs.toLowerCase();
+
+            // CABEÇALHO (Nome + Obs Padronizada)
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'card-header';
+            
+            const titleEl = document.createElement('div');
+            titleEl.className = 'card-title';
+            titleEl.textContent = name;
+            headerDiv.appendChild(titleEl);
+
+            if (obs) {
+                const obsEl = document.createElement('div');
+                obsEl.className = 'card-obs';
+                obsEl.textContent = "Nota no título: " + obs;
+                headerDiv.appendChild(obsEl);
+            }
+            cardEl.appendChild(headerDiv);
+
+            // ETIQUETAS
+            const labelsContainer = document.createElement('div');
+            labelsContainer.className = 'labels-container';
+            cardEl.appendChild(labelsContainer);
+
+            if (card.idLabels && card.idLabels.length > 0) {
+                card.idLabels.forEach(labelId => {
+                    const labelInfo = labelsMap[labelId];
+                    if (labelInfo) {
+                        const lbl = document.createElement('span');
+                        lbl.className = 'label';
+                        const labelNameText = labelInfo.name || '';
+                        lbl.textContent = labelNameText === '' ? 'SEM NOME' : labelNameText; 
+                        lbl.style.backgroundColor = trelloColors[labelInfo.color] || trelloColors['null'];
+                        labelsContainer.appendChild(lbl);
+                        searchData += " " + labelNameText.toLowerCase();
+                    }
+                });
+            }
+
+            // UI Etiquetas Locais
+            const renderLocalLabelsUI = () => {
+                const oldLocals = labelsContainer.querySelectorAll('.local-label');
+                oldLocals.forEach(el => el.remove());
+                
+                const labels = getLocalLabels(card.id);
+                let localSearchStr = "";
+
+                labels.forEach(lblText => {
+                    const lblEl = document.createElement('span');
+                    lblEl.className = 'local-label';
+                    lblEl.innerHTML = `${lblText} <span class="remove-lbl" title="Remover Etiqueta">&#10005;</span>`;
+                    
+                    lblEl.querySelector('.remove-lbl').onclick = () => {
+                        const newLabels = labels.filter(l => l !== lblText);
+                        saveLocalLabels(card.id, newLabels);
+                        renderLocalLabelsUI();
+                        filterCards();
+                    };
+
+                    labelsContainer.appendChild(lblEl);
+                    localSearchStr += lblText.toLowerCase() + " ";
+                });
+                
+                cardEl.setAttribute('data-search', searchData + " " + localSearchStr);
+            };
+            renderLocalLabelsUI();
+
+            const addLocalLabelDiv = document.createElement('div');
+            addLocalLabelDiv.className = 'add-local-label';
+            const addInput = document.createElement('input');
+            addInput.type = 'text';
+            addInput.placeholder = 'Nova etiqueta... (Pressione Enter)';
+            
+            addInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const newLabel = addInput.value.trim();
+                    if (newLabel) {
+                        const currentLabels = getLocalLabels(card.id);
+                        if (!currentLabels.includes(newLabel)) {
+                            currentLabels.push(newLabel);
+                            saveLocalLabels(card.id, currentLabels);
+                            renderLocalLabelsUI();
+                            addInput.value = '';
+                            filterCards();
+                        }
+                    }
+                }
+            });
+            addLocalLabelDiv.appendChild(addInput);
+            cardEl.appendChild(addLocalLabelDiv);
+
+            // DESCRIÇÃO (Se o card já veio com descrição do Trello)
+            if (card.desc && card.desc.trim() !== '') {
+                const descEl = document.createElement('div');
+                descEl.className = 'desc-box';
+                const limit = 200;
+                if (card.desc.length > limit) {
+                    descEl.textContent = card.desc.substring(0, limit) + '...';
+                    descEl.title = card.desc;
+                } else {
+                    descEl.textContent = card.desc;
+                }
+                cardEl.appendChild(descEl);
+            }
+
+            // SESSÃO DE HISTÓRICO DE ATUALIZAÇÕES
+            const updatesSection = document.createElement('div');
+            updatesSection.className = 'updates-section';
+            
+            const updatesTitle = document.createElement('div');
+            updatesTitle.className = 'updates-title';
+            updatesTitle.textContent = 'Histórico de Atualizações';
+            updatesSection.appendChild(updatesTitle);
+
+            const updatesList = document.createElement('div');
+            updatesList.className = 'updates-list';
+            updatesSection.appendChild(updatesList);
+
+            const renderUpdatesUI = () => {
+                updatesList.innerHTML = '';
+                const updates = getUpdates(card.id);
+                
+                // Mostrar do mais novo para o mais velho ou mais velho para mais novo?
+                // Mostrar em ordem original (push adiciona no final). Mais recentes embaixo.
+                updates.forEach((updateObj, index) => {
+                    const uItem = document.createElement('div');
+                    uItem.className = 'update-item';
+                    
+                    const uHeader = document.createElement('div');
+                    uHeader.className = 'update-item-header';
+                    uHeader.innerHTML = `<span>${updateObj.date}</span> <span class="update-delete" title="Apagar Registro">&#10005;</span>`;
+                    
+                    uHeader.querySelector('.update-delete').onclick = () => {
+                        if(confirm('Tem certeza que deseja apagar essa atualização do histórico?')) {
+                            updates.splice(index, 1);
+                            saveUpdates(card.id, updates);
+                            renderUpdatesUI();
+                        }
+                    };
+
+                    const uText = document.createElement('div');
+                    uText.className = 'update-item-text';
+                    uText.textContent = updateObj.text;
+
+                    uItem.appendChild(uHeader);
+                    uItem.appendChild(uText);
+                    updatesList.appendChild(uItem);
+                });
+                
+                // Rolar a lista para baixo automaticamente se tiver scroll
+                updatesList.scrollTop = updatesList.scrollHeight;
+            };
+
+            renderUpdatesUI();
+
+            const addUpdateBox = document.createElement('div');
+            addUpdateBox.className = 'add-update-box';
+            
+            const updateTextarea = document.createElement('textarea');
+            updateTextarea.placeholder = 'Escreva o que aconteceu de novo com essa pessoa...';
+            
+            const updateBtn = document.createElement('button');
+            updateBtn.className = 'btn-small';
+            updateBtn.textContent = 'Adicionar ao Histórico';
+
+            updateBtn.onclick = () => {
+                const text = updateTextarea.value.trim();
+                if (text) {
+                    const updates = getUpdates(card.id);
+                    // Formatar data bonitinha: DD/MM/AAAA às HH:MM
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('pt-BR') + ' às ' + now.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+                    
+                    updates.push({ date: dateStr, text: text });
+                    saveUpdates(card.id, updates);
+                    renderUpdatesUI();
+                    updateTextarea.value = '';
+                }
+            };
+
+            addUpdateBox.appendChild(updateTextarea);
+            addUpdateBox.appendChild(updateBtn);
+            updatesSection.appendChild(addUpdateBox);
+
+            cardEl.appendChild(updatesSection);
+
+            return cardEl;
+        }
+
+        function filterCards() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.card');
+            
+            cards.forEach(card => {
+                const searchStr = card.getAttribute('data-search') || '';
+                if (searchStr.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
