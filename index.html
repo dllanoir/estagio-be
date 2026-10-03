@@ -21,7 +21,7 @@ header input[type=search]{width:240px;max-width:100%;padding:8px 12px;border:1px
 .btn{padding:8px 14px;border:1px solid var(--ln);border-radius:8px;background:var(--pn)}
 .btn.p{background:var(--ac);border-color:var(--ac);color:#fff}
 .app{display:grid;grid-template-columns:210px 1fr;gap:20px;padding:20px;max-width:1600px;margin:0 auto}
-nav{display:flex;flex-direction:column;gap:2px;align-self:start;position:sticky;top:calc(var(--hh,64px) + 12px)}
+nav{display:flex;flex-direction:column;gap:2px;align-self:start;position:sticky;top:calc(var(--hh,64px) + 12px);max-height:calc(100vh - var(--hh,64px) - 24px);max-height:calc(100dvh - var(--hh,64px) - 24px);overflow-y:auto;overscroll-behavior:contain;padding:6px;background:var(--pn);border:1px solid var(--ln);border-radius:10px}nav [data-a=nm]{color:var(--ac);font-weight:600;border-bottom:1px solid var(--ln);border-radius:0 0 8px 8px;margin-bottom:4px}
 nav button{display:flex;justify-content:space-between;gap:8px;padding:7px 10px;border:0;border-radius:8px;background:none;text-align:left}
 nav button.on{background:var(--ac);color:#fff}
 nav small{opacity:.7}
@@ -49,19 +49,28 @@ button.lab.off{opacity:.3}
 #dr label{display:block;font-size:14px;color:var(--mut);margin-bottom:10px}
 #dr select,#dr input,#dr textarea{display:block;width:100%;margin-top:3px;padding:7px 9px;border:1px solid var(--ln);border-radius:8px;color:var(--ink);background:var(--pn)}
 .g{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
-.g label:last-child{grid-column:1/-1}
 .q{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .q button{padding:3px 10px;border:1px dashed var(--mut);border-radius:99px;background:none;font-size:13px}
 .add{display:flex;gap:6px}.add input{flex:1}
 .hist{list-style:none;padding:0;margin:12px 0}
-.hist li{padding:8px 0;border-top:1px solid var(--ln);font-size:15px}
+.hist li{position:relative;padding:8px 28px 8px 0;border-top:1px solid var(--ln);font-size:15px}
 .hist time{display:block;color:var(--mut);font-size:12px}
+.mg{display:inline-flex;align-items:center;gap:6px;margin:2px 6px 2px 0;padding:2px 3px 2px 8px;font-size:13px}.mg small{opacity:.8}
+.tx{display:grid;place-items:center;width:22px;height:22px;padding:0;border:0;border-radius:50%;background:rgba(0,0,0,.3);color:#fff}.tx:hover,.tx:focus-visible{background:#c53030}
+#dg{border:0;border-radius:12px;padding:20px;width:min(420px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.25)}#dg::backdrop{background:rgba(20,30,40,.45)}#dg p{margin:0 0 12px}
+#dg input{width:100%;margin-bottom:12px;padding:8px 10px;border:1px solid var(--ln);border-radius:8px}.dgb{display:flex;flex-direction:row-reverse;gap:8px}.btn.dng{background:#c53030;border-color:#c53030;color:#fff}
+#bn{margin-bottom:12px;padding:10px 12px;border:1px solid #e0b252;border-radius:8px;background:#fff7e0;font-size:14px}#bn[hidden]{display:none}#bn .btn{margin-left:8px;padding:4px 10px}
+#lf select{padding:5px 8px;border:1px solid var(--ln);border-radius:8px;background:var(--pn);font-size:14px}
+.x{position:absolute;right:0;top:6px;border:0;background:none;color:var(--mut);font-size:16px}.cap{font-size:14px;color:var(--mut);margin:12px 0 2px}
+.tb{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}.tb button{min-width:34px;padding:3px 8px;border:1px solid var(--ln);border-radius:6px;background:var(--pn)}
+.ed{min-height:90px;padding:8px 10px;border:1px solid var(--ln);border-radius:8px}.ed ul,.ed ol{margin:4px 0;padding-left:22px}
+.row b,.dh input{text-transform:uppercase}#lg{margin-bottom:12px;padding:10px;background:var(--pn);border:1px solid var(--ln);border-radius:8px;max-height:50vh;overflow:auto}#lg[hidden]{display:none}#lgc{display:flex;flex-wrap:wrap;gap:4px}.lgt{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px}.lgt input{flex:1 1 160px;padding:6px 10px;border:1px solid var(--ln);border-radius:8px}.lgt .btn:disabled{opacity:.4;cursor:default}.mg.sel{outline:3px solid var(--ink);outline-offset:1px}.lr{display:flex;align-items:center;gap:8px}.lr small{color:var(--mut);margin-right:auto}.lr2{display:inline-flex;align-items:center;margin:2px 8px 2px 0}.tr{border:0;background:none;font-size:16px;padding:2px 4px}
 .empty{padding:40px;text-align:center;color:var(--mut)}
 #tt{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);padding:10px 16px;border-radius:8px;background:var(--ink);color:#fff}
 #tt:empty{display:none}
-@media(max-width:900px){.app{grid-template-columns:1fr;gap:10px;padding:12px}nav{flex-direction:row;overflow-x:auto;position:sticky;top:var(--hh,60px);z-index:4;margin:0 -12px;padding:6px 12px;background:var(--bg)}nav button{white-space:nowrap;flex:none;gap:6px}}
+@media(max-width:900px){.app{grid-template-columns:1fr;gap:10px;padding:12px}nav{flex-direction:row;max-height:none;border:0;border-radius:0;overflow-x:auto;overflow-y:hidden;position:sticky;top:var(--hh,60px);z-index:4;margin:0 -12px;padding:6px 12px;background:var(--bg)}nav button{white-space:nowrap;flex:none;gap:6px}}
 @media(max-width:600px){header{padding:10px max(12px,env(safe-area-inset-right)) 10px max(12px,env(safe-area-inset-left));gap:8px}header h1{font-size:17px}header input[type=search]{order:5;flex:1 1 100%;width:100%}.row{grid-template-columns:1fr}.row .st{text-align:left}#chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}.chip{flex:none;white-space:nowrap}#dr{width:100%;border-left:0}body.lock{overflow:hidden}.sp{margin-left:0;width:100%}.mp{right:auto;left:-140px}}
-@media(pointer:coarse){.btn,.chip,nav button,.q button,button.lab,.seg button{min-height:40px}}
+@media(pointer:coarse){.btn,.chip,nav button,.q button,button.lab,.seg button,.tb button{min-height:40px}}
 @media(prefers-reduced-motion:no-preference){#dr{animation:in .18s ease-out}@keyframes in{from{transform:translateX(40px);opacity:0}}}
 </style>
 </head>
@@ -73,8 +82,9 @@ button.lab.off{opacity:.3}
   <details class="mn"><summary class="btn">Dados ▾</summary><div class="mp"><button class="btn" data-a="imp">Importar Trello ou backup</button><button class="btn" data-a="exp">Baixar backup completo (JSON)</button></div></details>
   <input type="file" id="fi" accept=".json,application/json" hidden>
 </header>
-<div class="app"><nav id="rail" aria-label="Mês"></nav><main><div id="lf"></div><div id="lp" hidden></div><div class="chips" id="chips"></div><div id="list"></div></main></div>
+<div class="app"><nav id="rail" aria-label="Mês"></nav><main><div id="bn" hidden></div><div id="lf"></div><div id="lp" hidden></div><div id="lg" hidden><div class="lgt"><input id="lgq" type="search" placeholder="Filtrar labels pelo nome"><button class="chip" data-a="lsu">Selecionar sem uso</button><button class="chip" data-a="lsa">Selecionar todas</button><button class="chip" data-a="lsx">Limpar seleção</button><button class="btn dng" id="lgd" data-a="lsd" disabled>Excluir selecionadas</button></div><div id="lgc"></div></div><div class="chips" id="chips"></div><div id="list"></div></main></div>
 <aside id="dr" hidden aria-label="Detalhes do contato"></aside>
+<dialog id="dg"><p id="dgm"></p><input id="dgi" hidden><div class="dgb"><button class="btn p" id="dgo" data-d="ok">OK</button><button class="btn" data-d="no">Cancelar</button></div></dialog>
 <div id="tt" role="status" aria-live="polite"></div>
 <script>
 const S=[['triagem','Novo contato','#7b8794'],['docs','Cobrar documentos','#b7791f'],['guia','Guia a emitir/pagar','#2b6cb0'],['entrada','Dar entrada','#6b46c1'],['inss','Em análise','#0f766e'],['deferido','Deferido, a receber','#2f855a'],['fim','Finalizada','#4a5568'],['indef','Indeferido','#c53030']];
@@ -88,24 +98,40 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const norm=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
 const now=()=>new Date().toISOString();
+const up=s=>String(s??'').toLocaleUpperCase('pt-BR'),toHtml=t=>esc(t).replace(/\r?\n/g,'<br>'),plain=h=>String(h||'').replace(/<[^>]+>/g,' ');
+const okd=v=>!v||/^20\d\d-/.test(v);
+const fx=s=>s?s.split('-').reverse().join('/'):'';
+const txt=h=>{const d=document.createElement('div');d.innerHTML=String(h||'').replace(/<li>/gi,'• ').replace(/<\/(li|p|div)>|<br\s*\/?>/gi,'\n');return d.textContent.trim()};
+function clean(h){const t=document.createElement('template');t.innerHTML=h;const ok=/^(B|STRONG|I|EM|U|S|STRIKE|UL|OL|LI|BR|DIV|P)$/;
+ (function w(n){[...n.childNodes].forEach(k=>{if(k.nodeType===1){w(k);if(!ok.test(k.tagName))k.replaceWith(...k.childNodes);else[...k.attributes].forEach(a=>k.removeAttribute(a.name))}else if(k.nodeType!==3)k.remove()})})(t.content);return t.innerHTML}
+const hs=c=>c.hist.map((h,i)=>({h,i})).sort((a,b)=>(b.h.d?Date.parse(b.h.d):-1)-(a.h.d?Date.parse(a.h.d):-1)||a.i-b.i);
 const mlabel=k=>k?ML[+k.slice(5)-1]+' de '+k.slice(0,4):'Sem data';
 const mkey=t=>{const m=norm(t).match(/(janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro).*?(\d{4})/);return m?m[2]+'-'+String(MN.indexOf(m[1])+1).padStart(2,'0'):''};
 let db;try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
-db=db||{cards:{},labels:{}};
-let st={mes:'*',et:'ativos',q:'',lb:[],mode:'e',lopen:false,open:null};
+db=db||{cards:{},labels:{}};db.meses=db.meses||[];db.gone=db.gone||[];db.del=db.del||[];
+let st={mes:'*',et:'ativos',q:'',lb:[],mode:'e',lopen:false,sort:'etapa',ls:[],lq:'',lm:false,lg:false,open:null};
 let cur=[];
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast('Não foi possível salvar: '+e.message)}}
 let tm;function toast(m){$('#tt').textContent=m;clearTimeout(tm);tm=setTimeout(()=>$('#tt').textContent='',5000)}
 function ls(n){const [b,v]=(db.labels[n]||'black').split('_');const lt=v==='light',dk=v==='dark',h=HEX[b]||HEX.black;
  return `background:color-mix(in srgb,${h} ${dk?'65%,#000':lt?'55%,#fff':'100%,#000'});color:${lt||['yellow','lime','sky'].includes(b)?'#1b2a38':'#fff'}`}
+const TRASH='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v5M14 11v5"/></svg>';
+const tchip=(l,n,sel)=>`<span class="lab mg${sel?' sel':''}" ${sel===undefined?'':`role="checkbox" aria-checked="${sel}" tabindex="0" data-a="lsel" data-l="${esc(l)}"`} style="${ls(l)}">${sel?'✓ ':''}${esc(l)}${n==null?'':' <small>'+n+'</small>'}<button class="tx" data-a="dl" data-l="${esc(l)}" aria-label="Excluir label ${esc(l)}" title="Excluir label">${TRASH}</button></span>`;
+let _a=null;
+function ask(msg,o={}){return new Promise(res=>{const d=$('#dg'),i=$('#dgi'),b=$('#dgo');$('#dgm').textContent=msg;i.hidden=!o.input;i.value='';i.placeholder=o.ph||'';
+ b.textContent=o.ok||'OK';b.className='btn '+(o.danger?'dng':'p');
+ _a=ok=>{_a=null;try{d.close()}catch(e){}d.removeAttribute('open');res(ok?(o.input?i.value.trim():true):null)};
+ try{d.showModal()}catch(e){d.setAttribute('open','')}if(o.input)i.focus()})}
+const lt=c=>Math.max(0,...c.hist.map(h=>h.d?Date.parse(h.d):0)),si=c=>S.findIndex(s=>s[0]===c.etapa),nm=(a,b)=>a.nome.localeCompare(b.nome,'pt'),dk=v=>v||'9999';
+const SORT={etapa:(a,b)=>si(a)-si(b)||nm(a,b),nome:nm,parto:(a,b)=>dk(a.parto).localeCompare(dk(b.parto))||nm(a,b),ativ:(a,b)=>lt(b)-lt(a)||nm(a,b)};
 const labs=a=>a.map(l=>`<span class="lab" style="${ls(l)}">${esc(l)}</span>`).join('');
-const fd=iso=>iso?new Date(iso).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'Pré-carga do Trello';
-const fs=s=>s?s.split('-').reverse().slice(0,2).join('/'):'';
+const fd=(iso,o)=>iso?new Date(iso).toLocaleString('pt-BR',o?{day:'2-digit',month:'2-digit',year:'2-digit'}:{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'Pré-carga do Trello';
+const fs=s=>s?s.split('-').reverse().map((x,i)=>i==2?x.slice(2):x).join('/'):'';
 
 // ---------- Importação do Trello ----------
 function parseName(raw){
  const m=raw.match(/^(.*?)\s*(?:[-—–]\s+|\s[-—–]\s*|\()(.*)$/);
- const nome=(m?m[1]:raw).trim(),extra=m?m[2].replace(/\)\s*$/,'').trim():'';
+ const nome=up((m?m[1]:raw).trim()),extra=m?m[2].replace(/\)\s*$/,'').trim():'';
  const sq=extra.match(/saque dia (\d{1,2})\/(\d{1,2})/i);let saque='';
  if(sq){const t=Date.now();saque=[-1,0,1].map(o=>new Date(new Date().getFullYear()+o,+sq[2]-1,+sq[1])).sort((a,b)=>Math.abs(a-t)-Math.abs(b-t))[0].toLocaleDateString('sv')}
  return{nome,extra,saque}}
@@ -113,11 +139,11 @@ function stage(lab,ln){const h=x=>lab.some(l=>norm(l).includes(x)),n=norm(ln);
  return h('finalizada')?'fim':h('indeferi')&&!h('deferido')?'indef':h('deferido')?'deferido':h('entrada ok')?'inss':h('guia paga')?'entrada':h('guia emitida')||h('guia agendada')?'guia':n.includes('aguardando deferimento')?'inss':n.startsWith('indeferidos')?'indef':n.startsWith('deferidos')?'deferido':n.includes('dar entrada')?'entrada':'triagem'}
 function importTrello(j){
  const L={};j.lists.forEach(l=>L[l.id]=l.name);
- (j.labels||[]).forEach(l=>{if(l.name)db.labels[l.name]=l.color});
+ (j.labels||[]).forEach(l=>{if(l.name&&!db.gone.includes(l.name))db.labels[l.name]=l.color});
  let n=0,u=0;
  for(const c of j.cards){
-  const ln=L[c.idList]||'';if(/introdu/i.test(ln))continue;
-  const lab=(c.labels||[]).map(l=>l.name).filter(Boolean),ex=db.cards[c.id];
+  const ln=L[c.idList]||'';if(/introdu/i.test(ln)||db.del.includes(c.id))continue;
+  const lab=(c.labels||[]).map(l=>l.name).filter(x=>x&&!db.gone.includes(x)),ex=db.cards[c.id];
   if(ex){let ch=0;const nl=lab.filter(x=>!ex.tl.includes(x));
    if(nl.length){ex.labels=[...new Set([...ex.labels,...nl])];ch=1}ex.tl=lab;
    if(c.desc&&c.desc!==ex.td){ex.td=c.desc;ex.hist.unshift({d:now(),t:'Anotação atualizada no Trello: '+c.desc});ch=1}
@@ -125,30 +151,30 @@ function importTrello(j){
   const p=parseName(c.name),mes=mkey(ln),hist=[];
   if(p.extra)hist.push({d:null,t:p.extra});
   if(!mes&&ln)hist.push({d:null,t:'Lista no Trello: '+ln});
-  db.cards[c.id]={id:c.id,nome:p.nome,mes,etapa:stage(lab,ln),labels:lab,tl:lab,obs:c.desc||'',td:c.desc||'',saque:p.saque,hist,arq:!!c.closed};n++}
+  db.cards[c.id]={id:c.id,nome:p.nome,mes,etapa:stage(lab,ln),labels:lab,tl:lab,obs:toHtml(c.desc||''),rich:1,td:c.desc||'',saque:p.saque,parto:'',hist,arq:!!c.closed};n++}
  save();toast(`Importação concluída: ${n} novos, ${u} atualizados.`)}
-function load(file){const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);
+function load(file){const r=new FileReader();r.onload=async()=>{try{const j=JSON.parse(r.result);
   if(Array.isArray(j.cards)&&j.lists)importTrello(j);
-  else if(j.app==='sm'&&confirm('Restaurar backup? Isso substitui os dados atuais deste navegador.')){db={cards:j.cards,labels:j.labels};save();toast('Backup restaurado.')}
-  else if(j.app!=='sm')toast('Arquivo não reconhecido.');
+  else if(j.app==='sm'){if(await ask('Restaurar backup? Isso substitui os dados atuais deste navegador.',{ok:'Restaurar',danger:true})){db={cards:j.cards,labels:j.labels,meses:j.meses||[],gone:j.gone||[],del:j.del||[],bk:j.bk};save();toast('Backup restaurado.')}}
+  else toast('Arquivo não reconhecido.');
   render()}catch(e){toast('Erro ao ler o arquivo: '+e.message)}};r.readAsText(file)}
 
 // ---------- Tela ----------
 const all=()=>Object.values(db.cards);
-const hit=c=>!st.q||norm([c.nome,c.obs,...c.hist.map(h=>h.t)].join(' ')).includes(norm(st.q));
+const hit=c=>!st.q||norm([c.nome,plain(c.obs),...c.hist.map(h=>h.t)].join(' ')).includes(norm(st.q));
 const inMes=c=>st.mes==='*'||c.mes===st.mes;
 function render(){
  const cs=all(),act=c=>!c.arq&&c.etapa!=='fim';
- const ks=[...new Set(cs.map(c=>c.mes))].sort((a,b)=>!a?1:!b?-1:a<b?-1:1);
- $('#rail').innerHTML=`<button data-m="*" class="${st.mes==='*'?'on':''}">Todos os meses<small>${cs.filter(act).length}</small></button>`+
+ const ks=[...new Set([...cs.map(c=>c.mes),...db.meses])].sort((a,b)=>!a?1:!b?-1:a<b?-1:1);
+ $('#rail').innerHTML=`<button data-m="*" class="${st.mes==='*'?'on':''}">Todos os meses<small>${cs.filter(act).length}</small></button><button data-a="nm">+ Novo mês</button>`+
   ks.map(k=>`<button data-m="${k}" class="${st.mes===k?'on':''}">${mlabel(k)}<small>${cs.filter(c=>c.mes===k&&act(c)).length}</small></button>`).join('');
  const has=c=>!st.lb.length||(st.mode==='e'?st.lb.every(l=>c.labels.includes(l)):st.lb.some(l=>c.labels.includes(l)));
  const pre=cs.filter(c=>inMes(c)&&hit(c)),base=pre.filter(has),cnt=f=>base.filter(f).length;
- const ch=[['ativos','Em andamento',cnt(act)],...S.map(s=>[s[0],s[1],cnt(c=>c.etapa===s[0]&&!c.arq)]),['arq','Arquivados',cnt(c=>c.arq)]];
+ const ch=[['ativos','Em andamento',cnt(act)],['todos','Todos',cnt(c=>!c.arq)],...S.map(s=>[s[0],s[1],cnt(c=>c.etapa===s[0]&&!c.arq)]),['arq','Arquivados',cnt(c=>c.arq)]];
  $('#chips').innerHTML=ch.map(x=>`<button class="chip ${st.et===x[0]?'on':''}" data-e="${x[0]}">${x[1]} · ${x[2]}</button>`).join('');
- const ef=c=>st.et==='ativos'?act(c):st.et==='arq'?c.arq:c.etapa===st.et&&!c.arq;
+ const ef=c=>st.et==='ativos'?act(c):st.et==='todos'?!c.arq:st.et==='arq'?c.arq:c.etapa===st.et&&!c.arq;
  const rows=base.filter(ef)
-  .sort((a,b)=>S.findIndex(s=>s[0]===a.etapa)-S.findIndex(s=>s[0]===b.etapa)||a.nome.localeCompare(b.nome,'pt'));
+  .sort(SORT[st.sort]||SORT.etapa);
  cur=rows;
  const lc={},E=st.mode==='e';(E?rows:pre.filter(ef)).forEach(c=>c.labels.forEach(l=>lc[l]=(lc[l]||0)+1));
  const lo=Object.keys(db.labels).filter(l=>lc[l]||st.lb.includes(l)).sort((a,b)=>(lc[b]||0)-(lc[a]||0)),lb=l=>`data-a="lbt" data-l="${esc(l)}" style="${ls(l)}"`;
@@ -156,12 +182,19 @@ function render(){
   +(st.lb.length>1?`<span class="seg" role="group" aria-label="Combinação de labels"><button class="${st.mode==='e'?'on':''}" data-a="lbm" data-v="e">Todas</button><button class="${st.mode==='o'?'on':''}" data-a="lbm" data-v="o">Qualquer uma</button></span>`:'')
   +st.lb.map(l=>`<button class="lab" ${lb(l)}>${esc(l)} ✕</button>`).join('')
   +(st.lb.length?'<button class="chip" data-a="lbx">Limpar labels</button>':'')
-  +`<button class="btn sp" data-a="csv">Exportar ${rows.length} (CSV)</button>`;
+  +`<select id="so" aria-label="Ordenar">${[['etapa','Ordenar: etapa'],['nome','Nome (A–Z)'],['parto','Data do parto'],['ativ','Atividade recente']].map(o=>`<option value="${o[0]}" ${st.sort===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select><button class="chip ${st.lg?'on':''}" data-a="lg">Gerenciar labels</button><button class="btn sp" data-a="csv">Exportar ${rows.length} (CSV)</button>`;
+ $('#lg').hidden=!st.lg;
+ const ua={};cs.forEach(c=>c.labels.forEach(l=>ua[l]=(ua[l]||0)+1));const lq=norm(st.lq);st.ls=st.ls.filter(l=>db.labels[l]);
+ const vl=Object.keys(db.labels).filter(l=>norm(l).includes(lq)).sort((a,b)=>a.localeCompare(b,'pt'));
+ $('#lgc').innerHTML='<small class="sp0">Clique nas labels para selecionar várias e exclua de uma vez; a lixeira dentro da label exclui só aquela. O número é quantos contatos a usam.</small>'+(vl.map(l=>tchip(l,ua[l]||0,st.ls.includes(l))).join('')||'Nenhuma label encontrada.');
+ $('#lgd').textContent=st.ls.length?`Excluir ${st.ls.length} selecionada${st.ls.length>1?'s':''}`:'Excluir selecionadas';$('#lgd').disabled=!st.ls.length;
+ window._vl=vl;window._ua=ua;
+ const dd=db.bk?(Date.now()-Date.parse(db.bk))/864e5:Infinity;$('#bn').hidden=!(cs.length&&dd>7);$('#bn').innerHTML=`Seus dados ficam só neste navegador. ${db.bk?'Último backup há '+Math.floor(dd)+' dias.':'Você ainda não fez backup.'}<button class="btn" data-a="exp">Baixar backup agora</button>`;
  $('#lp').hidden=!st.lopen;$('#lp').innerHTML=`<small class="sp0">${E&&st.lb.length?'Só aparecem as labels que ocorrem junto com as selecionadas; o número é quantos contatos ficam ao adicioná-la.':'O número é quantos contatos têm a label nos filtros atuais.'}</small>`+lo.map(l=>`<button class="lab ${st.lb.includes(l)?'':'off'}" ${lb(l)}>${esc(l)} (${lc[l]||0})</button>`).join('')||'Nenhuma label nos contatos filtrados.';
  $('#list').innerHTML=!cs.length?'<div class="empty"><h2>Nenhum contato ainda</h2><p>Use “Importar Trello / backup” para carregar o JSON exportado do Trello, ou crie um novo contato.</p></div>'
-  :rows.map(c=>{const s=SN[c.etapa]||S[0],last=c.hist[0];
-   return `<button class="row" style="--sc:${s[2]}" data-id="${c.id}"><span><b>${esc(c.nome)}</b> ${labs(c.labels)}</span><span class="st">${s[1]}${c.saque?' · pgto '+fs(c.saque):''}</span>${last?`<span class="nt">${esc(last.t)}</span>`:''}</button>`}).join('')||'<div class="empty">Nada por aqui com esses filtros.</div>'}
-function mopts(cur){const ks=new Set(['',cur]);all().forEach(c=>ks.add(c.mes));
+  :rows.map(c=>{const s=SN[c.etapa]||S[0],last=(hs(c)[0]||{}).h;
+   return `<button class="row" style="--sc:${s[2]}" data-id="${c.id}"><span><b>${esc(c.nome)}</b> ${labs(c.labels)}</span><span class="st">${s[1]}${c.parto?' · parto '+fs(c.parto):''}${c.saque?' · pgto '+fs(c.saque):''}</span>${last?`<span class="nt">${esc(last.t)}</span>`:''}</button>`}).join('')||'<div class="empty">Nada por aqui com esses filtros.</div>'}
+function mopts(cur){const ks=new Set(['',cur]);all().forEach(c=>ks.add(c.mes));db.meses.forEach(m=>ks.add(m));
  for(let y=2026;y<=2027;y++)for(let m=1;m<=12;m++)ks.add(y+'-'+String(m).padStart(2,'0'));
  return[...ks].sort((a,b)=>!a?1:!b?-1:a<b?-1:1).map(k=>`<option value="${k}" ${k===cur?'selected':''}>${mlabel(k)}</option>`).join('')}
 function drawer(id){
@@ -169,22 +202,28 @@ function drawer(id){
  d.innerHTML=`<div class="dh"><input id="f-nome" value="${esc(c.nome)}" aria-label="Nome"><button data-a="close" aria-label="Fechar">✕</button></div>
  <div class="g"><label>Mês<select id="f-mes">${mopts(c.mes)}</select></label>
  <label>Etapa<select id="f-et">${S.map(s=>`<option value="${s[0]}" ${s[0]===c.etapa?'selected':''}>${s[1]}</option>`).join('')}</select></label>
+ <label>Data do parto<input type="date" id="f-parto" value="${c.parto||''}"></label>
  <label>Data de pagamento<input type="date" id="f-saque" value="${c.saque||''}"></label></div>
- <div>${Object.keys(db.labels).map(l=>`<button class="lab ${c.labels.includes(l)?'':'off'}" data-a="lab" data-l="${esc(l)}" style="${ls(l)}">${esc(l)}</button>`).join('')}</div>
+ ${(()=>{const ix=si(c),n=ix>=0&&ix<6?S[ix+1]:null;return n?`<button class="chip" data-a="adv" style="margin-bottom:10px">Avançar para “${n[1]}” →</button>`:''})()}
+ <div>${Object.keys(db.labels).map(l=>st.lm?tchip(l):`<button class="lab ${c.labels.includes(l)?'':'off'}" data-a="lab" data-l="${esc(l)}" style="${ls(l)}">${esc(l)}</button>`).join('')}</div>
+ <button class="chip" data-a="lm">${st.lm?'Concluir':'Gerenciar labels'}</button>
  <div class="add" style="margin:8px 0 0"><input id="f-nl" placeholder="Nova label"><select id="f-nc" style="width:auto">${[['green','Verde'],['yellow','Amarelo'],['orange','Laranja'],['red','Vermelho'],['purple','Roxo'],['blue','Azul'],['sky','Azul-claro'],['lime','Lima'],['pink','Rosa'],['black','Preto']].map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</select><button class="btn" data-a="nl">Criar</button></div>
- <label style="margin-top:12px">Anotações<textarea id="f-obs" rows="3">${esc(c.obs)}</textarea></label>
+ <div class="cap">Anotações</div>
+ <div class="tb" role="toolbar" aria-label="Formatação">${[['bold','<b>N</b>'],['italic','<i>I</i>'],['underline','<u>S</u>'],['strikeThrough','<s>T</s>'],['insertUnorderedList','• Lista'],['insertOrderedList','1. Lista'],['removeFormat','Limpar']].map(o=>`<button data-x="${o[0]}" title="${o[0]}">${o[1]}</button>`).join('')}</div>
+ <div id="f-obs" class="ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Anotações">${c.obs}</div>
  <h3>Histórico</h3><div class="q">${QK.map(q=>`<button data-a="q" data-t="${esc(q)}">${esc(q.replace(/: $/,''))}</button>`).join('')}</div>
  <div class="add"><input id="f-h" placeholder="O que aconteceu?"><button class="btn p" data-a="addh">Registrar</button></div>
- <ul class="hist">${c.hist.map(h=>`<li><time>${fd(h.d)}</time>${esc(h.t)}</li>`).join('')}</ul>
- <button class="btn" data-a="arq">${c.arq?'Restaurar contato':'Arquivar contato'}</button>`}
+ <label style="margin-top:8px">Data do registro (opcional; sem data usa agora)<input type="date" id="f-hd"></label>
+ <ul class="hist">${hs(c).map(({h,i})=>`<li><time>${fd(h.d,h.o)}</time>${esc(h.t)}<button class="x" data-a="dh" data-i="${i}" aria-label="Apagar registro">✕</button></li>`).join('')}</ul>
+ <button class="btn" data-a="arq">${c.arq?'Restaurar contato':'Arquivar contato'}</button> <button class="btn" data-a="dc" style="color:#c53030">Excluir contato</button>`}
 const log=(c,t)=>c.hist.unshift({d:now(),t});
 function newCard(){const id='m'+Date.now().toString(36);
- db.cards[id]={id,nome:'Novo contato',mes:/^\d/.test(st.mes)?st.mes:'',etapa:'triagem',labels:[],tl:[],obs:'',td:'',saque:'',hist:[{d:now(),t:'Contato criado'}],arq:false};
+ db.cards[id]={id,nome:'NOVO CONTATO',parto:'',rich:1,mes:/^\d/.test(st.mes)?st.mes:'',etapa:'triagem',labels:[],tl:[],obs:'',td:'',saque:'',hist:[{d:now(),t:'Contato criado'}],arq:false};
  save();render();drawer(id);$('#f-nome').select()}
 
 document.addEventListener('click',e=>{
  const mn=$('.mn');if(mn.open&&!e.target.closest('summary'))mn.open=false;
- const t=e.target.closest('[data-a],[data-m],[data-e],[data-id]');if(!t)return;const D=t.dataset,c=db.cards[st.open];
+ const t=e.target.closest('[data-a],[data-m],[data-e],[data-id],[data-x]');if(!t)return;const D=t.dataset,c=db.cards[st.open];
  if(D.m!==undefined){st.mes=D.m;render()}
  else if(D.e){st.et=D.e;render()}
  else if(D.id)drawer(D.id);
@@ -195,8 +234,21 @@ document.addEventListener('click',e=>{
  else if(D.a==='lbm'){st.mode=D.v;render()}
  else if(D.a==='lbx'){st.lb=[];render()}
  else if(D.a==='csv')exportCsv();
+ else if(D.x){document.execCommand(D.x);saveObs()}
+ else if(D.a==='nm')addMes();
+ else if(D.a==='lm'){st.lm=!st.lm;drawer(st.open)}
+ else if(D.a==='dl')delLabels([D.l]);
+ else if(D.a==='lsel'){const i=st.ls.indexOf(D.l);i<0?st.ls.push(D.l):st.ls.splice(i,1);render()}
+ else if(D.a==='lsu'){st.ls=_vl.filter(l=>!_ua[l]);render();if(!st.ls.length)toast('Nenhuma label sem uso nesta lista.')}
+ else if(D.a==='lsa'){st.ls=[..._vl];render()}
+ else if(D.a==='lsx'){st.ls=[];render()}
+ else if(D.a==='lsd'&&st.ls.length)delLabels([...st.ls]);
+ else if(c&&D.a==='dc')delCard(c);
+ else if(D.a==='lg'){st.lg=!st.lg;render()}
+ else if(c&&D.a==='dh')delHist(c,+D.i);
+ else if(c&&D.a==='adv'&&si(c)>=0&&si(c)<6){const n=S[si(c)+1];log(c,`Etapa: ${SN[c.etapa][1]} → ${n[1]}`);c.etapa=n[0];save();drawer(c.id);render()}
  else if(D.a==='close'){drawer(null);}
- else if(D.a==='exp')dl(JSON.stringify({app:'sm',v:1,...db}),'application/json','cantinho-backup-'+now().slice(0,10)+'.json');
+ else if(D.a==='exp'){db.bk=now();save();dl(JSON.stringify({app:'sm',v:1,...db}),'application/json','cantinho-backup-'+now().slice(0,10)+'.json');render()}
  else if(c&&D.a==='lab'){const i=c.labels.indexOf(D.l);i<0?c.labels.push(D.l):c.labels.splice(i,1);save();drawer(c.id);render()}
  else if(c&&D.a==='q'){const i=$('#f-h');i.value=D.t;i.focus();if(!D.t.endsWith(': '))addh()}
  else if(c&&D.a==='addh')addh();
@@ -205,26 +257,48 @@ document.addEventListener('click',e=>{
 function dl(txt,type,name){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type}));a.download=name;a.click()}
 function exportCsv(){
  const q=v=>{v=String(v??'');if(/^[=+@]/.test(v))v="'"+v;return'"'+v.replace(/"/g,'""')+'"'};
- const H=['Nome','Mês','Etapa','Labels','Data de pagamento','Anotações','Último registro','Histórico completo'];
- const L=cur.map(c=>[c.nome,mlabel(c.mes),(SN[c.etapa]||S[0])[1],c.labels.join(' | '),c.saque?c.saque.split('-').reverse().join('/'):'',c.obs,c.hist[0]?c.hist[0].t:'',c.hist.map(h=>(h.d?new Date(h.d).toLocaleString('pt-BR'):'Pré-carga')+': '+h.t).join('\n')]);
+ const H=['Nome','Mês','Etapa','Labels','Data do parto','Data de pagamento','Anotações','Último registro','Histórico completo'];
+ const L=cur.map(c=>[c.nome,mlabel(c.mes),(SN[c.etapa]||S[0])[1],c.labels.join(' | '),fx(c.parto),fx(c.saque),txt(c.obs),(hs(c)[0]||{h:{}}).h.t||'',hs(c).map(({h})=>(h.d?new Date(h.d).toLocaleString('pt-BR'):'Pré-carga')+': '+h.t).join('\n')]);
  dl('\ufeff'+[H,...L].map(r=>r.map(q).join(';')).join('\r\n'),'text/csv;charset=utf-8',`cantinho-${st.mes==='*'?'todos':st.mes||'sem-data'}-${now().slice(0,10)}.csv`);
  toast(cur.length+' contatos exportados.')}
 function addl(){const c=db.cards[st.open],n=$('#f-nl').value.trim();if(!c||!n)return;
  const nome=Object.keys(db.labels).find(l=>norm(l)===norm(n))||n;if(!db.labels[nome])db.labels[nome]=$('#f-nc').value;
  if(!c.labels.includes(nome))c.labels.push(nome);save();drawer(c.id);render()}
-function addh(){const c=db.cards[st.open],v=$('#f-h').value.trim();if(!c||!v)return;log(c,v);save();drawer(c.id);render()}
-document.addEventListener('keydown',e=>{if(e.target.id==='f-h'&&e.key==='Enter')addh();if(e.target.id==='f-nl'&&e.key==='Enter')addl();if(e.key==='Escape')drawer(null)});
+function addh(){const c=db.cards[st.open],v=$('#f-h').value.trim(),dv=$('#f-hd').value;if(!c||!v)return;c.hist.unshift(dv?{d:new Date(dv+'T12:00:00').toISOString(),o:1,t:v}:{d:now(),t:v});save();drawer(c.id);render()}
+function saveObs(){const c=db.cards[st.open],el=$('#f-obs');if(c&&el){c.obs=clean(el.innerHTML);save()}}
+async function delCard(c){if(!await ask(`Excluir definitivamente "${c.nome}"? Não dá para desfazer (para só esconder, use Arquivar).`,{ok:'Excluir',danger:true}))return;
+ delete db.cards[c.id];if(!db.del.includes(c.id))db.del.push(c.id);save();drawer(null);render();toast('Contato excluído.')}
+async function delHist(c,i){if(!await ask('Apagar este registro do histórico?',{ok:'Apagar',danger:true}))return;c.hist.splice(i,1);save();drawer(c.id);render()}
+async function addMes(){const v=await ask('Novo mês (mês/ano, por exemplo 11/2026):',{input:1,ph:'11/2026',ok:'Adicionar'});if(!v)return;const m=v.match(/(\d{1,2})\D+(\d{4})/);if(!m||+m[1]<1||+m[1]>12)return toast('Formato inválido. Use mês/ano, por exemplo 11/2026.');
+ const k=m[2]+'-'+m[1].padStart(2,'0');if(!db.meses.includes(k))db.meses.push(k);save();st.mes=k;render()}
+async function delLabels(a){const n=all().filter(c=>c.labels.some(l=>a.includes(l))).length;
+ if(!await ask(a.length>1?`Excluir ${a.length} labels de todos os contatos (${n} contatos afetados)?`:`Excluir a label "${a[0]}" de todos os contatos (${n})?`,{ok:'Excluir',danger:true}))return;
+ a.forEach(l=>{delete db.labels[l];if(!db.gone.includes(l))db.gone.push(l)});all().forEach(c=>{c.labels=c.labels.filter(x=>!a.includes(x))});
+ st.lb=st.lb.filter(x=>!a.includes(x));st.ls=st.ls.filter(x=>!a.includes(x));save();drawer(st.open);render();toast(a.length>1?a.length+' labels excluídas.':'Label excluída.')}
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.dataset&&e.target.dataset.a==='lsel'){e.preventDefault();e.target.click()}
+ if(e.target.id==='f-h'&&e.key==='Enter')addh();if(e.target.id==='f-nl'&&e.key==='Enter')addl();if(e.key==='Escape'&&!$('#dg').open)drawer(null)});
 document.addEventListener('change',e=>{
  if(e.target.id==='fi'){if(e.target.files[0])load(e.target.files[0]);e.target.value='';return}
+ if(e.target.id==='so'){st.sort=e.target.value;render();return}
  const c=db.cards[st.open];if(!c)return;const v=e.target.value;
- if(e.target.id==='f-nome')c.nome=v.trim()||c.nome;
- else if(e.target.id==='f-obs')c.obs=v;
- else if(e.target.id==='f-saque')c.saque=v;
+ if(e.target.id==='f-nome')c.nome=up(v.trim())||c.nome;
+ else if(e.target.id==='f-parto'){if(okd(v))c.parto=v}
+  else if(e.target.id==='f-saque'){if(okd(v))c.saque=v}
  else if(e.target.id==='f-mes'){log(c,`Mês: ${mlabel(c.mes)} → ${mlabel(v)}`);c.mes=v}
  else if(e.target.id==='f-et'){log(c,`Etapa: ${SN[c.etapa][1]} → ${SN[v][1]}`);c.etapa=v}
  else return;
  save();render();if(/f-(mes|et)/.test(e.target.id))drawer(c.id)});
+const inEd=e=>e.target.closest&&e.target.closest('#f-obs');
+document.addEventListener('mousedown',e=>{if(e.target.closest('[data-x]'))e.preventDefault()});
+document.addEventListener('input',e=>{if(inEd(e))saveObs();if(e.target.id==='lgq'){st.lq=e.target.value;render()}});
+document.addEventListener('focusout',e=>{if(inEd(e))render();if(e.target.id==='f-parto'){const c=db.cards[st.open];if(c&&c.parto&&!c.mes){c.mes=c.parto.slice(0,7);save();const m=$('#f-mes');if(m)m.innerHTML=mopts(c.mes);render()}}});
+document.addEventListener('paste',e=>{if(inEd(e)){e.preventDefault();document.execCommand('insertText',false,e.clipboardData.getData('text/plain'))}});
+$('#dg').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(b&&_a)_a(b.dataset.d==='ok')});
+$('#dg').addEventListener('cancel',e=>{e.preventDefault();if(_a)_a(false)});
+$('#dg').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='dgi'){e.preventDefault();if(_a)_a(true)}});
 $('#q').addEventListener('input',e=>{st.q=e.target.value;render()});
+all().forEach(c=>{c.nome=up(c.nome);if(!c.rich){c.obs=toHtml(c.obs);c.rich=1}});save();
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 new ResizeObserver(()=>document.documentElement.style.setProperty('--hh',$('header').offsetHeight+'px')).observe($('header'));
 render();
 </script>
