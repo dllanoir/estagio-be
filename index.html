@@ -72,6 +72,7 @@ button.lab.off{opacity:.3}
 @media(max-width:600px){header{padding:10px max(12px,env(safe-area-inset-right)) 10px max(12px,env(safe-area-inset-left));gap:8px}header h1{font-size:17px}header input[type=search]{order:5;flex:1 1 100%;width:100%}.row{grid-template-columns:1fr}.row .st{text-align:left}#chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}.chip{flex:none;white-space:nowrap}#dr{width:100%;border-left:0}body.lock{overflow:hidden}.sp{margin-left:0;width:100%}.mp{right:auto;left:-140px}}
 @media(pointer:coarse){nav .mx{width:36px;height:36px}.btn,.chip,nav button,.q button,button.lab,.seg button,.tb button{min-height:40px}}
 @media(prefers-reduced-motion:no-preference){#dr{animation:in .18s ease-out}@keyframes in{from{transform:translateX(40px);opacity:0}}}
+#mb{margin-bottom:12px;padding:10px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--pn)}#mb[hidden]{display:none}#mb.pend{border-color:#e0b252;background:#fff7e0}.mbh{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:6px}.mbh label{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:14px}#mbx{display:block;width:100%;min-height:44px;padding:8px 10px;border:1px solid var(--ln);border-radius:8px;resize:none;overflow:hidden;background:var(--pn);color:var(--ink)}.mt{flex:1;min-width:0}.np{display:block;max-width:180px;font-style:normal;font-size:12px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mk{margin-left:5px;font-size:12px}.mk.pend{color:#e0b252}nav .mx.pe{color:var(--ac)}nav .mx.pe:hover,nav .mx.pe:focus-visible{background:var(--ac);border-color:var(--ac);color:#fff}
 </style>
 </head>
 <body>
@@ -82,7 +83,7 @@ button.lab.off{opacity:.3}
   <details class="mn"><summary class="btn">Dados ▾</summary><div class="mp"><button class="btn" data-a="imp">Importar Trello ou backup</button><button class="btn" data-a="exp">Baixar backup completo (JSON)</button></div></details>
   <input type="file" id="fi" accept=".json,application/json" hidden>
 </header>
-<div class="app"><nav id="rail" aria-label="Mês"></nav><main><div id="bn" hidden></div><div id="lf"></div><div id="lp" hidden></div><div id="lg" hidden><div class="lgt"><input id="lgq" type="search" placeholder="Filtrar labels pelo nome"><button class="chip" data-a="lsu">Selecionar sem uso</button><button class="chip" data-a="lsa">Selecionar todas</button><button class="chip" data-a="lsx">Limpar seleção</button><button class="btn dng" id="lgd" data-a="lsd" disabled>Excluir selecionadas</button></div><div id="lgc"></div></div><div class="chips" id="chips"></div><div id="list"></div></main></div>
+<div class="app"><nav id="rail" aria-label="Mês"></nav><main><div id="bn" hidden></div><div id="mb" hidden></div><div id="lf"></div><div id="lp" hidden></div><div id="lg" hidden><div class="lgt"><input id="lgq" type="search" placeholder="Filtrar labels pelo nome"><button class="chip" data-a="lsu">Selecionar sem uso</button><button class="chip" data-a="lsa">Selecionar todas</button><button class="chip" data-a="lsx">Limpar seleção</button><button class="btn dng" id="lgd" data-a="lsd" disabled>Excluir selecionadas</button></div><div id="lgc"></div></div><div class="chips" id="chips"></div><div id="list"></div></main></div>
 <aside id="dr" hidden aria-label="Detalhes do contato"></aside>
 <dialog id="dg"><p id="dgm"></p><input id="dgi" hidden><div class="dgb"><button class="btn p" id="dgo" data-d="ok">OK</button><button class="btn dng" id="dga" data-d="alt" hidden></button><button class="btn" data-d="no">Cancelar</button></div></dialog>
 <div id="tt" role="status" aria-live="polite"></div>
@@ -108,7 +109,7 @@ const hs=c=>c.hist.map((h,i)=>({h,i})).sort((a,b)=>(b.h.d?Date.parse(b.h.d):-1)-
 const mlabel=k=>k?ML[+k.slice(5)-1]+' de '+k.slice(0,4):'Sem data';
 const mkey=t=>{const m=norm(t).match(/(janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro).*?(\d{4})/);return m?m[2]+'-'+String(MN.indexOf(m[1])+1).padStart(2,'0'):''};
 let db;try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
-db=db||{cards:{},labels:{}};db.meses=db.meses||[];db.gone=db.gone||[];db.del=db.del||[];
+db=db||{cards:{},labels:{}};db.meses=db.meses||[];db.mnotes=db.mnotes||{};db.gone=db.gone||[];db.del=db.del||[];
 let st={mes:'*',et:'ativos',q:'',lb:[],mode:'e',lopen:false,sort:'etapa',ls:[],lq:'',lm:false,lg:false,mm:false,open:null};
 let cur=[];
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast('Não foi possível salvar: '+e.message)}}
@@ -139,12 +140,12 @@ function stage(lab,ln){const h=x=>lab.some(l=>norm(l).includes(x)),n=norm(ln);
  return h('finalizada')?'fim':h('indeferi')&&!h('deferido')?'indef':h('deferido')?'deferido':h('entrada ok')?'inss':h('guia paga')?'entrada':h('guia emitida')||h('guia agendada')?'guia':n.includes('aguardando deferimento')?'inss':n.startsWith('indeferidos')?'indef':n.startsWith('deferidos')?'deferido':n.includes('dar entrada')?'entrada':'triagem'}
 function importTrello(j){
  const L={};j.lists.forEach(l=>L[l.id]=l.name);
- (j.labels||[]).forEach(l=>{if(l.name&&!db.gone.includes(l.name))db.labels[l.name]=l.color});
- let n=0,u=0;
+ (j.labels||[]).forEach(l=>{if(l.name&&!db.gone.includes(l.name)&&!db.labels[l.name])db.labels[l.name]=l.color});
+ let n=0,u=0,k=0;
  for(const c of j.cards){
   const ln=L[c.idList]||'';if(/introdu/i.test(ln)||db.del.includes(c.id))continue;
   const lab=(c.labels||[]).map(l=>l.name).filter(x=>x&&!db.gone.includes(x)),ex=db.cards[c.id];
-  if(ex){let ch=0;const nl=lab.filter(x=>!ex.tl.includes(x));
+  if(ex){k++;let ch=0;const nl=lab.filter(x=>!ex.tl.includes(x));
    if(nl.length){ex.labels=[...new Set([...ex.labels,...nl])];ch=1}ex.tl=lab;
    if(c.desc&&c.desc!==ex.td){ex.td=c.desc;ex.hist.unshift({d:now(),t:'Anotação atualizada no Trello: '+c.desc});ch=1}
    u+=ch;continue}
@@ -152,10 +153,18 @@ function importTrello(j){
   if(p.extra)hist.push({d:null,t:p.extra});
   if(!mes&&ln)hist.push({d:null,t:'Lista no Trello: '+ln});
   db.cards[c.id]={id:c.id,nome:p.nome,mes,etapa:stage(lab,ln),labels:lab,tl:lab,obs:toHtml(c.desc||''),rich:1,td:c.desc||'',saque:p.saque,parto:'',hist,arq:!!c.closed};n++}
- save();toast(`Importação concluída: ${n} novos, ${u} atualizados.`)}
+ save();toast(`Importação concluída: ${n} novos adicionados; ${k} já existiam e foram mantidos${u?` (${u} com novidades do Trello acrescentadas, sem sobrescrever)`:''}.`)}
+function mergeBackup(j){let n=0,k=0;
+ Object.values(j.cards||{}).forEach(c=>{if(db.cards[c.id]){k++;return}if(db.del.includes(c.id))return;c.labels=(c.labels||[]).filter(l=>!db.gone.includes(l));db.cards[c.id]=c;n++});
+ Object.entries(j.labels||{}).forEach(([l,v])=>{if(!db.labels[l]&&!db.gone.includes(l))db.labels[l]=v});
+ (j.meses||[]).forEach(m=>{if(!db.meses.includes(m))db.meses.push(m)});
+ Object.entries(j.mnotes||{}).forEach(([m,v])=>{if(!db.mnotes[m])db.mnotes[m]=v});
+ save();toast(`Backup mesclado: ${n} contatos novos adicionados; ${k} já existiam e foram mantidos.`)}
 function load(file){const r=new FileReader();r.onload=async()=>{try{const j=JSON.parse(r.result);
   if(Array.isArray(j.cards)&&j.lists)importTrello(j);
-  else if(j.app==='sm'){if(await ask('Restaurar backup? Isso substitui os dados atuais deste navegador.',{ok:'Restaurar',danger:true})){db={cards:j.cards,labels:j.labels,meses:j.meses||[],gone:j.gone||[],del:j.del||[],bk:j.bk};save();toast('Backup restaurado.')}}
+  else if(j.app==='sm'){const r=await ask('Importar backup: "mesclar" mantém tudo o que já existe aqui e só adiciona o que falta; "substituir" apaga os dados atuais deste navegador.',{ok:'Mesclar (só adicionar o que falta)',alt:'Substituir tudo'});
+  if(r==='alt'){db={cards:j.cards,labels:j.labels,meses:j.meses||[],mnotes:j.mnotes||{},gone:j.gone||[],del:j.del||[],bk:j.bk};save();toast('Backup restaurado.')}
+  else if(r)mergeBackup(j)}
   else toast('Arquivo não reconhecido.');
   render()}catch(e){toast('Erro ao ler o arquivo: '+e.message)}};r.readAsText(file)}
 
@@ -167,8 +176,12 @@ function render(){
  const cs=all(),act=c=>!c.arq&&c.etapa!=='fim';
  const ks=[...new Set([...cs.map(c=>c.mes),...db.meses])].sort((a,b)=>!a?1:!b?-1:a<b?-1:1);
  $('#rail').innerHTML=`<button data-m="*" class="${st.mes==='*'?'on':''}">Todos os meses<small>${cs.filter(act).length}</small></button><button data-a="nm">+ Novo mês</button><button data-a="mm" aria-pressed="${st.mm}">${st.mm?'Concluir':'Gerenciar meses'}</button>`+
-ks.map(k=>{const b=`<button data-m="${k}" class="${st.mes===k?'on':''}">${mlabel(k)}<small>${cs.filter(c=>c.mes===k&&act(c)).length}</small></button>`;
-return st.mm&&k?`<div class="mr">${b}<button class="mx" data-a="dmes" data-k="${k}" aria-label="Excluir mês ${mlabel(k)}" title="Excluir mês">${TRASH}</button></div>`:b}).join('');
+ks.map(k=>{const nt=db.mnotes[k],mkr=nt?(nt.v?'<span class="mk pend" role="img" aria-label="Pendente de validação">●</span>':'<span class="mk" role="img" aria-label="Tem nota">✎</span>'):'',pv=nt&&nt.n.trim()?`<em class="np">${esc(nt.n.trim().split(/\n/)[0])}</em>`:'',b=`<button data-m="${k}" class="${st.mes===k?'on':''}"><span class="mt">${mlabel(k)}${mkr}${pv}</span><small>${cs.filter(c=>c.mes===k&&act(c)).length}</small></button>`;
+return st.mm&&k?`<div class="mr">${b}<button class="mx pe" data-a="emes" data-k="${k}" aria-label="Escrever nota em ${mlabel(k)}" title="Escrever nota do mês">✎</button><button class="mx" data-a="dmes" data-k="${k}" aria-label="Excluir mês ${mlabel(k)}" title="Excluir mês">${TRASH}</button></div>`:b}).join('');
+ const sk=/^\d/.test(st.mes)?st.mes:'',sn=(sk&&db.mnotes[sk])||{n:'',v:false},mb=$('#mb');
+ mb.hidden=!sk;mb.className=sn.v?'pend':'';
+ if(!sk){mb.innerHTML='';mb.dataset.k=''}
+ else if(!(mb.contains(document.activeElement)&&mb.dataset.k===sk)){mb.dataset.k=sk;mb.innerHTML=`<div class="mbh"><b>${mlabel(sk)}</b><label><input type="checkbox" id="mbv"${sn.v?' checked':''}> Pendente de validação</label></div><textarea id="mbx" rows="1" placeholder="Escreva aqui o que precisa conferir neste mês…" aria-label="Nota de ${mlabel(sk)}">\n${esc(sn.n)}</textarea>`;grow($('#mbx'))}
  const has=c=>!st.lb.length||(st.mode==='e'?st.lb.every(l=>c.labels.includes(l)):st.lb.some(l=>c.labels.includes(l)));
  const pre=cs.filter(c=>inMes(c)&&hit(c)),base=pre.filter(has),cnt=f=>base.filter(f).length;
  const ch=[['ativos','Em andamento',cnt(act)],['todos','Todos',cnt(c=>!c.arq)],...S.map(s=>[s[0],s[1],cnt(c=>c.etapa===s[0]&&!c.arq)]),['arq','Arquivados',cnt(c=>c.arq)]];
@@ -239,6 +252,7 @@ document.addEventListener('click',e=>{
  else if(D.a==='nm')addMes();
 else if(D.a==='mm'){st.mm=!st.mm;render()}
 else if(D.a==='dmes')delMes(D.k);
+else if(D.a==='emes'){st.mes=D.k;render();const t=$('#mbx');if(t){t.focus();t.scrollIntoView({block:'nearest'})}}
  else if(D.a==='lm'){st.lm=!st.lm;drawer(st.open)}
  else if(D.a==='dl')delLabels([D.l]);
  else if(D.a==='lsel'){const i=st.ls.indexOf(D.l);i<0?st.ls.push(D.l):st.ls.splice(i,1);render()}
@@ -274,11 +288,13 @@ async function delCard(c){if(!await ask(`Excluir definitivamente "${c.nome}"? N�
 async function delHist(c,i){if(!await ask('Apagar este registro do histórico?',{ok:'Apagar',danger:true}))return;c.hist.splice(i,1);save();drawer(c.id);render()}
 async function addMes(){const v=await ask('Novo mês (mês/ano, por exemplo 11/2026):',{input:1,ph:'11/2026',ok:'Adicionar'});if(!v)return;const m=v.match(/(\d{1,2})\D+(\d{4})/);if(!m||+m[1]<1||+m[1]>12)return toast('Formato inválido. Use mês/ano, por exemplo 11/2026.');
  const k=m[2]+'-'+m[1].padStart(2,'0');if(!db.meses.includes(k))db.meses.push(k);save();st.mes=k;render()}
-async function delMes(k){const cs=all().filter(c=>c.mes===k),n=cs.length,pl=n>1;let r;
+const grow=t=>{if(t){t.style.height='auto';t.style.height=t.scrollHeight+'px'}};
+function setMes(k,f){if(!k)return;const m=db.mnotes[k]||{n:'',v:false};f(m);if(m.n.trim()||m.v)db.mnotes[k]=m;else delete db.mnotes[k];save()}
+async function delMes(k){const cs=all().filter(c=>c.mes===k),n=cs.length,pl=n>1;let r;const nn=db.mnotes[k]?' A nota do mês também será excluída.':'';
 
-if(!n){r=await ask(`Excluir o mês ${mlabel(k)}? Ele está vazio.`,{ok:'Excluir',danger:true})}
+if(!n){r=await ask(`Excluir o mês ${mlabel(k)}? Ele está vazio.${nn}`,{ok:'Excluir',danger:true})}
 
-else r=await ask(`${mlabel(k)} tem ${n} contato${pl?'s':''}. O que fazer com ${pl?'eles':'ele'}?`,{ok:'Mover para "Sem data"',alt:pl?`Excluir mês e ${n} contatos`:'Excluir mês e contato'});
+else r=await ask(`${mlabel(k)} tem ${n} contato${pl?'s':''}. O que fazer com ${pl?'eles':'ele'}?${nn}`,{ok:'Mover para "Sem data"',alt:pl?`Excluir mês e ${n} contatos`:'Excluir mês e contato'});
 
 if(!r)return;
 
@@ -286,7 +302,7 @@ if(r==='alt')cs.forEach(c=>{delete db.cards[c.id];if(!db.del.includes(c.id))db.d
 
 else cs.forEach(c=>{log(c,`Mês: ${mlabel(k)} → Sem data`);c.mes=''});
 
-db.meses=db.meses.filter(m=>m!==k);if(st.mes===k)st.mes='*';
+db.meses=db.meses.filter(m=>m!==k);delete db.mnotes[k];if(st.mes===k)st.mes='*';
 
 save();drawer(db.cards[st.open]?st.open:null);render();toast(r==='alt'?`Mês e ${n} contato${pl?'s':''} excluídos.`:n?`Mês excluído; ${n} contato${pl?'s':''} em "Sem data".`:'Mês excluído.')}
 
@@ -299,6 +315,7 @@ document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.tar
 document.addEventListener('change',e=>{
  if(e.target.id==='fi'){if(e.target.files[0])load(e.target.files[0]);e.target.value='';return}
  if(e.target.id==='so'){st.sort=e.target.value;render();return}
+ if(e.target.id==='mbv'){setMes($('#mb').dataset.k,m=>m.v=e.target.checked);render();return}
  const c=db.cards[st.open];if(!c)return;const v=e.target.value;
  if(e.target.id==='f-nome')c.nome=up(v.trim())||c.nome;
  else if(e.target.id==='f-parto'){if(okd(v))c.parto=v}
@@ -309,7 +326,7 @@ document.addEventListener('change',e=>{
  save();render();if(/f-(mes|et)/.test(e.target.id))drawer(c.id)});
 const inEd=e=>e.target.closest&&e.target.closest('#f-obs');
 document.addEventListener('mousedown',e=>{if(e.target.closest('[data-x]'))e.preventDefault()});
-document.addEventListener('input',e=>{if(inEd(e))saveObs();if(e.target.id==='lgq'){st.lq=e.target.value;render()}});
+document.addEventListener('input',e=>{if(inEd(e))saveObs();if(e.target.id==='lgq'){st.lq=e.target.value;render()}if(e.target.id==='mbx'){setMes($('#mb').dataset.k,m=>m.n=e.target.value);grow(e.target);render()}});
 document.addEventListener('focusout',e=>{if(inEd(e))render();if(e.target.id==='f-parto'){const c=db.cards[st.open];if(c&&c.parto&&!c.mes){c.mes=c.parto.slice(0,7);save();const m=$('#f-mes');if(m)m.innerHTML=mopts(c.mes);render()}}});
 document.addEventListener('paste',e=>{if(inEd(e)){e.preventDefault();document.execCommand('insertText',false,e.clipboardData.getData('text/plain'))}});
 $('#dg').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(b&&_a)_a(b.dataset.d==='ok'?true:b.dataset.d==='alt'?'alt':false)});
