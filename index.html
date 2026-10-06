@@ -21,7 +21,7 @@ header input[type=search]{width:240px;max-width:100%;padding:8px 12px;border:1px
 .btn{padding:8px 14px;border:1px solid var(--ln);border-radius:8px;background:var(--pn)}
 .btn.p{background:var(--ac);border-color:var(--ac);color:#fff}
 .app{display:grid;grid-template-columns:210px 1fr;gap:20px;padding:20px;max-width:1600px;margin:0 auto}
-nav{display:flex;flex-direction:column;gap:2px;align-self:start;position:sticky;top:calc(var(--hh,64px) + 12px);max-height:calc(100vh - var(--hh,64px) - 24px);max-height:calc(100dvh - var(--hh,64px) - 24px);overflow-y:auto;overscroll-behavior:contain;padding:6px;background:var(--pn);border:1px solid var(--ln);border-radius:10px}nav [data-a=nm]{color:var(--ac);font-weight:600;border-bottom:1px solid var(--ln);border-radius:0 0 8px 8px;margin-bottom:4px}
+nav{display:flex;flex-direction:column;gap:2px;align-self:start;position:sticky;top:calc(var(--hh,64px) + 12px);max-height:calc(100vh - var(--hh,64px) - 24px);max-height:calc(100dvh - var(--hh,64px) - 24px);overflow-y:auto;overscroll-behavior:contain;padding:6px;background:var(--pn);border:1px solid var(--ln);border-radius:10px}nav [data-a=nm]{color:var(--ac);font-weight:600}nav [data-a=mm]{color:var(--mut);font-size:14px;border-bottom:1px solid var(--ln);border-radius:0 0 8px 8px;margin-bottom:4px}.mr{display:flex;align-items:center;gap:4px}.mr>button:first-child{flex:1;min-width:0}nav .mx{flex:none;justify-content:center;align-items:center;width:30px;height:30px;min-height:0;padding:0;border:1px solid var(--ln);border-radius:50%;background:var(--pn);color:#c53030}nav .mx:hover,nav .mx:focus-visible{background:#c53030;border-color:#c53030;color:#fff}
 nav button{display:flex;justify-content:space-between;gap:8px;padding:7px 10px;border:0;border-radius:8px;background:none;text-align:left}
 nav button.on{background:var(--ac);color:#fff}
 nav small{opacity:.7}
@@ -58,7 +58,7 @@ button.lab.off{opacity:.3}
 .mg{display:inline-flex;align-items:center;gap:6px;margin:2px 6px 2px 0;padding:2px 3px 2px 8px;font-size:13px}.mg small{opacity:.8}
 .tx{display:grid;place-items:center;width:22px;height:22px;padding:0;border:0;border-radius:50%;background:rgba(0,0,0,.3);color:#fff}.tx:hover,.tx:focus-visible{background:#c53030}
 #dg{border:0;border-radius:12px;padding:20px;width:min(420px,92vw);box-shadow:0 12px 40px rgba(0,0,0,.25)}#dg::backdrop{background:rgba(20,30,40,.45)}#dg p{margin:0 0 12px}
-#dg input{width:100%;margin-bottom:12px;padding:8px 10px;border:1px solid var(--ln);border-radius:8px}.dgb{display:flex;flex-direction:row-reverse;gap:8px}.btn.dng{background:#c53030;border-color:#c53030;color:#fff}
+#dg input{width:100%;margin-bottom:12px;padding:8px 10px;border:1px solid var(--ln);border-radius:8px}.dgb{display:flex;flex-direction:row-reverse;flex-wrap:wrap;gap:8px}.btn.dng{background:#c53030;border-color:#c53030;color:#fff}
 #bn{margin-bottom:12px;padding:10px 12px;border:1px solid #e0b252;border-radius:8px;background:#fff7e0;font-size:14px}#bn[hidden]{display:none}#bn .btn{margin-left:8px;padding:4px 10px}
 #lf select{padding:5px 8px;border:1px solid var(--ln);border-radius:8px;background:var(--pn);font-size:14px}
 .x{position:absolute;right:0;top:6px;border:0;background:none;color:var(--mut);font-size:16px}.cap{font-size:14px;color:var(--mut);margin:12px 0 2px}
@@ -68,9 +68,9 @@ button.lab.off{opacity:.3}
 .empty{padding:40px;text-align:center;color:var(--mut)}
 #tt{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);padding:10px 16px;border-radius:8px;background:var(--ink);color:#fff}
 #tt:empty{display:none}
-@media(max-width:900px){.app{grid-template-columns:1fr;gap:10px;padding:12px}nav{flex-direction:row;max-height:none;border:0;border-radius:0;overflow-x:auto;overflow-y:hidden;position:sticky;top:var(--hh,60px);z-index:4;margin:0 -12px;padding:6px 12px;background:var(--bg)}nav button{white-space:nowrap;flex:none;gap:6px}}
+@media(max-width:900px){.app{grid-template-columns:1fr;gap:10px;padding:12px}nav{flex-direction:row;max-height:none;border:0;border-radius:0;overflow-x:auto;overflow-y:hidden;position:sticky;top:var(--hh,60px);z-index:4;margin:0 -12px;padding:6px 12px;background:var(--bg)}nav button{white-space:nowrap;flex:none;gap:6px}.mr{flex:none}}
 @media(max-width:600px){header{padding:10px max(12px,env(safe-area-inset-right)) 10px max(12px,env(safe-area-inset-left));gap:8px}header h1{font-size:17px}header input[type=search]{order:5;flex:1 1 100%;width:100%}.row{grid-template-columns:1fr}.row .st{text-align:left}#chips{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}.chip{flex:none;white-space:nowrap}#dr{width:100%;border-left:0}body.lock{overflow:hidden}.sp{margin-left:0;width:100%}.mp{right:auto;left:-140px}}
-@media(pointer:coarse){.btn,.chip,nav button,.q button,button.lab,.seg button,.tb button{min-height:40px}}
+@media(pointer:coarse){nav .mx{width:36px;height:36px}.btn,.chip,nav button,.q button,button.lab,.seg button,.tb button{min-height:40px}}
 @media(prefers-reduced-motion:no-preference){#dr{animation:in .18s ease-out}@keyframes in{from{transform:translateX(40px);opacity:0}}}
 </style>
 </head>
@@ -84,7 +84,7 @@ button.lab.off{opacity:.3}
 </header>
 <div class="app"><nav id="rail" aria-label="Mês"></nav><main><div id="bn" hidden></div><div id="lf"></div><div id="lp" hidden></div><div id="lg" hidden><div class="lgt"><input id="lgq" type="search" placeholder="Filtrar labels pelo nome"><button class="chip" data-a="lsu">Selecionar sem uso</button><button class="chip" data-a="lsa">Selecionar todas</button><button class="chip" data-a="lsx">Limpar seleção</button><button class="btn dng" id="lgd" data-a="lsd" disabled>Excluir selecionadas</button></div><div id="lgc"></div></div><div class="chips" id="chips"></div><div id="list"></div></main></div>
 <aside id="dr" hidden aria-label="Detalhes do contato"></aside>
-<dialog id="dg"><p id="dgm"></p><input id="dgi" hidden><div class="dgb"><button class="btn p" id="dgo" data-d="ok">OK</button><button class="btn" data-d="no">Cancelar</button></div></dialog>
+<dialog id="dg"><p id="dgm"></p><input id="dgi" hidden><div class="dgb"><button class="btn p" id="dgo" data-d="ok">OK</button><button class="btn dng" id="dga" data-d="alt" hidden></button><button class="btn" data-d="no">Cancelar</button></div></dialog>
 <div id="tt" role="status" aria-live="polite"></div>
 <script>
 const S=[['triagem','Novo contato','#7b8794'],['docs','Cobrar documentos','#b7791f'],['guia','Guia a emitir/pagar','#2b6cb0'],['entrada','Dar entrada','#6b46c1'],['inss','Em análise','#0f766e'],['deferido','Deferido, a receber','#2f855a'],['fim','Finalizada','#4a5568'],['indef','Indeferido','#c53030']];
@@ -109,7 +109,7 @@ const mlabel=k=>k?ML[+k.slice(5)-1]+' de '+k.slice(0,4):'Sem data';
 const mkey=t=>{const m=norm(t).match(/(janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro).*?(\d{4})/);return m?m[2]+'-'+String(MN.indexOf(m[1])+1).padStart(2,'0'):''};
 let db;try{db=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 db=db||{cards:{},labels:{}};db.meses=db.meses||[];db.gone=db.gone||[];db.del=db.del||[];
-let st={mes:'*',et:'ativos',q:'',lb:[],mode:'e',lopen:false,sort:'etapa',ls:[],lq:'',lm:false,lg:false,open:null};
+let st={mes:'*',et:'ativos',q:'',lb:[],mode:'e',lopen:false,sort:'etapa',ls:[],lq:'',lm:false,lg:false,mm:false,open:null};
 let cur=[];
 function save(){try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){toast('Não foi possível salvar: '+e.message)}}
 let tm;function toast(m){$('#tt').textContent=m;clearTimeout(tm);tm=setTimeout(()=>$('#tt').textContent='',5000)}
@@ -119,8 +119,8 @@ const TRASH='<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke=
 const tchip=(l,n,sel)=>`<span class="lab mg${sel?' sel':''}" ${sel===undefined?'':`role="checkbox" aria-checked="${sel}" tabindex="0" data-a="lsel" data-l="${esc(l)}"`} style="${ls(l)}">${sel?'✓ ':''}${esc(l)}${n==null?'':' <small>'+n+'</small>'}<button class="tx" data-a="dl" data-l="${esc(l)}" aria-label="Excluir label ${esc(l)}" title="Excluir label">${TRASH}</button></span>`;
 let _a=null;
 function ask(msg,o={}){return new Promise(res=>{const d=$('#dg'),i=$('#dgi'),b=$('#dgo');$('#dgm').textContent=msg;i.hidden=!o.input;i.value='';i.placeholder=o.ph||'';
- b.textContent=o.ok||'OK';b.className='btn '+(o.danger?'dng':'p');
- _a=ok=>{_a=null;try{d.close()}catch(e){}d.removeAttribute('open');res(ok?(o.input?i.value.trim():true):null)};
+ b.textContent=o.ok||'OK';b.className='btn '+(o.danger?'dng':'p');const a=$('#dga');a.hidden=!o.alt;a.textContent=o.alt||'';
+ _a=ok=>{_a=null;try{d.close()}catch(e){}d.removeAttribute('open');res(ok==='alt'?'alt':ok?(o.input?i.value.trim():true):null)};
  try{d.showModal()}catch(e){d.setAttribute('open','')}if(o.input)i.focus()})}
 const lt=c=>Math.max(0,...c.hist.map(h=>h.d?Date.parse(h.d):0)),si=c=>S.findIndex(s=>s[0]===c.etapa),nm=(a,b)=>a.nome.localeCompare(b.nome,'pt'),dk=v=>v||'9999';
 const SORT={etapa:(a,b)=>si(a)-si(b)||nm(a,b),nome:nm,parto:(a,b)=>dk(a.parto).localeCompare(dk(b.parto))||nm(a,b),ativ:(a,b)=>lt(b)-lt(a)||nm(a,b)};
@@ -166,8 +166,9 @@ const inMes=c=>st.mes==='*'||c.mes===st.mes;
 function render(){
  const cs=all(),act=c=>!c.arq&&c.etapa!=='fim';
  const ks=[...new Set([...cs.map(c=>c.mes),...db.meses])].sort((a,b)=>!a?1:!b?-1:a<b?-1:1);
- $('#rail').innerHTML=`<button data-m="*" class="${st.mes==='*'?'on':''}">Todos os meses<small>${cs.filter(act).length}</small></button><button data-a="nm">+ Novo mês</button>`+
-  ks.map(k=>`<button data-m="${k}" class="${st.mes===k?'on':''}">${mlabel(k)}<small>${cs.filter(c=>c.mes===k&&act(c)).length}</small></button>`).join('');
+ $('#rail').innerHTML=`<button data-m="*" class="${st.mes==='*'?'on':''}">Todos os meses<small>${cs.filter(act).length}</small></button><button data-a="nm">+ Novo mês</button><button data-a="mm" aria-pressed="${st.mm}">${st.mm?'Concluir':'Gerenciar meses'}</button>`+
+ks.map(k=>{const b=`<button data-m="${k}" class="${st.mes===k?'on':''}">${mlabel(k)}<small>${cs.filter(c=>c.mes===k&&act(c)).length}</small></button>`;
+return st.mm&&k?`<div class="mr">${b}<button class="mx" data-a="dmes" data-k="${k}" aria-label="Excluir mês ${mlabel(k)}" title="Excluir mês">${TRASH}</button></div>`:b}).join('');
  const has=c=>!st.lb.length||(st.mode==='e'?st.lb.every(l=>c.labels.includes(l)):st.lb.some(l=>c.labels.includes(l)));
  const pre=cs.filter(c=>inMes(c)&&hit(c)),base=pre.filter(has),cnt=f=>base.filter(f).length;
  const ch=[['ativos','Em andamento',cnt(act)],['todos','Todos',cnt(c=>!c.arq)],...S.map(s=>[s[0],s[1],cnt(c=>c.etapa===s[0]&&!c.arq)]),['arq','Arquivados',cnt(c=>c.arq)]];
@@ -236,6 +237,8 @@ document.addEventListener('click',e=>{
  else if(D.a==='csv')exportCsv();
  else if(D.x){document.execCommand(D.x);saveObs()}
  else if(D.a==='nm')addMes();
+else if(D.a==='mm'){st.mm=!st.mm;render()}
+else if(D.a==='dmes')delMes(D.k);
  else if(D.a==='lm'){st.lm=!st.lm;drawer(st.open)}
  else if(D.a==='dl')delLabels([D.l]);
  else if(D.a==='lsel'){const i=st.ls.indexOf(D.l);i<0?st.ls.push(D.l):st.ls.splice(i,1);render()}
@@ -271,6 +274,22 @@ async function delCard(c){if(!await ask(`Excluir definitivamente "${c.nome}"? N�
 async function delHist(c,i){if(!await ask('Apagar este registro do histórico?',{ok:'Apagar',danger:true}))return;c.hist.splice(i,1);save();drawer(c.id);render()}
 async function addMes(){const v=await ask('Novo mês (mês/ano, por exemplo 11/2026):',{input:1,ph:'11/2026',ok:'Adicionar'});if(!v)return;const m=v.match(/(\d{1,2})\D+(\d{4})/);if(!m||+m[1]<1||+m[1]>12)return toast('Formato inválido. Use mês/ano, por exemplo 11/2026.');
  const k=m[2]+'-'+m[1].padStart(2,'0');if(!db.meses.includes(k))db.meses.push(k);save();st.mes=k;render()}
+async function delMes(k){const cs=all().filter(c=>c.mes===k),n=cs.length,pl=n>1;let r;
+
+if(!n){r=await ask(`Excluir o mês ${mlabel(k)}? Ele está vazio.`,{ok:'Excluir',danger:true})}
+
+else r=await ask(`${mlabel(k)} tem ${n} contato${pl?'s':''}. O que fazer com ${pl?'eles':'ele'}?`,{ok:'Mover para "Sem data"',alt:pl?`Excluir mês e ${n} contatos`:'Excluir mês e contato'});
+
+if(!r)return;
+
+if(r==='alt')cs.forEach(c=>{delete db.cards[c.id];if(!db.del.includes(c.id))db.del.push(c.id)});
+
+else cs.forEach(c=>{log(c,`Mês: ${mlabel(k)} → Sem data`);c.mes=''});
+
+db.meses=db.meses.filter(m=>m!==k);if(st.mes===k)st.mes='*';
+
+save();drawer(db.cards[st.open]?st.open:null);render();toast(r==='alt'?`Mês e ${n} contato${pl?'s':''} excluídos.`:n?`Mês excluído; ${n} contato${pl?'s':''} em "Sem data".`:'Mês excluído.')}
+
 async function delLabels(a){const n=all().filter(c=>c.labels.some(l=>a.includes(l))).length;
  if(!await ask(a.length>1?`Excluir ${a.length} labels de todos os contatos (${n} contatos afetados)?`:`Excluir a label "${a[0]}" de todos os contatos (${n})?`,{ok:'Excluir',danger:true}))return;
  a.forEach(l=>{delete db.labels[l];if(!db.gone.includes(l))db.gone.push(l)});all().forEach(c=>{c.labels=c.labels.filter(x=>!a.includes(x))});
@@ -293,7 +312,7 @@ document.addEventListener('mousedown',e=>{if(e.target.closest('[data-x]'))e.prev
 document.addEventListener('input',e=>{if(inEd(e))saveObs();if(e.target.id==='lgq'){st.lq=e.target.value;render()}});
 document.addEventListener('focusout',e=>{if(inEd(e))render();if(e.target.id==='f-parto'){const c=db.cards[st.open];if(c&&c.parto&&!c.mes){c.mes=c.parto.slice(0,7);save();const m=$('#f-mes');if(m)m.innerHTML=mopts(c.mes);render()}}});
 document.addEventListener('paste',e=>{if(inEd(e)){e.preventDefault();document.execCommand('insertText',false,e.clipboardData.getData('text/plain'))}});
-$('#dg').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(b&&_a)_a(b.dataset.d==='ok')});
+$('#dg').addEventListener('click',e=>{const b=e.target.closest('[data-d]');if(b&&_a)_a(b.dataset.d==='ok'?true:b.dataset.d==='alt'?'alt':false)});
 $('#dg').addEventListener('cancel',e=>{e.preventDefault();if(_a)_a(false)});
 $('#dg').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='dgi'){e.preventDefault();if(_a)_a(true)}});
 $('#q').addEventListener('input',e=>{st.q=e.target.value;render()});
