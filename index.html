@@ -759,8 +759,14 @@ button.lab.off{opacity:.38}
 .ai-wh-info{gap:2px}
 .ai-wh-info h3{font-size:15px}
 .ai-wh-info small{font-size:11px}
-.ai-new-btn{align-self:flex-start;margin-top:4px;padding:4px 8px;border-radius:7px;color:#fff;background:rgba(255,255,255,.12);font-size:11px;font-weight:700}
-.ai-new-btn:hover{background:rgba(255,255,255,.2)}
+.ai-new-btn{align-self:flex-start;padding:4px 8px;border-radius:7px;color:#fff;background:rgba(255,255,255,.12);font-size:11px;font-weight:700;border:0;cursor:pointer;transition:background-color .15s ease}
+.ai-new-btn:hover{background:rgba(255,255,255,.24)}
+.ai-model-picker{appearance:none;background:rgba(255,255,255,.16) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 7px center;color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:6px;font-size:11px;font-weight:700;padding:2px 22px 2px 7px;cursor:pointer;outline:none}
+.ai-model-picker:hover{background-color:rgba(255,255,255,.24);border-color:rgba(255,255,255,.45)}
+.ai-model-picker option{background:#1e1b4b;color:#fff}
+.ai-ctx-pill{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.9);background:rgba(255,255,255,.14);padding:2px 6px;border-radius:99px;white-space:nowrap;letter-spacing:.02em}
+.ai-retry-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:6px 13px;border-radius:8px;background:var(--ai-grad);color:#fff;border:0;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(99,102,241,.3);transition:all .15s ease}
+.ai-retry-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(99,102,241,.4)}
 .ai-msgs{padding:14px;background:#f6f8fc}
 .ai-form{padding:10px}
 .ai-form textarea{height:44px}
@@ -1157,9 +1163,19 @@ nav#rail .month-card.has-pending .month-note svg{color:var(--warning)}
   <div class="ai-wh">
     <div class="ai-wh-avatar" aria-hidden="true">✦</div>
     <div class="ai-wh-info">
-      <h2 id="ai-window-title" class="ai-title">Assistente</h2>
-      <small id="ai-wh-model-desc">Assistente do seu atendimento</small>
-      <button type="button" class="ai-new-btn" data-a="ai-new">Nova conversa</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <h2 id="ai-window-title" class="ai-title">Assistente</h2>
+        <button type="button" class="ai-new-btn" data-a="ai-new" title="Iniciar nova conversa limpa">Nova conversa</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
+        <select id="ai-model-select" class="ai-model-picker" aria-label="Escolher modelo Gemini">
+          <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (Padrão)</option>
+          <option value="gemini-3.8-flash">gemini-3.8-flash</option>
+          <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite</option>
+          <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
+        </select>
+        <span class="ai-ctx-pill" title="Histórico da conversa preservado mesmo ao trocar de modelo">✓ contexto ativo</span>
+      </div>
     </div>
     <button class="ai-wh-close" data-a="ai-close" aria-label="Fechar chat">✕</button>
   </div>
@@ -1211,10 +1227,14 @@ nav#rail .month-card.has-pending .month-note svg{color:var(--warning)}
       <small>Os dados enviados ao assistente passam pela API do Google.</small>
       <label style="display:block;margin-bottom:12px;font-size:13px;font-weight:600;color:var(--ink)">
         Modelo de Chat e Ferramentas (Flash):
-        <input type="text" id="cfg-chat-model" style="width:100%;margin-top:4px;padding:8px 12px;border:1px solid var(--ln);border-radius:8px;font-size:13.5px" placeholder="gemini-3.8-flash">
+        <input type="text" id="cfg-chat-model" style="width:100%;margin-top:4px;padding:8px 12px;border:1px solid var(--ln);border-radius:8px;font-size:13.5px" placeholder="gemini-3.5-flash-lite">
         <div class="cfg-presets">
+          <button type="button" class="cfg-preset-chip" data-preset="#cfg-chat-model" data-v="gemini-3.5-flash-lite">gemini-3.5-flash-lite (Padrão)</button>
           <button type="button" class="cfg-preset-chip" data-preset="#cfg-chat-model" data-v="gemini-3.8-flash">gemini-3.8-flash</button>
+          <button type="button" class="cfg-preset-chip" data-preset="#cfg-chat-model" data-v="gemini-3.1-flash-lite">gemini-3.1-flash-lite</button>
+          <button type="button" class="cfg-preset-chip" data-preset="#cfg-chat-model" data-v="gemini-2.5-flash-lite">gemini-2.5-flash-lite</button>
         </div>
+        <small style="display:block;margin-top:6px;color:var(--mut);font-weight:400">O contexto da conversa é mantido automaticamente ao alternar entre modelos. Se um modelo enfrentar alta demanda temporária, o sistema tenta novamente e recorre a modelos alternativos sem perda de dados.</small>
       </label>
       <label style="display:block;font-size:13px;font-weight:600;color:var(--ink)">
         Modelo para busca por significado:
@@ -1401,6 +1421,9 @@ const KEY='sm_atendimentos_v1';
 const KEY_GEMINI='gemini_api_key_v1';
 const KEY_CHAT_MODEL='gemini_chat_model_v1';
 const KEY_EMBED_MODEL='gemini_embed_model_v1';
+const KEY_CHAT_HISTORY='gemini_chat_history_v1';
+const KEY_CHAT_UI_MSGS='gemini_chat_ui_msgs_v1';
+const DEFAULT_CHAT_MODEL='gemini-3.5-flash-lite';
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -1488,10 +1511,32 @@ const fs=s=>s?s.split('-').reverse().map((x,i)=>i==2?x.slice(2):x).join('/'):'';
 // =========================================================================
 
 function getChatModel() {
-  const m=storage.getItem(KEY_CHAT_MODEL);return(!m||m==='gemini-2.5-flash')?'gemini-3.8-flash':m;
+  let m = storage.getItem(KEY_CHAT_MODEL);
+  if (!storage.getItem('gemini_chat_model_migrated_v2')) {
+    m = DEFAULT_CHAT_MODEL;
+    storage.setItem(KEY_CHAT_MODEL, DEFAULT_CHAT_MODEL);
+    storage.setItem('gemini_chat_model_migrated_v2', '1');
+  }
+  return m || DEFAULT_CHAT_MODEL;
 }
 function getEmbedModel() {
   const m=storage.getItem(KEY_EMBED_MODEL);return(!m||m==='gemini-embedding-001')?'gemini-embedding-2':m;
+}
+
+function isRetryableGeminiError(status, msg = '') {
+  if (status === 429 || status === 503 || status === 500 || status === 504) return true;
+  const lower = String(msg).toLowerCase();
+  return lower.includes('high demand') ||
+         lower.includes('spikes in demand') ||
+         lower.includes('temporarily unavailable') ||
+         lower.includes('resource has been exhausted') ||
+         lower.includes('quota') ||
+         lower.includes('rate limit') ||
+         lower.includes('overloaded') ||
+         lower.includes('try again later') ||
+         lower.includes('failed to fetch') ||
+         lower.includes('network') ||
+         lower.includes('timeout');
 }
 
 const IDB_NAME = 'cantinho_vectors_db';
@@ -1547,23 +1592,38 @@ function cosineSimilarity(vecA, vecB) {
   return dot / (Math.sqrt(mA) * Math.sqrt(mB) || 1);
 }
 
-async function geminiCallEmbed(text, apiKey) {
+async function geminiCallEmbed(text, apiKey, maxRetries = 3) {
   const model = getEmbedModel();
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:embedContent`;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-    body: JSON.stringify({
-      model: `models/${model}`,
-      content: { parts: [{ text }] }
-    })
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(()=>({}));
-    throw new Error(err.error?.message || `Erro ${res.status} no modelo de embedding (${model})`);
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+        body: JSON.stringify({
+          model: `models/${model}`,
+          content: { parts: [{ text }] }
+        })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return data.embedding.values;
+      }
+      const err = await res.json().catch(() => ({}));
+      const msg = err.error?.message || `Erro ${res.status} no modelo de embedding (${model})`;
+      if (attempt < maxRetries && isRetryableGeminiError(res.status, msg)) {
+        await new Promise(r => setTimeout(r, 1200 * attempt));
+        continue;
+      }
+      throw new Error(msg);
+    } catch (e) {
+      if (attempt < maxRetries && isRetryableGeminiError(undefined, e.message)) {
+        await new Promise(r => setTimeout(r, 1200 * attempt));
+        continue;
+      }
+      throw e;
+    }
   }
-  const data = await res.json();
-  return data.embedding.values;
 }
 
 let isSyncing = false;
@@ -1824,11 +1884,77 @@ function windowForModel(msgs) {
   return msgs.slice(start);
 }
 
+async function fetchGeminiWithRetry({ apiKey, primaryModel, contents, tools, systemInstruction, onNotice }) {
+  const fallbackList = ['gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'];
+  const modelsToTry = [primaryModel];
+  for (const f of fallbackList) {
+    if (!modelsToTry.includes(f)) modelsToTry.push(f);
+  }
+
+  let lastError = null;
+
+  for (let mIdx = 0; mIdx < modelsToTry.length; mIdx++) {
+    const currentModel = modelsToTry[mIdx];
+    const isPrimary = (mIdx === 0);
+    const maxAttempts = isPrimary ? 3 : 2;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent`;
+        const body = { contents, systemInstruction };
+        if (tools && tools.length) body.tools = tools;
+
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+          body: JSON.stringify(body)
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          const msg = errData.error?.message || `Erro ${res.status} no modelo ${currentModel}`;
+          const err = new Error(msg);
+          err.status = res.status;
+          err.model = currentModel;
+          err.isRetryable = isRetryableGeminiError(res.status, msg);
+          throw err;
+        }
+
+        const data = await res.json();
+        return { data, modelUsed: currentModel, isFallback: !isPrimary };
+      } catch (err) {
+        if (err.isRetryable === undefined) {
+          err.isRetryable = isRetryableGeminiError(err.status, err.message);
+        }
+        lastError = err;
+        if (!err.isRetryable) {
+          throw err;
+        }
+
+        if (attempt < maxAttempts) {
+          const delay = Math.min(6500, 1200 * Math.pow(1.6, attempt - 1) + Math.random() * 400);
+          if (onNotice) {
+            onNotice(`⏳ Alta demanda no modelo ${currentModel}. Tentando novamente em ${(delay/1000).toFixed(1)}s (tentativa ${attempt}/${maxAttempts})…`);
+          }
+          await new Promise(r => setTimeout(r, delay));
+        } else if (mIdx < modelsToTry.length - 1) {
+          const nextModel = modelsToTry[mIdx + 1];
+          if (onNotice) {
+            onNotice(`⚠️ O modelo ${currentModel} segue sobrecarregado. Alternando automaticamente para ${nextModel} sem perder o contexto…`);
+          }
+          await new Promise(r => setTimeout(r, 800));
+        }
+      }
+    }
+  }
+
+  throw lastError || new Error("Não foi possível obter resposta após tentativas e fallbacks.");
+}
+
 async function chatWithGemini(userPrompt) {
   const apiKey = storage.getItem(KEY_GEMINI);
   if (!apiKey) throw new Error("Chave de API não configurada. Abra Configurações e informe a chave.");
-  const model = getChatModel();
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+  const primaryModel = getChatModel();
   const turn = [{ role: "user", parts: [{ text: userPrompt }] }];
   const hoje = new Date();
   const system = { parts: [{ text: `Você é o Assistente Operacional do sistema "Meu cantinho", um CRM de gestão de atendimentos (fluxo de requerimentos junto ao INSS, com acompanhamento de documentos, guias, análise, deferimento e pagamento).
@@ -1855,49 +1981,132 @@ COMO TRABALHAR
 - Ao citar contatos criados, alterados ou encontrados, mostre nome, etapa e mês e, quando útil, o ID entre crases.
 - Responda em português do Brasil, de forma objetiva, explicando o que foi feito e sugerindo o próximo passo quando fizer sentido.` }] };
 
-  for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-      body: JSON.stringify({ contents: windowForModel([...conversationHistory, ...turn]), tools: GEMINI_TOOLS, systemInstruction: system })
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error?.message || `Erro ${res.status} no modelo de chat (${model})`);
+  let activeNoticeEl = null;
+  const updateNotice = (msg) => {
+    if (!activeNoticeEl) {
+      activeNoticeEl = appendAiMessage(msg, 'notice');
+    } else {
+      activeNoticeEl.textContent = msg;
+      const chat = $('#ai-chat');
+      if (chat) chat.scrollTop = chat.scrollHeight;
     }
-    const data = await res.json();
-    const candidate = data.candidates?.[0]?.content;
-    if (!candidate?.parts?.length) throw new Error("O modelo não retornou resposta.");
-    const calls = candidate.parts.filter(p => p.functionCall);
-    if (!calls.length) {
+  };
+  const clearNotice = () => {
+    if (activeNoticeEl) {
+      activeNoticeEl.remove();
+      activeNoticeEl = null;
+    }
+  };
+
+  try {
+    for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
+      const contentsPayload = windowForModel([...conversationHistory, ...turn]);
+
+      const { data, modelUsed, isFallback } = await fetchGeminiWithRetry({
+        apiKey,
+        primaryModel,
+        contents: contentsPayload,
+        tools: GEMINI_TOOLS,
+        systemInstruction: system,
+        onNotice: updateNotice
+      });
+      clearNotice();
+
+      const candidate = data.candidates?.[0]?.content;
+      if (!candidate?.parts?.length) throw new Error("O modelo não retornou resposta.");
+      const calls = candidate.parts.filter(p => p.functionCall);
+
+      if (!calls.length) {
+        turn.push(candidate);
+        conversationHistory.push(...turn);
+        saveChatStorage();
+        let finalText = candidate.parts.map(p => p.text || '').join('\n').trim();
+        if (isFallback) {
+          finalText += `\n\n*(Respondido automaticamente via **${modelUsed}** devido à alta demanda temporária no modelo principal)*`;
+        }
+        return finalText;
+      }
+
+      if (round === MAX_TOOL_ROUNDS) {
+        turn.push({ role: "model", parts: [{ text: "Parei após o limite de ações desta mensagem." }] });
+        conversationHistory.push(...turn);
+        saveChatStorage();
+        return "Parei após o limite de ações desta mensagem. Peça de novo se faltou algo.";
+      }
+
       turn.push(candidate);
-      conversationHistory.push(...turn);
-      return candidate.parts.map(p => p.text || '').join('\n').trim();
+      const responses = [];
+      for (const { functionCall: { name, args } } of calls) {
+        const lbl = TOOL_LABEL[name] || ['Executando ação…','Ação concluída'];
+        const line = appendAiMessage(lbl[0], 'tool');
+        let result;
+        try { result = await executeLocalTool(name, args || {}, apiKey); }
+        catch (e) { result = { erro: String(e.message || e) }; }
+        line.textContent = result.erro ? `Não foi possível concluir: ${lbl[1].toLowerCase()}` : lbl[1];
+        responses.push({ functionResponse: { name, response: result } });
+      }
+      turn.push({ role: "user", parts: responses });
     }
-    if (round === MAX_TOOL_ROUNDS) {
-      turn.push({ role: "model", parts: [{ text: "Parei após o limite de ações desta mensagem." }] });
-      conversationHistory.push(...turn);
-      return "Parei após o limite de ações desta mensagem. Peça de novo se faltou algo.";
-    }
-    turn.push(candidate);
-    const responses = [];
-    for (const { functionCall: { name, args } } of calls) {
-      const lbl = TOOL_LABEL[name] || ['Executando ação…','Ação concluída'];
-      const line = appendAiMessage(lbl[0], 'tool');
-      let result;
-      try { result = await executeLocalTool(name, args || {}, apiKey); }
-      catch (e) { result = { erro: String(e.message || e) }; }
-      line.textContent = result.erro ? `Não foi possível concluir: ${lbl[1].toLowerCase()}` : lbl[1];
-      responses.push({ functionResponse: { name, response: result } });
-    }
-    turn.push({ role: "user", parts: responses });
+  } finally {
+    clearNotice();
   }
+}
+
+function saveChatStorage() {
+  try {
+    storage.setItem(KEY_CHAT_HISTORY, JSON.stringify(conversationHistory));
+    const msgs = Array.from($('#ai-chat').querySelectorAll('.ai-msg:not(.notice):not(.tool)')).map(el => ({
+      html: el.innerHTML,
+      className: el.className
+    }));
+    storage.setItem(KEY_CHAT_UI_MSGS, JSON.stringify(msgs.slice(-40)));
+  } catch (e) {
+    console.warn('Falha ao salvar chat:', e);
+  }
+}
+
+function restoreChat() {
+  const chatEl = $('#ai-chat');
+  if (!chatEl) return;
+  chatEl.textContent = '';
+  try {
+    const rawHist = storage.getItem(KEY_CHAT_HISTORY);
+    const rawMsgs = storage.getItem(KEY_CHAT_UI_MSGS);
+    if (rawHist) {
+      const parsed = JSON.parse(rawHist);
+      if (Array.isArray(parsed) && parsed.length) {
+        conversationHistory.length = 0;
+        conversationHistory.push(...parsed);
+      }
+    }
+    if (rawMsgs) {
+      const parsedMsgs = JSON.parse(rawMsgs);
+      if (Array.isArray(parsedMsgs) && parsedMsgs.length > 0) {
+        parsedMsgs.forEach(m => {
+          const d = document.createElement('div');
+          d.className = m.className || 'ai-msg bot';
+          d.innerHTML = m.html;
+          chatEl.appendChild(d);
+        });
+        chatEl.scrollTop = chatEl.scrollHeight;
+        return;
+      }
+    }
+  } catch (e) {
+    console.warn('Falha ao restaurar chat:', e);
+  }
+  appendAiMessage('O assistente envia o conteúdo necessário para a API do Google. O contexto da conversa é preservado mesmo ao alternar de modelo ou recarregar.', 'notice');
 }
 
 function resetChat() {
   conversationHistory.length = 0;
-  $('#ai-chat').textContent = '';
-  appendAiMessage('O assistente envia o conteúdo necessário para a API do Google. Evite inserir informações que você não queira compartilhar com esse serviço.', 'notice');
+  storage.removeItem(KEY_CHAT_HISTORY);
+  storage.removeItem(KEY_CHAT_UI_MSGS);
+  const chatEl = $('#ai-chat');
+  if (chatEl) {
+    chatEl.textContent = '';
+    appendAiMessage('Nova conversa iniciada. O contexto foi reiniciado.', 'notice');
+  }
 }
 
 const AI_TAGS = /^(STRONG|EM|UL|LI|BR|H2|H3|H4|CODE|BUTTON)$/;
@@ -1949,9 +2158,14 @@ async function updateRagConfigStatus() {
   if (statusEl) {
     statusEl.innerHTML = `<b>${vecs.length}</b> de <b>${total}</b> contatos prontos para busca por significado`;
   }
+  const curModel = getChatModel();
   const descEl = $('#ai-wh-model-desc');
   if (descEl) {
-    descEl.textContent = getChatModel();
+    descEl.textContent = curModel;
+  }
+  const selectEl = $('#ai-model-select');
+  if (selectEl && selectEl.value !== curModel) {
+    selectEl.value = curModel;
   }
 }
 
@@ -2418,7 +2632,7 @@ document.addEventListener('click',e=>{
  const np=$('#notif-panel'),nw=$('#notif-wrap');
  if(np&&!e.target.closest('#notif-wrap')){np.hidden=true;$('#notif-btn')?.setAttribute('aria-expanded','false')}
 
- const t=e.target.closest('[data-a],[data-m],[data-e],[data-id],[data-x],[data-q],[data-dlg],[data-preset]');
+ const t=e.target.closest('[data-a],[data-m],[data-e],[data-id],[data-x],[data-q],[data-dlg],[data-preset],[data-retry]');
  if(!t)return;
  const D=t.dataset,c=db.cards[st.open];
 
@@ -2444,6 +2658,11 @@ document.addEventListener('click',e=>{
  else if(D.a==='dlg-close'){const dg=t.closest('dialog');if(dg)dg.close()}
  else if(D.preset!==undefined){$(D.preset).value=D.v}
  else if(D.a==='ai-new')resetChat();
+ else if(D.retry!==undefined){
+   const rp=D.retry;
+   t.closest('.ai-msg')?.remove();
+   if(rp){$('#ai-prompt').value=rp;$('#ai-form').dispatchEvent(new Event('submit'))}
+ }
  else if(t.classList.contains('ai-contact-btn')&&D.id){drawer(D.id)}
  else if(D.a==='imp')$('#fi').click();
  else if(D.a==='cfg')openSettingsModal();
@@ -2695,6 +2914,17 @@ $('#ai-fab').addEventListener('click', () => {
   if (!win.hidden) $('#ai-prompt').focus();
 });
 
+$('#ai-model-select')?.addEventListener('change', e => {
+  const newModel = e.target.value.trim();
+  if (newModel) {
+    storage.setItem(KEY_CHAT_MODEL, newModel);
+    storage.setItem('gemini_chat_model_migrated_v2', '1');
+    const cfgChat = $('#cfg-chat-model');
+    if (cfgChat) cfgChat.value = newModel;
+    toast(`Modelo alterado para ${newModel}. Histórico e contexto preservados.`);
+  }
+});
+
 $('#ai-form').addEventListener('submit', async e => {
   e.preventDefault();
   const inp = $('#ai-prompt');
@@ -2703,12 +2933,30 @@ $('#ai-form').addEventListener('submit', async e => {
 
   inp.value = '';
   appendAiMessage(txt, 'user');
+  saveChatStorage();
 
   try {
     const resp = await chatWithGemini(txt);
     appendAiMessage(resp || 'Sem resposta.', 'bot', true);
+    saveChatStorage();
   } catch (err) {
-    appendAiMessage(err.message, 'bot');
+    const isRetry = err.isRetryable !== undefined ? err.isRetryable : isRetryableGeminiError(err.status, err.message);
+    const errDiv = appendAiMessage(`⚠️ ${err.message || 'Erro ao processar com a IA.'}`, 'bot');
+    if (isRetry) {
+      const retryBtn = document.createElement('button');
+      retryBtn.type = 'button';
+      retryBtn.className = 'ai-retry-btn';
+      retryBtn.dataset.retry = txt;
+      retryBtn.innerHTML = '🔄 Tentar novamente agora';
+      retryBtn.addEventListener('click', () => {
+        errDiv.remove();
+        inp.value = txt;
+        $('#ai-form').dispatchEvent(new Event('submit'));
+      });
+      errDiv.appendChild(document.createElement('br'));
+      errDiv.appendChild(retryBtn);
+    }
+    saveChatStorage();
   }
 });
 
@@ -2726,7 +2974,12 @@ $('#cfg-save-btn').addEventListener('click', () => {
   if (key) storage.setItem(KEY_GEMINI, key);
   else storage.removeItem(KEY_GEMINI);
 
-  if (chatModel) storage.setItem(KEY_CHAT_MODEL, chatModel);
+  if (chatModel) {
+    storage.setItem(KEY_CHAT_MODEL, chatModel);
+    storage.setItem('gemini_chat_model_migrated_v2', '1');
+    const selectEl = $('#ai-model-select');
+    if (selectEl) selectEl.value = chatModel;
+  }
   if (embedModel) storage.setItem(KEY_EMBED_MODEL, embedModel);
 
   toast('Configurações salvas.');
@@ -2741,7 +2994,7 @@ $('#cfg-reindex-btn').addEventListener('click', async () => {
 });
 
 // Inicialização
-resetChat();
+restoreChat();
 Object.keys(db.cards).forEach(id=>{const c=normCard(db.cards[id]);if(c){c.nome=up(c.nome);db.cards[id]=c}});save();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 new ResizeObserver(()=>document.documentElement.style.setProperty('--hh',$('header').offsetHeight+'px')).observe($('header'));
