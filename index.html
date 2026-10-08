@@ -21,9 +21,6 @@
   --ac-light: #e6f4f7;
   --ln: #e2e8f0;
   --ln-light: #f1f5f9;
-  --ai: #6366f1;
-  --ai-hover: #4f46e5;
-  --ai-grad: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
   --danger: #dc2626;
   --danger-light: #fef2f2;
   --warning: #f59e0b;
@@ -542,91 +539,28 @@ dialog::backdrop{
   display:flex;gap:10px;justify-content:space-between;
 }
 
-/* --- BARRA DE SINCRONIZAÇÃO DE IA --- */
-#ai-sync-bar{
-  display:none;background:#f3f0ff;color:#493ca8;
-  padding:8px 24px;font-size:13px;font-weight:500;border-bottom:1px solid #dcd5f5;
-  justify-content:space-between;align-items:center;
+/* --- ESTILOS DE PENDÊNCIA NOS CARDS --- */
+.row.has-pending{
+  border-color:#fcd34d !important;background:#fffdf5 !important;
+  box-shadow:0 0 0 1px #f59e0b, var(--shadow-sm);
 }
-#ai-sync-bar.on{display:flex}
-.sync-pulse{
-  width:8px;height:8px;border-radius:50%;background:#818cf8;
-  display:inline-block;margin-right:6px;animation:pulse 1.2s infinite;
+.row.has-pending:hover{
+  border-color:#f59e0b !important;
+  box-shadow:0 0 0 1px #f59e0b, 0 8px 18px rgba(245,158,11,.15);
 }
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.2)}}
+.row .mk.pend{color:var(--warning);font-size:11px;margin-left:6px;vertical-align:middle}
 
-/* --- BOTÃO FLUTUANTE DA IA (FAB) --- */
-.ai-fab{
-  position:fixed;right:24px;bottom:24px;width:56px;height:56px;border-radius:50%;
-  background:var(--ai-grad);color:#fff;border:0;
-  box-shadow:0 8px 24px rgba(79,70,229,.35);
-  display:grid;place-items:center;z-index:40;cursor:pointer;
-  transition:all .2s cubic-bezier(.34,1.56,.64,1);
-}
-.ai-fab:hover{transform:scale(1.08);box-shadow:0 12px 28px rgba(79,70,229,.45)}
-.ai-fab svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.ai-fab-dot{position:absolute;top:3px;right:3px;width:12px;height:12px;background:#10b981;border:2px solid #fff;border-radius:50%}
-
-/* --- JANELA DO CHAT IA FLUTUANTE --- */
-#ai-window{
-  position:fixed;bottom:92px;right:24px;width:min(440px,calc(100vw - 32px));height:600px;max-height:calc(100dvh - 110px);
-  background:var(--pn);border-radius:var(--radius-xl);box-shadow:var(--shadow-xl);border:1px solid var(--ln);
-  display:flex;flex-direction:column;z-index:42;overflow:hidden;
-  animation:aiPop .2s cubic-bezier(.16,1,.3,1);
-}
-#ai-window[hidden]{display:none}
-@keyframes aiPop{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
-
-.ai-wh{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--ai-grad);color:#fff}
-.ai-wh-avatar{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:20px}
-.ai-wh-info{flex:1;min-width:0}
-.ai-wh-info h3{font-size:16px;color:#fff;line-height:1.2;font-weight:700}
-.ai-wh-info small{color:rgba(255,255,255,.85);font-size:12px;display:flex;align-items:center;gap:4px}
-.ai-wh-close{background:none;border:0;color:#fff;font-size:20px;opacity:.8;padding:4px;cursor:pointer}
-.ai-wh-close:hover{opacity:1}
-
-.ai-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#f8fafc}
-.ai-msg{max-width:88%;padding:11px 15px;border-radius:14px;font-size:13.5px;line-height:1.5;word-break:break-word}
-.ai-msg strong{color:var(--ink);font-weight:700}
-.ai-msg.user{align-self:flex-end;background:var(--ai);color:#fff;border-bottom-right-radius:3px}
-.ai-msg.user strong{color:#fff}
-.ai-msg.bot{align-self:flex-start;background:var(--pn);color:var(--ink);border:1px solid var(--ln);border-bottom-left-radius:3px;box-shadow:var(--shadow-xs)}
-.ai-msg.tool{align-self:center;font-size:12px;color:var(--mut);background:var(--pn-alt);padding:5px 12px;border-radius:99px;border:1px solid var(--ln)}
-.ai-list{margin:6px 0;padding-left:18px}
-.ai-list li{margin-bottom:4px;line-height:1.45}
-.ai-code{padding:2px 6px;border-radius:5px;background:#e2e8f0;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;color:var(--ink);font-weight:600}
-.ai-contact-btn{display:inline-flex;align-items:center;gap:5px;margin:3px 0;padding:4px 10px;border-radius:6px;background:var(--ac-light);border:1px solid rgba(15,92,110,.25);color:var(--ac);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s ease}
-.ai-contact-btn:hover{background:#d0ebf1;border-color:var(--ac);transform:translateY(-1px)}
-
-.ai-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px;background:var(--pn);border-top:1px solid var(--ln-light)}
-.ai-suggestion-chip{
-  padding:4px 9px;border:1px solid var(--ln);border-radius:99px;
-  background:var(--pn-alt);font-size:11.5px;color:var(--ai);font-weight:600;cursor:pointer;
-}
-.ai-suggestion-chip:hover{background:#e0e7ff;border-color:#c7d2fe}
-
-.ai-form{display:flex;gap:8px;padding:12px;background:var(--pn);border-top:1px solid var(--ln)}
-.ai-form textarea{
-  flex:1;height:42px;resize:none;padding:10px 14px;
-  border:1px solid var(--ln);border-radius:22px;font-size:13.5px;outline:none;
-}
-.ai-form textarea:focus{border-color:var(--ai);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
-.ai-send{
-  width:42px;height:42px;border-radius:50%;border:0;background:var(--ai);
-  color:#fff;display:grid;place-items:center;transition:transform .15s ease;
-}
-.ai-send:hover{background:var(--ai-hover);transform:scale(1.05)}
-
-/* --- TOAST NOTIFICATION --- */
+/* --- TOAST NOTIFICATION (CANTO SUPERIOR DIREITO) --- */
 #tt{
-  position:fixed;left:50%;bottom:28px;transform:translateX(-50%);
-  padding:11px 20px;border-radius:var(--radius-md);
-  background:var(--ink);color:#fff;z-index:999;
-  font-size:13.5px;font-weight:500;box-shadow:var(--shadow-lg);
-  display:flex;align-items:center;gap:8px;animation:toastUp .2s cubic-bezier(.16,1,.3,1);
+  position:fixed;right:22px;top:22px;left:auto;bottom:auto;transform:none;
+  padding:12px 20px;border-radius:var(--radius-md);
+  background:var(--ink);color:#fff;z-index:9999;
+  font-size:13.5px;font-weight:600;box-shadow:var(--shadow-xl);
+  display:flex;align-items:center;gap:8px;animation:toastSlideIn .22s cubic-bezier(.16,1,.3,1);
+  max-width:min(460px,calc(100vw - 32px));line-height:1.4;
 }
 #tt:empty{display:none}
-@keyframes toastUp{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes toastSlideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
 
 /* --- RESPONSIVIDADE --- */
 @media(max-width:960px){
@@ -641,12 +575,6 @@ dialog::backdrop{
   #dr{width:100%}
 }
 button.brand{background:none;border:0;font:inherit;color:inherit;text-align:left;cursor:pointer;padding:0;display:flex;align-items:center;gap:10px}
-.ai-h{margin:8px 0 2px;font-size:14px;font-weight:600}
-.ai-msg.notice{align-self:stretch;max-width:100%;background:transparent;border:1px dashed var(--ln);color:var(--mut);font-size:12.5px}
-.ai-msg.bot,.ai-msg.user{white-space:pre-wrap}
-.ai-msg.bot .ai-list,.ai-msg.bot .ai-h{white-space:normal}
-button.cfg-preset-chip{font:inherit;cursor:pointer}
-.ai-title{font-size:14px;font-weight:600;margin:0}
 .dr-card-title{text-transform:none;letter-spacing:0}
 
 
@@ -750,26 +678,11 @@ button.lab.off{opacity:.38}
 .dr-card-title{font-size:11px;color:#718096}
 .dr-grid{gap:10px}
 .dr-grid label{font-size:11.5px}
+.dr-grid label.dr-inline-label{display:inline-flex !important;flex-direction:row !important;align-items:center !important;gap:5px !important;margin:0 !important;cursor:pointer}
+.chip.pend-chip-on{background:#fef3c7 !important;color:#92400e !important;border-color:#f59e0b !important;font-weight:700}
+.page-stat.stat-active{border-color:#f59e0b !important;background:#fffbeb !important;box-shadow:0 0 0 2px rgba(245,158,11,.22) !important}
 .adv-card{margin-bottom:0}
 .dr-footer{padding:13px 20px;background:#fff}
-
-#ai-window{width:min(460px,calc(100vw - 24px));height:min(680px,calc(100dvh - 110px));right:20px;bottom:88px;border-radius:18px}
-.ai-wh{padding:13px 15px;background:linear-gradient(135deg,#6671f2,#5144d4);gap:10px}
-.ai-wh-avatar{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.18);font-size:16px}
-.ai-wh-info{gap:2px}
-.ai-wh-info h3{font-size:15px}
-.ai-wh-info small{font-size:11px}
-.ai-new-btn{align-self:flex-start;padding:4px 8px;border-radius:7px;color:#fff;background:rgba(255,255,255,.12);font-size:11px;font-weight:700;border:0;cursor:pointer;transition:background-color .15s ease}
-.ai-new-btn:hover{background:rgba(255,255,255,.24)}
-.ai-model-picker{appearance:none;background:rgba(255,255,255,.16) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 7px center;color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:6px;font-size:11px;font-weight:700;padding:2px 22px 2px 7px;cursor:pointer;outline:none}
-.ai-model-picker:hover{background-color:rgba(255,255,255,.24);border-color:rgba(255,255,255,.45)}
-.ai-model-picker option{background:#1e1b4b;color:#fff}
-.ai-ctx-pill{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.9);background:rgba(255,255,255,.14);padding:2px 6px;border-radius:99px;white-space:nowrap;letter-spacing:.02em}
-.ai-retry-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:6px 13px;border-radius:8px;background:var(--ai-grad);color:#fff;border:0;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(99,102,241,.3);transition:all .15s ease}
-.ai-retry-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(99,102,241,.4)}
-.ai-msgs{padding:14px;background:#f6f8fc}
-.ai-form{padding:10px}
-.ai-form textarea{height:44px}
 
 /* Ações em lote e seleção múltipla de contatos */
 .bulk-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;margin-bottom:12px;grid-column:1/-1}
@@ -790,8 +703,6 @@ button.lab.off{opacity:.38}
 .row.bulk-mode .row-note, .row:has(.row-cb-wrap) .row-note{grid-column:1/-1}
 .notif-dot.parto{background:#ec4899}
 
-.cfg-link{font-size:12.5px;color:var(--ai);font-weight:700;text-decoration:none}
-.cfg-link:hover{text-decoration:underline}
 .cfg-sec{padding:16px;border-radius:13px}
 .cfg-sec-title{font-size:14px}
 .cfg-stat-box{gap:10px}
@@ -805,8 +716,7 @@ button.lab.off{opacity:.38}
 .label-mgr-create select{flex:0 1 150px}
 .label-mgr-create .btn{flex:0 0 auto}
 
-#tt{bottom:max(20px,env(safe-area-inset-bottom));padding:10px 16px;max-width:min(620px,calc(100vw - 30px));text-align:center}
-.ai-fab{right:max(20px,env(safe-area-inset-right));bottom:max(20px,env(safe-area-inset-bottom));}
+#tt{top:max(16px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));}
 
 @media(max-width:1180px){
   .search-wrap{width:min(320px,29vw)}
@@ -851,8 +761,6 @@ button.lab.off{opacity:.38}
   #dr{width:100%;border-left:0}
   .dr-grid{grid-template-columns:1fr}
   .dr-footer{padding-bottom:max(13px,env(safe-area-inset-bottom))}
-  .ai-fab{width:52px;height:52px;right:14px;bottom:14px}
-  #ai-window{right:12px;left:12px;width:auto;bottom:76px;max-height:calc(100dvh - 90px)}
   .modal-body{padding:15px}
   .modal-footer{padding:12px 15px;position:sticky;bottom:0}
   .cfg-stat-box{align-items:flex-start;flex-direction:column}
@@ -1044,11 +952,6 @@ nav#rail .month-card.has-pending .month-note svg{color:var(--warning)}
 <body>
 <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
 
-<div id="ai-sync-bar">
-  <span><span class="sync-pulse"></span> Indexando base no navegador com modelo de embeddings...</span>
-  <small id="ai-sync-count"></small>
-</div>
-
 <!-- HEADER / NAVBAR MODERNA -->
 <header>
   <button type="button" class="brand" data-a="home" title="Voltar à visão inicial">
@@ -1171,111 +1074,13 @@ nav#rail .month-card.has-pending .month-note svg{color:var(--warning)}
 <div id="dr-backdrop" data-a="close"></div>
 <aside id="dr" role="dialog" aria-modal="true" aria-label="Detalhes do contato" hidden></aside>
 
-<!-- BOTÃO FLUTUANTE DA IA -->
-<button class="ai-fab" id="ai-fab" aria-label="Abrir Assistente Inteligente" title="Assistente Gemini">
-  <span class="ai-fab-dot"></span>
-  <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
-</button>
-
-<!-- JANELA DO CHAT FLUTUANTE GEMINI -->
-<div id="ai-window" hidden role="dialog" aria-labelledby="ai-window-title">
-  <div class="ai-wh">
-    <div class="ai-wh-avatar" aria-hidden="true">✦</div>
-    <div class="ai-wh-info">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-        <h2 id="ai-window-title" class="ai-title">Assistente</h2>
-        <button type="button" class="ai-new-btn" data-a="ai-new" title="Iniciar nova conversa limpa">Nova conversa</button>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
-        <select id="ai-model-select" class="ai-model-picker" aria-label="Escolher modelo Gemini">
-          <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (Padrão)</option>
-          <option value="gemini-3.8-flash">gemini-3.8-flash</option>
-          <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite</option>
-          <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
-        </select>
-        <span class="ai-ctx-pill" title="Histórico da conversa preservado mesmo ao trocar de modelo">✓ contexto ativo</span>
-      </div>
-    </div>
-    <button class="ai-wh-close" data-a="ai-close" aria-label="Fechar chat">✕</button>
-  </div>
-  <div class="ai-msgs" id="ai-chat">
-    
-  </div>
-  <div class="ai-suggestions">
-    <button class="ai-suggestion-chip" data-q="Quais contatos faltam documentos?">Faltam documentos</button>
-    <button class="ai-suggestion-chip" data-q="Faça um resumo geral dos contatos ativos">Resumo geral</button>
-    <button class="ai-suggestion-chip" data-q="Criar contato MARIA SILVA etapa triagem">Cadastrar contato</button>
-  </div>
-  <form class="ai-form" id="ai-form">
-    <textarea id="ai-prompt" placeholder="Digite uma dúvida ou comando..." rows="1"></textarea>
-    <button type="submit" class="ai-send" aria-label="Enviar">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-    </button>
-  </form>
-</div>
-
-<!-- MODAL DE CONFIGURAÇÕES -->
+<!-- MODAL DE DADOS E BACKUPS -->
 <dialog id="cfg-dlg" aria-labelledby="cfg-title">
   <div class="modal-header">
-    <h2 id="cfg-title">Configurações</h2>
+    <h2 id="cfg-title">Gestão de Dados & Backups</h2>
     <button class="modal-close" data-dlg="close" aria-label="Fechar">✕</button>
   </div>
   <div class="modal-body">
-    <div class="cfg-sec">
-      <div class="cfg-sec-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        Google Gemini API Key
-      </div>
-      <small>Fica armazenada somente neste navegador. As consultas enviadas ao assistente são processadas pela API do Google. Para uso em produção, prefira um proxy/backend para proteger a chave.</small>
-      <div class="cfg-input-grp">
-        <input type="password" id="cfg-key" placeholder="AIzaSy...">
-        <button class="btn" id="cfg-key-toggle" type="button" title="Mostrar ou ocultar a chave" aria-label="Mostrar ou ocultar a chave">Mostrar</button>
-      </div>
-      <div style="margin-top:8px">
-        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="cfg-link">
-          Gerenciar chave no Google AI Studio ↗
-        </a>
-      </div>
-    </div>
-
-    <div class="cfg-sec">
-      <div class="cfg-sec-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-        Modelos do assistente
-      </div>
-      <small>Os dados enviados ao assistente passam pela API do Google.</small>
-      <label style="display:block;margin-bottom:12px;font-size:13px;font-weight:600;color:var(--ink)">
-        Modelo de Chat e Ferramentas (Flash):
-        <input type="text" id="cfg-chat-model" style="width:100%;margin-top:4px;padding:8px 12px;border:1px solid var(--ln);border-radius:8px;font-size:13.5px" placeholder="gemini-3.5-flash-lite">
-        <div class="cfg-presets">
-          <button type="button" class="cfg-preset-chip" data-preset="#cfg-chat-model" data-v="gemini-3.5-flash-lite">gemini-3.5-flash-lite (Padrão)</button>
-          <button type="button" class="cfg-preset-chip" data-preset="#cfg-chat-model" data-v="gemini-3.8-flash">gemini-3.8-flash</button>
-          <button type="button" class="cfg-preset-chip" data-preset="#cfg-chat-model" data-v="gemini-3.1-flash-lite">gemini-3.1-flash-lite</button>
-          <button type="button" class="cfg-preset-chip" data-preset="#cfg-chat-model" data-v="gemini-2.5-flash-lite">gemini-2.5-flash-lite</button>
-        </div>
-        <small style="display:block;margin-top:6px;color:var(--mut);font-weight:400">O contexto da conversa é mantido automaticamente ao alternar entre modelos. Se um modelo enfrentar alta demanda temporária, o sistema tenta novamente e recorre a modelos alternativos sem perda de dados.</small>
-      </label>
-      <label style="display:block;font-size:13px;font-weight:600;color:var(--ink)">
-        Modelo para busca por significado:
-        <input type="text" id="cfg-embed-model" style="width:100%;margin-top:4px;padding:8px 12px;border:1px solid var(--ln);border-radius:8px;font-size:13.5px" placeholder="gemini-embedding-2">
-        <div class="cfg-presets">
-          <button type="button" class="cfg-preset-chip" data-preset="#cfg-embed-model" data-v="gemini-embedding-2">gemini-embedding-2</button>
-        </div>
-      </label>
-    </div>
-
-    <div class="cfg-sec">
-      <div class="cfg-sec-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-        Banco de Vetores Local (IndexedDB)
-      </div>
-      <small>Mantém os vetores localmente para agilizar a busca semântica dos contatos.</small>
-      <div class="cfg-stat-box">
-        <span id="cfg-rag-status" style="font-size:13.5px">Carregando status...</span>
-        <button class="btn" id="cfg-reindex-btn" type="button">Reindexar Tudo</button>
-      </div>
-    </div>
-
     <div class="cfg-sec">
       <div class="cfg-sec-title">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -1317,8 +1122,7 @@ nav#rail .month-card.has-pending .month-note svg{color:var(--warning)}
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn" id="cfg-close-btn" type="button">Cancelar</button>
-    <button class="btn p" id="cfg-save-btn" type="button">Salvar Configurações</button>
+    <button class="btn p" data-dlg="close" type="button">Fechar</button>
   </div>
 </dialog>
 
@@ -1437,12 +1241,6 @@ const colorOpts=sel=>COLORS.map(c=>`<option value="${c[0]}"${c[0]===sel?' select
 const safeLabelColor=v=>{const [base,mode]=String(v??'black').split('_');return COLORS.some(c=>c[0]===base)?base+(mode==='light'||mode==='dark'?'_'+mode:''):'black'};
 const storage=(()=>{const memory=new Map();let native=null;try{const probe='__cantinho_storage_probe__';localStorage.setItem(probe,'1');localStorage.removeItem(probe);native=localStorage}catch(e){}return{persistent:!!native,getItem:k=>{try{return native?native.getItem(k):memory.get(k)??null}catch(e){return memory.get(k)??null}},setItem:(k,v)=>{try{if(native)native.setItem(k,v);else memory.set(k,String(v))}catch(e){memory.set(k,String(v));throw e}},removeItem:k=>{try{if(native)native.removeItem(k);else memory.delete(k)}catch(e){memory.delete(k)}}}})();
 const KEY='sm_atendimentos_v1';
-const KEY_GEMINI='gemini_api_key_v1';
-const KEY_CHAT_MODEL='gemini_chat_model_v1';
-const KEY_EMBED_MODEL='gemini_embed_model_v1';
-const KEY_CHAT_HISTORY='gemini_chat_history_v1';
-const KEY_CHAT_UI_MSGS='gemini_chat_ui_msgs_v1';
-const DEFAULT_CHAT_MODEL='gemini-3.5-flash-lite';
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -1467,7 +1265,7 @@ function normCard(c){
  c.labels=Array.isArray(c.labels)?c.labels.map(String):[];c.tl=Array.isArray(c.tl)?c.tl.map(String):[];
  c.hist=Array.isArray(c.hist)?c.hist.filter(h=>h&&typeof h==='object').map(h=>({...h,d:h.d?String(h.d):null,t:String(h.t??'')})):[];
  if(!c.rich){c.obs=toHtml(c.obs);c.rich=1}else c.obs=clean(String(c.obs??''));
- c.td=String(c.td??'');c.arq=!!c.arq;c.parto_ok=!!c.parto_ok;return c}
+ c.td=String(c.td??'');c.arq=!!c.arq;c.parto_ok=!!c.parto_ok;c.pend=!!c.pend;return c}
 let db,persisted=storage.getItem(KEY);try{db=JSON.parse(persisted)}catch(e){}
 db=(db&&typeof db==='object')?db:{cards:{},labels:{}};db.cards=(db.cards&&typeof db.cards==='object')?db.cards:{};db.labels=(db.labels&&typeof db.labels==='object')?Object.fromEntries(Object.entries(db.labels).map(([l,v])=>[String(l),safeLabelColor(v)]).filter(([l])=>l)):{};db.meses=Array.isArray(db.meses)?db.meses.filter(okm):[];db.mnotes=(db.mnotes&&typeof db.mnotes==='object')?db.mnotes:{};db.gone=Array.isArray(db.gone)?db.gone.map(String):[];db.del=Array.isArray(db.del)?db.del.map(String):[];Object.values(db.cards).forEach(c=>{if(c&&Array.isArray(c.labels))c.labels.map(String).forEach(l=>{if(l&&!db.labels[l])db.labels[l]='black'})});persisted=persisted||JSON.stringify(db);
 let st={mes:'*',et:'ativos',q:'',lb:[],mode:'e',lopen:false,sort:'etapa',ls:[],lq:'',mm:false,open:null,bulk:false,sel:[]};
@@ -1525,758 +1323,9 @@ const labs=a=>a.map(l=>`<span class="lab" style="${ls(l)}">${esc(l)}</span>`).jo
 const fd=(iso,o)=>iso?new Date(iso).toLocaleString('pt-BR',o?{day:'2-digit',month:'2-digit',year:'2-digit'}:{day:'2-digit',month:'2-digit',year:'2-digit',hour:'2-digit',minute:'2-digit'}):'Importado do Trello';
 const fs=s=>s?s.split('-').reverse().map((x,i)=>i==2?x.slice(2):x).join('/'):'';
 
-// =========================================================================
-// MÓDULO GEMINI API & VETORIAL RAG NO NAVEGADOR
-// =========================================================================
-
-function getChatModel() {
-  let m = storage.getItem(KEY_CHAT_MODEL);
-  if (!storage.getItem('gemini_chat_model_migrated_v2')) {
-    m = DEFAULT_CHAT_MODEL;
-    storage.setItem(KEY_CHAT_MODEL, DEFAULT_CHAT_MODEL);
-    storage.setItem('gemini_chat_model_migrated_v2', '1');
-  }
-  return m || DEFAULT_CHAT_MODEL;
-}
-function getEmbedModel() {
-  const m=storage.getItem(KEY_EMBED_MODEL);return(!m||m==='gemini-embedding-001')?'gemini-embedding-2':m;
-}
-
-function isRetryableGeminiError(status, msg = '') {
-  if (status === 429 || status === 503 || status === 500 || status === 504) return true;
-  const lower = String(msg).toLowerCase();
-  return lower.includes('high demand') ||
-         lower.includes('spikes in demand') ||
-         lower.includes('temporarily unavailable') ||
-         lower.includes('resource has been exhausted') ||
-         lower.includes('quota') ||
-         lower.includes('rate limit') ||
-         lower.includes('overloaded') ||
-         lower.includes('try again later') ||
-         lower.includes('failed to fetch') ||
-         lower.includes('network') ||
-         lower.includes('timeout');
-}
-
-const IDB_NAME = 'cantinho_vectors_db';
-const IDB_STORE = 'vectors';
-
-let _idb=null;
-function openVecDB(){
-  if(_idb)return _idb;
-  _idb=new Promise((resolve,reject)=>{
-    const req=indexedDB.open(IDB_NAME,1);
-    req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains(IDB_STORE))req.result.createObjectStore(IDB_STORE,{keyPath:'id'})};
-    req.onsuccess=()=>{const d=req.result;d.onversionchange=()=>{d.close();_idb=null};d.onclose=()=>{_idb=null};resolve(d)};
-    req.onerror=()=>{_idb=null;reject(req.error)};
-  });
-  return _idb;
-}
-async function idbRun(mode,fn){
-  try{
-    const idb=await openVecDB(),tx=idb.transaction(IDB_STORE,mode);
-    const out=fn(tx.objectStore(IDB_STORE));
-    return await new Promise((res,rej)=>{tx.oncomplete=()=>res(out&&'result' in out?out.result:undefined);tx.onerror=tx.onabort=()=>rej(tx.error)});
-  }catch(e){console.warn('Falha no banco local de buscas:',e);return undefined}
-}
-const putVector=(id,vector,hash)=>idbRun('readwrite',st=>st.put({id,vector,hash}));
-const getAllVectors=async()=>(await idbRun('readonly',st=>st.getAll()))||[];
-const clearAllVectors=()=>idbRun('readwrite',st=>st.clear());
-const deleteVector=id=>idbRun('readwrite',st=>st.delete(id));
-
-function cardToText(c) {
-  return `Nome: ${c.nome}
-Etapa: ${(SN[c.etapa]||[])[1]||c.etapa}
-Mês: ${mlabel(c.mes)}
-Parto: ${c.parto||'Não informado'}
-Pagamento: ${c.saque||'Não informado'}
-Labels: ${c.labels.join(', ')}
-Anotações: ${txt(c.obs)}
-Histórico: ${c.hist.map(h => h.t).join('; ')}`.trim();
-}
-
-function simpleHash(str) {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) hash = ((hash << 5) - hash) + str.charCodeAt(i) | 0;
-  return hash.toString();
-}
-
-function cosineSimilarity(vecA, vecB) {
-  let dot = 0, mA = 0, mB = 0;
-  for (let i = 0; i < vecA.length; i++) {
-    dot += vecA[i] * vecB[i];
-    mA += vecA[i] * vecA[i];
-    mB += vecB[i] * vecB[i];
-  }
-  return dot / (Math.sqrt(mA) * Math.sqrt(mB) || 1);
-}
-
-async function geminiCallEmbed(text, apiKey, maxRetries = 3) {
-  const model = getEmbedModel();
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:embedContent`;
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-        body: JSON.stringify({
-          model: `models/${model}`,
-          content: { parts: [{ text }] }
-        })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        return data.embedding.values;
-      }
-      const err = await res.json().catch(() => ({}));
-      const msg = err.error?.message || `Erro ${res.status} no modelo de embedding (${model})`;
-      if (attempt < maxRetries && isRetryableGeminiError(res.status, msg)) {
-        await new Promise(r => setTimeout(r, 1200 * attempt));
-        continue;
-      }
-      throw new Error(msg);
-    } catch (e) {
-      if (attempt < maxRetries && isRetryableGeminiError(undefined, e.message)) {
-        await new Promise(r => setTimeout(r, 1200 * attempt));
-        continue;
-      }
-      throw e;
-    }
-  }
-}
-
-let isSyncing = false;
-async function syncEmbeddings(forceAll = false) {
-  const key = storage.getItem(KEY_GEMINI);
-  if (!key || isSyncing) return;
-
-  const cards = Object.values(db.cards);
-  if (!cards.length) return;
-
-  if (forceAll) await clearAllVectors();
-
-  isSyncing = true;
-  const stored = await getAllVectors();
-  const map = new Map(stored.map(s => [s.id, s.hash]));
-  const missing = cards.filter(c => map.get(c.id) !== simpleHash(cardToText(c)));
-
-  if (missing.length > 0) {
-    const bar = $('#ai-sync-bar');
-    const cnt = $('#ai-sync-count');
-    bar.classList.add('on');
-    let done = 0;
-
-    for (const c of missing) {
-      cnt.textContent = `${done + 1} de ${missing.length}`;
-      try {
-        const text = cardToText(c);
-        const vector = await geminiCallEmbed(text, key);
-        await putVector(c.id, vector, simpleHash(text));
-        done++;
-        await new Promise(r => setTimeout(r, 220));
-      } catch (e) {
-        console.warn('Embed falhou:', c.nome, e);
-        if (e.message.includes('quota') || e.message.includes('429')) break;
-      }
-    }
-    bar.classList.remove('on');
-  }
-  isSyncing = false;
-  updateRagConfigStatus();
-}
-
-const embTimers=new Map(),embSeq=new Map();
-function queueCardEmbedding(c){
-  if(!c||!storage.getItem(KEY_GEMINI))return;
-  clearTimeout(embTimers.get(c.id));
-  embTimers.set(c.id,setTimeout(()=>runCardEmbedding(c.id),1500));
-}
-async function runCardEmbedding(id){
-  embTimers.delete(id);
-  const c=db.cards[id],key=storage.getItem(KEY_GEMINI);
-  if(!c||!key)return;
-  const seq=(embSeq.get(id)||0)+1;embSeq.set(id,seq);
-  try{
-    const text=cardToText(c),vector=await geminiCallEmbed(text,key);
-    if(embSeq.get(id)!==seq||!db.cards[id])return;
-    await putVector(id,vector,simpleHash(text));
-    updateRagConfigStatus();
-  }catch(e){console.warn('Não foi possível atualizar a busca do contato:',e)}
-}
-
-const GEMINI_TOOLS = [
-  { functionDeclarations: [
-    { name:"executar_no_banco", description:"Executa código JavaScript diretamente no banco de dados 'db' da aplicação. Ferramenta principal e prioritária para realizar qualquer comando ou consulta que o usuário pedir (criar contatos, consultar, filtrar, alterar em lote, mover meses, adicionar ocorrências, excluir em lote, calcular estatísticas, etc.). Retorna o resultado para você responder. IMPORTANTE: para ações de perigo que excluam múltiplos contatos ou apaguem dados em massa, você DEVE primeiro verificar a quantidade e pedir confirmação curta e resumida ao usuário antes de executar.", parameters:{type:"OBJECT",properties:{codigo_js:{type:"STRING",description:"Código JavaScript a executar com acesso direto a db, all(), cur, st, S, SN, ML, save(), render(), toast(), deleteVector(), queueCardEmbedding(), updateRagConfigStatus(). Pode usar return para retornar dados."},descricao:{type:"STRING",description:"Breve descrição da operação."},confirmado_pelo_usuario:{type:"BOOLEAN",description:"Defina como true SOMENTE se o usuário já tiver confirmado a ação de perigo expressamente."}},required:["codigo_js"]} },
-    { name:"estado_sistema", description:"Lê o estado completo e atual do aplicativo: contatos, etapas, meses, etiquetas, filtros atuais, pendências do mês e status do backup.", parameters:{type:"OBJECT",properties:{}} },
-    { name:"buscar_contatos", description:"Busca contatos por significado, texto, nome, etapa, mês, etiquetas, datas, anotações ou histórico. Use esta ferramenta quando o usuário não fornecer um ID exato.", parameters:{type:"OBJECT",properties:{consulta:{type:"STRING",description:"Consulta em linguagem natural"},limite:{type:"INTEGER",description:"Quantidade máxima de resultados, de 1 a 20"}},required:["consulta"]} },
-    { name:"ler_contato", description:"Retorna todos os dados de um contato, incluindo etiquetas, anotações e histórico completo. Pode localizar por ID ou nome.", parameters:{type:"OBJECT",properties:{id:{type:"STRING"},nome:{type:"STRING"}}} },
-    { name:"navegar_sistema", description:"Altera a visão da aplicação como faria um usuário: mês, etapa, busca, ordenação e filtro de etiquetas.", parameters:{type:"OBJECT",properties:{mes:{type:"STRING",description:"Todos os meses, sem-data ou chave AAAA-MM"},etapa:{type:"STRING",enum:["ativos","todos","arq","triagem","docs","guia","entrada","inss","deferido","fim","indef"]},busca:{type:"STRING"},ordenacao:{type:"STRING",enum:["etapa","nome","parto","ativ"]},etiquetas:{type:"ARRAY",items:{type:"STRING"}},modo_etiquetas:{type:"STRING",enum:["e","o"]},limpar_filtros:{type:"BOOLEAN"}}} },
-    { name:"abrir_contato", description:"Abre o cadastro de um contato no modal de detalhes para o usuário.", parameters:{type:"OBJECT",properties:{id:{type:"STRING"},nome:{type:"STRING"}}} },
-    { name:"criar_contato", description:"Cria um novo atendimento com todos os campos disponíveis no cadastro.", parameters:{type:"OBJECT",properties:{nome:{type:"STRING"},etapa:{type:"STRING",enum:S.map(s=>s[0])},parto:{type:"STRING",description:"AAAA-MM-DD"},saque:{type:"STRING",description:"AAAA-MM-DD"},anotacoes:{type:"STRING"},anotacoes_html:{type:"STRING"},mes:{type:"STRING",description:"AAAA-MM"},etiquetas:{type:"ARRAY",items:{type:"STRING"}}},required:["nome"]} },
-    { name:"atualizar_contato", description:"Altera qualquer campo principal disponível no cadastro: nome, etapa, mês, parto, pagamento e anotações.", parameters:{type:"OBJECT",properties:{id:{type:"STRING"},nome:{type:"STRING"},etapa:{type:"STRING",enum:S.map(s=>s[0])},mes:{type:"STRING",description:"AAAA-MM"},parto:{type:"STRING",description:"AAAA-MM-DD"},saque:{type:"STRING",description:"AAAA-MM-DD"},anotacoes:{type:"STRING"},anotacoes_html:{type:"STRING"}},required:["id"]} },
-    { name:"excluir_contato", description:"Exclui definitivamente um contato. A interface exibirá confirmação antes da exclusão.", parameters:{type:"OBJECT",properties:{id:{type:"STRING"},nome:{type:"STRING"}}} },
-    { name:"arquivar_contato", description:"Arquiva ou restaura um contato, como o botão do cadastro.", parameters:{type:"OBJECT",properties:{id:{type:"STRING"},nome:{type:"STRING"},arquivar:{type:"BOOLEAN"}}} },
-    { name:"avancar_etapa", description:"Avança o contato para a próxima etapa do fluxo exatamente como o atalho Avançar etapa.", parameters:{type:"OBJECT",properties:{id:{type:"STRING"},nome:{type:"STRING"}}} },
-    { name:"gerenciar_etiqueta", description:"Cria, renomeia, muda a cor ou exclui etiquetas. Exclusão pede confirmação na interface.", parameters:{type:"OBJECT",properties:{operacao:{type:"STRING",enum:["criar","renomear","cor","excluir"]},nome:{type:"STRING"},novo_nome:{type:"STRING"},cor:{type:"STRING",enum:COLORS.map(c=>c[0])}},required:["operacao","nome"]} },
-    { name:"aplicar_etiqueta", description:"Adiciona ou remove uma etiqueta de um contato.", parameters:{type:"OBJECT",properties:{id:{type:"STRING"},nome_contato:{type:"STRING"},etiqueta:{type:"STRING"},acao:{type:"STRING",enum:["adicionar","remover"]},criar_se_ausente:{type:"BOOLEAN"},cor:{type:"STRING",enum:COLORS.map(c=>c[0])}},required:["etiqueta","acao"]} },
-    { name:"adicionar_historico", description:"Registra uma ocorrência no histórico do contato, com data opcional.", parameters:{type:"OBJECT",properties:{id:{type:"STRING"},nome:{type:"STRING"},texto:{type:"STRING"},data:{type:"STRING",description:"AAAA-MM-DD, opcional"}},required:["texto"]} },
-    { name:"editar_historico", description:"Edita o texto de um registro existente do histórico pelo índice retornado por ler_contato.", parameters:{type:"OBJECT",properties:{id:{type:"STRING"},indice:{type:"INTEGER"},texto:{type:"STRING"}},required:["id","indice","texto"]} },
-    { name:"excluir_historico", description:"Exclui um registro existente do histórico pelo índice. A interface exibirá confirmação.", parameters:{type:"OBJECT",properties:{id:{type:"STRING"},indice:{type:"INTEGER"}},required:["id","indice"]} },
-    { name:"criar_mes", description:"Cria um novo mês de atendimento e seleciona o mês.", parameters:{type:"OBJECT",properties:{mes:{type:"STRING",description:"AAAA-MM"}},required:["mes"]} },
-    { name:"atualizar_nota_mes", description:"Cria ou atualiza a anotação do mês e seu estado de pendência/validação.", parameters:{type:"OBJECT",properties:{mes:{type:"STRING",description:"AAAA-MM"},texto:{type:"STRING"},pendente:{type:"BOOLEAN"}},required:["mes"]} },
-    { name:"excluir_mes", description:"Exclui um mês. Pode mover os contatos para Sem data ou excluir os contatos junto. A interface pedirá confirmação.", parameters:{type:"OBJECT",properties:{mes:{type:"STRING",description:"AAAA-MM"},destino_contatos:{type:"STRING",enum:["sem_data","excluir"]}},required:["mes"]} },
-    { name:"exportar_backup", description:"Baixa o backup completo JSON do sistema e atualiza a data do último backup.", parameters:{type:"OBJECT",properties:{}} },
-    { name:"exportar_csv", description:"Baixa o CSV da visão atualmente filtrada.", parameters:{type:"OBJECT",properties:{}} },
-    { name:"importar_dados", description:"Importa um JSON de backup do Meu cantinho ou um JSON exportado do Trello. O conteúdo deve ser fornecido pelo usuário ou já estar disponível na conversa. Pode mesclar ou substituir os dados. Substituição pede confirmação.", parameters:{type:"OBJECT",properties:{conteudo_json:{type:"STRING"},modo:{type:"STRING",enum:["mesclar","substituir"]}},required:["conteudo_json"]} },
-    { name:"abrir_configuracoes", description:"Abre as configurações da aplicação.", parameters:{type:"OBJECT",properties:{}} },
-    { name:"configurar_modelos", description:"Altera os modelos configurados para chat e/ou busca semântica. A chave da API continua sendo gerenciada manualmente nas configurações.", parameters:{type:"OBJECT",properties:{modelo_chat:{type:"STRING"},modelo_embedding:{type:"STRING"}}} },
-    { name:"reindexar_busca", description:"Reconstrói todos os vetores locais da busca semântica.", parameters:{type:"OBJECT",properties:{}} }
-  ]}
-];
-
-function resolveContact(args={}){
-  if(args.id && db.cards[args.id])return db.cards[args.id];
-  const wanted=norm(args.nome_contato||args.nome||'');
-  if(!wanted)return null;
-  const exact=all().find(c=>norm(c.nome)===wanted);
-  return exact||all().find(c=>norm(c.nome).includes(wanted))||null;
-}
-function contactPayload(c){
-  return c?{id:c.id,nome:c.nome,etapa:(SN[c.etapa]||[])[1]||c.etapa,etapa_id:c.etapa,mes:c.mes,mes_nome:mlabel(c.mes),parto:c.parto||'',saque:c.saque||'',etiquetas:[...c.labels],anotacoes:txt(c.obs),anotacoes_html:c.obs||'',arquivado:!!c.arq,historico:c.hist.map((h,i)=>({indice:i,data:h.d||'',texto:h.t,origem_trello:!!h.o}))}:null;
-}
-function lexicalContactSearch(q,limit=10){
- const needle=norm(q),tokens=needle.split(/\s+/).filter(Boolean);
- return all().map(c=>{const hay=norm([c.nome,c.mes,mlabel(c.mes),SN[c.etapa]?.[1]||c.etapa,c.labels.join(' '),plain(c.obs),...c.hist.map(h=>h.t)].join(' '));let score=0;if(norm(c.nome).includes(needle))score+=80;if(hay.includes(needle))score+=30;tokens.forEach(t=>{if(hay.includes(t))score+=4});return{c,score}}).filter(x=>x.score>0).sort((a,b)=>b.score-a.score||nm(a.c,b.c)).slice(0,limit);
-}
-async function semanticOrLexicalSearch(q,apiKey,limit=10){
-  try{
-    const vecs=await getAllVectors();
-    if(apiKey&&vecs.length){
-      const qVec=await geminiCallEmbed(q,apiKey);
-      return vecs.map(v=>({id:v.id,score:cosineSimilarity(qVec,v.vector)})).sort((a,b)=>b.score-a.score).slice(0,limit).map(v=>({c:db.cards[v.id],score:v.score})).filter(x=>x.c);
-    }
-  }catch(e){console.warn('Busca semântica indisponível, usando busca textual.',e)}
-  return lexicalContactSearch(q,limit).map(x=>({c:x.c,score:x.score/100}));
-}
-async function saveToolRefresh(c=null){
-  if(!save())return false;
-  render();
-  if(c){if(st.open===c.id)drawer(c.id);queueCardEmbedding(c)}
-  return true;
-}
-async function executeDbScript(code, confirmado = false) {
-  if (!code || typeof code !== 'string') return { erro: 'Código JavaScript não fornecido.' };
-
-  const prevDbJson = JSON.stringify(db);
-  const initialCardsCount = Object.keys(db.cards).length;
-  const prevCards = { ...db.cards };
-
-  const scope = {
-    db, all, cur, st, S, SN, ML, MN, mlabel, mkey, norm, up, now,
-    save, render, toast, drawer, deleteVector, queueCardEmbedding,
-    syncEmbeddings, updateRagConfigStatus, normCard
-  };
-
-  try {
-    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
-    const fn = new AsyncFunction(...Object.keys(scope), code);
-    const result = await fn(...Object.values(scope));
-
-    const finalCardsCount = Object.keys(db.cards).length;
-    const deletedCount = initialCardsCount - finalCardsCount;
-
-    // Proteção de segurança: se a operação excluiu múltiplos contatos sem confirmação prévia
-    if (deletedCount > 1 && !confirmado) {
-      db = JSON.parse(prevDbJson);
-      save();
-      render();
-      return {
-        bloqueado_requer_confirmacao: true,
-        contatos_afetados: deletedCount,
-        alerta: `Ação de perigo detectada: ${deletedCount} contatos seriam excluídos. Solicite confirmação curta ao usuário antes de prosseguir (exemplo: 'Você pediu para apagar [descrição da ação] (${deletedCount} contatos). Posso prosseguir?'). NÃO exclua nada até que o usuário responda confirmando.`
-      };
-    }
-
-    // Sincronização automática de vetores e log de exclusão
-    const curCardIds = new Set(Object.keys(db.cards));
-    Object.keys(prevCards).forEach(id => {
-      if (!curCardIds.has(id)) {
-        deleteVector(id);
-        if (!db.del.includes(id)) db.del.push(id);
-      }
-    });
-    curCardIds.forEach(id => {
-      if (!prevCards[id]) {
-        queueCardEmbedding(db.cards[id]);
-      }
-    });
-
-    if (JSON.stringify(db) !== prevDbJson) {
-      save();
-      render();
-      updateRagConfigStatus();
-    }
-
-    return {
-      sucesso: true,
-      resultado: result !== undefined ? result : 'Operação executada diretamente no banco com sucesso.'
-    };
-  } catch (err) {
-    db = JSON.parse(prevDbJson);
-    save();
-    render();
-    return { erro: String(err.message || err) };
-  }
-}
-
-async function executeLocalTool(name,args,apiKey){
-  if(name==='executar_no_banco'){
-    return await executeDbScript(args.codigo_js, !!args.confirmado_pelo_usuario);
-  }
-  if(name==='estado_sistema'){
-    const cs=all(),act=c=>!c.arq&&c.etapa!=='fim',pending=Object.entries(db.mnotes||{}).filter(([k,v])=>v&&v.v).map(([k,v])=>({mes:k,mes_nome:mlabel(k),texto:v.n||''}));
-    return {filtros:{mes:st.mes,etapa:st.et,busca:st.q,etiquetas:[...st.lb],modo_etiquetas:st.mode,ordenacao:st.sort},totais:{contatos:cs.length,ativos:cs.filter(act).length,arquivados:cs.filter(c=>c.arq).length,sem_mes:cs.filter(c=>!c.mes&&!c.arq).length},etapas:Object.fromEntries(S.map(s=>[s[0],cs.filter(c=>!c.arq&&c.etapa===s[0]).length])),meses:db.meses.map(k=>({chave:k,nome:mlabel(k),nota:db.mnotes[k]?.n||'',pendente:!!db.mnotes[k]?.v})),etiquetas:Object.keys(db.labels),pendencias_mes:pending,backup:{ultimo:db.bk||null,dias:backupAgeDays()}};
-  }
-  if(name==='buscar_contatos'){
-    const q=String(args.consulta||'').trim(),limit=Math.min(20,Math.max(1,Number(args.limite)||10));if(!q)return{erro:'Informe uma consulta'};
-    const found=await semanticOrLexicalSearch(q,apiKey,limit);
-    return {contatos_encontrados:found.map(x=>({...contactPayload(x.c),similaridade:x.score?Math.round(x.score*100)+'%':''}))};
-  }
-  if(name==='ler_contato'){
-    const c=resolveContact(args);if(!c)return{erro:'Contato não encontrado'};return{contato:contactPayload(c)};
-  }
-  if(name==='navegar_sistema'){
-    if(args.limpar_filtros){st.mes='*';st.et='ativos';st.q='';st.lb=[];st.mode='e';$('#q').value=''}
-    if(args.mes!==undefined){const m=norm(args.mes||'');st.mes=m==='todos'?'*':m==='sem-data'?'':/^\d{4}-\d{2}$/.test(args.mes)?args.mes:(mkey(String(args.mes))||st.mes)}
-    if(args.etapa)st.et=args.etapa;
-    if(args.busca!==undefined){st.q=String(args.busca||'');$('#q').value=st.q}
-    if(args.ordenacao)st.sort=args.ordenacao;
-    if(Array.isArray(args.etiquetas))st.lb=[...new Set(args.etiquetas.filter(l=>db.labels[l]))];
-    if(args.modo_etiquetas)st.mode=args.modo_etiquetas;
-    render();
-    return{status:'sucesso',filtros:{mes:st.mes,etapa:st.et,busca:st.q,etiquetas:[...st.lb],ordenacao:st.sort}};
-  }
-  if(name==='abrir_contato'){const c=resolveContact(args);if(!c)return{erro:'Contato não encontrado'};drawer(c.id);return{status:'sucesso',contato:contactPayload(c)}}
-  if(name==='criar_contato'){
-    const nome=String(args.nome||'').trim();if(!nome)return{erro:'Nome obrigatório'};
-    const parto=args.parto===undefined?'':(okd(args.parto)?String(args.parto||''):null);if(parto===null)return{erro:'Data do parto inválida'};
-    const saque=args.saque===undefined?'':(okd(args.saque)?String(args.saque||''):null);if(saque===null)return{erro:'Data de pagamento inválida'};
-    const mes=args.mes&&/^\d{4}-(0[1-9]|1[0-2])$/.test(args.mes)?args.mes:(parto?parto.slice(0,7):'');
-    const requestedLabels=Array.isArray(args.etiquetas)?args.etiquetas.map(String).filter(Boolean):[];requestedLabels.forEach(l=>{if(!db.labels[l])db.labels[l]='black'});
-    const id='m'+Date.now().toString(36),obs=args.anotacoes_html?clean(String(args.anotacoes_html)):toHtml(args.anotacoes||'');
-    db.cards[id]={id,nome:up(nome),etapa:SN[args.etapa]?args.etapa:'triagem',parto,saque,mes,labels:[...new Set(requestedLabels)],tl:[],obs,rich:1,td:'',hist:[{d:now(),t:'Contato criado pelo Assistente'}],arq:false};
-    if(mes&&!db.meses.includes(mes))db.meses.push(mes);
-    const c=db.cards[id];if(!await saveToolRefresh(c))return{erro:'Não foi possível salvar'};return{status:'sucesso',contato:contactPayload(c)};
-  }
-  if(name==='atualizar_contato'){
-    const c=resolveContact(args);if(!c)return{erro:'Contato não encontrado'};const changes=[];
-    if(args.nome!==undefined){const n=up(String(args.nome||'').trim());if(n&&n!==c.nome){log(c,`Nome: ${c.nome} → ${n}`);c.nome=n;changes.push('nome')}}
-    if(args.etapa!==undefined){if(!SN[args.etapa])return{erro:'Etapa inválida'};if(c.etapa!==args.etapa){log(c,`Etapa: ${SN[c.etapa][1]} → ${SN[args.etapa][1]}`);c.etapa=args.etapa;changes.push('etapa')}}
-    if(args.mes!==undefined){if(args.mes&&!/^\d{4}-(0[1-9]|1[0-2])$/.test(args.mes))return{erro:'Mês inválido'};if(c.mes!==args.mes){log(c,`Mês alterado: ${mlabel(c.mes)} → ${mlabel(args.mes)}`);c.mes=args.mes||'';if(c.mes&&!db.meses.includes(c.mes))db.meses.push(c.mes);changes.push('mes')}}
-    for(const [campo,rot] of [['parto','Parto'],['saque','Pagamento']])if(args[campo]!==undefined){if(!okd(args[campo]))return{erro:`Data inválida em ${campo}`};if(c[campo]!==args[campo]){log(c,`${rot}: ${fx(c[campo])||'vazio'} → ${fx(args[campo])||'vazio'}`);c[campo]=args[campo]||'';changes.push(campo)}}
-    if(args.anotacoes!==undefined||args.anotacoes_html!==undefined){const o=args.anotacoes_html!==undefined?clean(String(args.anotacoes_html)):toHtml(String(args.anotacoes||''));if(o!==c.obs){c.obs=o;log(c,'Anotações atualizadas');changes.push('anotacoes')}}
-    if(c.parto&&!c.mes){c.mes=c.parto.slice(0,7);if(!db.meses.includes(c.mes))db.meses.push(c.mes);changes.push('mes')}
-    if(!changes)return{status:'sem alterações',contato:contactPayload(c)};if(!await saveToolRefresh(c))return{erro:'Não foi possível salvar'};return{status:'sucesso',campos_alterados:changes,contato:contactPayload(c)};
-  }
-  if(name==='excluir_contato'){
-    const c=resolveContact(args);if(!c)return{erro:'Contato não encontrado'};
-    if(!await ask(`Excluir definitivamente o contato "${c.nome}"?`,{ok:'Excluir',danger:true,title:'Excluir contato'}))return{status:'cancelado'};
-    delete db.cards[c.id];if(!db.del.includes(c.id))db.del.push(c.id);await deleteVector(c.id);if(!save())return{erro:'Não foi possível salvar'};drawer(null);render();updateRagConfigStatus();return{status:'sucesso',id:c.id,nome:c.nome};
-  }
-  if(name==='arquivar_contato'){
-    const c=resolveContact(args);if(!c)return{erro:'Contato não encontrado'};const target=args.arquivar===undefined?!c.arq:!!args.arquivar;if(c.arq!==target){c.arq=target;log(c,target?'Contato arquivado':'Contato restaurado');if(!await saveToolRefresh(c))return{erro:'Não foi possível salvar'}}return{status:'sucesso',contato:contactPayload(c)};
-  }
-  if(name==='avancar_etapa'){
-    const c=resolveContact(args);if(!c)return{erro:'Contato não encontrado'};const ix=si(c);if(ix<0||ix>=S.length-1)return{status:'sem próxima etapa',contato:contactPayload(c)};const n=S[ix+1];log(c,`Etapa avançada: ${SN[c.etapa][1]} → ${n[1]}`);c.etapa=n[0];if(!await saveToolRefresh(c))return{erro:'Não foi possível salvar'};return{status:'sucesso',contato:contactPayload(c)};
-  }
-  if(name==='gerenciar_etiqueta'){
-    const op=args.operacao,n=String(args.nome||'').trim();if(!n)return{erro:'Nome da etiqueta obrigatório'};
-    if(op==='criar'){if(db.labels[n])return{erro:'Etiqueta já existe'};db.labels[n]=args.cor||'black';save();render();if(st.open)drawer(st.open);return{status:'sucesso',etiqueta:n}}
-    if(!db.labels[n])return{erro:'Etiqueta não encontrada'};
-    if(op==='renomear'){const nn=String(args.novo_nome||'').trim();if(!nn)return{erro:'Novo nome obrigatório'};if(db.labels[nn])return{erro:'Já existe uma etiqueta com esse nome'};db.labels[nn]=db.labels[n];delete db.labels[n];all().forEach(c=>{const i=c.labels.indexOf(n);if(i>=0)c.labels[i]=nn});st.lb=st.lb.map(x=>x===n?nn:x);st.ls=st.ls.map(x=>x===n?nn:x);save();if(st.open)drawer(st.open);render();return{status:'sucesso',etiqueta_anterior:n,etiqueta:nn}}
-    if(op==='cor'){db.labels[n]=args.cor||'black';save();if(st.open)drawer(st.open);render();return{status:'sucesso',etiqueta:n,cor:db.labels[n]}}
-    if(op==='excluir'){if(!await ask(`Excluir a etiqueta "${n}"?`,{ok:'Excluir',danger:true,title:'Excluir etiqueta'}))return{status:'cancelado'};delete db.labels[n];if(!db.gone.includes(n))db.gone.push(n);all().forEach(c=>c.labels=c.labels.filter(x=>x!==n));st.lb=st.lb.filter(x=>x!==n);st.ls=st.ls.filter(x=>x!==n);save();if(st.open)drawer(st.open);render();return{status:'sucesso',etiqueta:n}}
-  }
-  if(name==='aplicar_etiqueta'){
-    const c=resolveContact(args);if(!c)return{erro:'Contato não encontrado'};const l=String(args.etiqueta||'').trim();if(!l)return{erro:'Etiqueta obrigatória'};
-    if(args.criar_se_ausente&&!db.labels[l])db.labels[l]=args.cor||'black';if(!db.labels[l])return{erro:'Etiqueta não encontrada'};
-    const has=c.labels.includes(l);if(args.acao==='adicionar'&&!has)c.labels.push(l);if(args.acao==='remover'&&has)c.labels=c.labels.filter(x=>x!==l);save();if(st.open)drawer(c.id);render();queueCardEmbedding(c);return{status:'sucesso',contato:contactPayload(c)};
-  }
-  if(name==='adicionar_historico'){
-    const c=resolveContact(args);if(!c)return{erro:'Contato não encontrado'};const tx=String(args.texto||'').trim();if(!tx)return{erro:'Texto vazio'};const dv=args.data||'';if(dv&&!okd(dv))return{erro:'Data inválida'};c.hist.unshift(dv?{d:new Date(dv+'T12:00:00').toISOString(),o:1,t:tx}:{d:now(),t:tx});if(!await saveToolRefresh(c))return{erro:'Não foi possível salvar'};return{status:'sucesso',contato:c.nome};
-  }
-  if(name==='editar_historico'||name==='excluir_historico'){
-    const c=resolveContact(args);if(!c)return{erro:'Contato não encontrado'};const i=Number(args.indice),item=c.hist[i];if(!item)return{erro:'Índice de histórico não encontrado'};
-    if(name==='editar_historico'){const tx=String(args.texto||'').trim();if(!tx)return{erro:'Texto vazio'};item.t=tx;save();drawer(c.id);render();queueCardEmbedding(c);return{status:'sucesso',registro:i}}
-    if(!await ask('Apagar esta ocorrência do histórico?',{ok:'Apagar',danger:true,title:'Excluir histórico'}))return{status:'cancelado'};c.hist.splice(i,1);save();drawer(c.id);render();queueCardEmbedding(c);return{status:'sucesso',registro:i};
-  }
-  if(name==='criar_mes'){
-    const k=String(args.mes||'');if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(k))return{erro:'Mês inválido. Use AAAA-MM.'};if(!db.meses.includes(k))db.meses.push(k);save();st.mes=k;render();return{status:'sucesso',mes:k,mes_nome:mlabel(k)};
-  }
-  if(name==='atualizar_nota_mes'){
-    const k=String(args.mes||'');if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(k))return{erro:'Mês inválido. Use AAAA-MM.'};const m=db.mnotes[k]||{n:'',v:false};if(args.texto!==undefined)m.n=String(args.texto||'');if(args.pendente!==undefined)m.v=!!args.pendente;if(m.n.trim()||m.v)db.mnotes[k]=m;else delete db.mnotes[k];if(!db.meses.includes(k))db.meses.push(k);save();st.mes=k;render();return{status:'sucesso',mes:k,nota:db.mnotes[k]||{n:'',v:false}};
-  }
-  if(name==='excluir_mes'){
-    const k=String(args.mes||''),cs=all().filter(c=>c.mes===k);if(!/^\d{4}-(0[1-9]|1[0-2])$/.test(k))return{erro:'Mês inválido'};const destino=args.destino_contatos||'sem_data';
-    const msg=cs.length?`${mlabel(k)} possui ${cs.length} contato${cs.length===1?'':'s'}. ${destino==='excluir'?'Excluir também esses contatos':'Mover os contatos para Sem data'}?`:`Excluir o mês ${mlabel(k)}?`;if(!await ask(msg,{ok:destino==='excluir'?'Excluir tudo':'Excluir mês',danger:true,title:'Excluir mês'}))return{status:'cancelado'};
-    if(destino==='excluir')cs.forEach(c=>{delete db.cards[c.id];deleteVector(c.id);if(!db.del.includes(c.id))db.del.push(c.id)});else cs.forEach(c=>{log(c,`Mês alterado: ${mlabel(k)} → Sem data`);c.mes=''});
-    db.meses=db.meses.filter(m=>m!==k);delete db.mnotes[k];if(st.mes===k)st.mes='*';save();drawer(db.cards[st.open]?st.open:null);render();updateRagConfigStatus();return{status:'sucesso',mes:k};
-  }
-  if(name==='exportar_backup'){db.bk=now();if(!save())return{erro:'Não foi possível gravar a data do backup'};dl(JSON.stringify({app:'sm',v:1,...db}),'application/json','cantinho-backup-'+now().slice(0,10)+'.json');render();return{status:'sucesso',arquivo:'backup JSON completo'}}
-  if(name==='exportar_csv'){exportCsv();return{status:'sucesso',contatos:cur.length,visao:`${st.mes} / ${st.et}`}}
-  if(name==='abrir_configuracoes'){openSettingsModal();return{status:'sucesso'}}
-  if(name==='configurar_modelos'){
-    if(args.modelo_chat){storage.setItem(KEY_CHAT_MODEL,String(args.modelo_chat).trim())}
-    if(args.modelo_embedding){storage.setItem(KEY_EMBED_MODEL,String(args.modelo_embedding).trim())}
-    updateRagConfigStatus();return{status:'sucesso',modelo_chat:getChatModel(),modelo_embedding:getEmbedModel()};
-  }
-  if(name==='reindexar_busca'){await syncEmbeddings(true);return{status:'sucesso'}}
-  if(name==='importar_dados'){
-    let j;try{j=JSON.parse(String(args.conteudo_json||''))}catch(e){return{erro:'JSON inválido'}}
-    if(args.modo==='substituir'){
-      const ok=await ask('Substituir todos os dados atuais pelos dados importados?',{ok:'Substituir tudo',danger:true,title:'Restaurar backup'});if(!ok)return{status:'cancelado'};
-    }
-    if(Array.isArray(j.cards)&&j.lists){
-      if(args.modo==='substituir'){
-        db={cards:{},labels:{},meses:[],mnotes:{},gone:[],del:[],bk:null};save();
-      }
-      importTrello(j);return{status:'sucesso',tipo:'Trello',modo:args.modo||'mesclar'}
-    }
-    if(j.app==='sm'){
-      if(args.modo==='substituir'){
-        const cards={};Object.values(j.cards||{}).forEach(c=>{c=normCard(c);if(c)cards[c.id]=c});const labels={};Object.keys(j.labels||{}).forEach(l=>{if(l)labels[String(l)]=safeLabelColor(j.labels[l])});Object.values(cards).forEach(c=>c.labels.forEach(l=>{if(l&&!labels[l])labels[l]='black'}));db={cards,labels,meses:Array.isArray(j.meses)?j.meses.filter(okm):[],mnotes:j.mnotes&&typeof j.mnotes==='object'?j.mnotes:{},gone:Array.isArray(j.gone)?j.gone.map(String):[],del:Array.isArray(j.del)?j.del.map(String):[],bk:j.bk};save();await syncEmbeddings(true);render();return{status:'sucesso',tipo:'backup',modo:'substituir',contatos:Object.keys(cards).length};
-      }
-      mergeBackup(j);return{status:'sucesso',tipo:'backup',modo:'mesclar'};
-    }
-    return{erro:'Formato não reconhecido'};
-  }
-  return{erro:'Ação não suportada'};
-}
-
-const conversationHistory = [];
-const MAX_TOOL_ROUNDS = 12, MAX_SENT = 30;
-const TOOL_LABEL = {
-  executar_no_banco: ['Executando no banco de dados…','Operação concluída no banco'],
-  buscar_contatos: ['Buscando contatos…','Contatos consultados'],
-  criar_contato: ['Criando contato…','Contato criado'],
-  atualizar_contato: ['Atualizando contato…','Contato atualizado'],
-  adicionar_historico: ['Registrando no histórico…','Registro adicionado'],
-  resumo_geral: ['Consultando o resumo…','Resumo consultado']
-};
-const isUserText = m => m.role === 'user' && m.parts?.some(p => p.text !== undefined);
-
-function windowForModel(msgs) {
-  let start = Math.max(0, msgs.length - MAX_SENT);
-  while (start < msgs.length && !isUserText(msgs[start])) start++;
-  return msgs.slice(start);
-}
-
-async function fetchGeminiWithRetry({ apiKey, primaryModel, contents, tools, systemInstruction, onNotice }) {
-  const fallbackList = ['gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'];
-  const modelsToTry = [primaryModel];
-  for (const f of fallbackList) {
-    if (!modelsToTry.includes(f)) modelsToTry.push(f);
-  }
-
-  let lastError = null;
-
-  for (let mIdx = 0; mIdx < modelsToTry.length; mIdx++) {
-    const currentModel = modelsToTry[mIdx];
-    const isPrimary = (mIdx === 0);
-    const maxAttempts = isPrimary ? 3 : 2;
-
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent`;
-        const body = { contents, systemInstruction };
-        if (tools && tools.length) body.tools = tools;
-
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-          body: JSON.stringify(body)
-        });
-
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
-          const msg = errData.error?.message || `Erro ${res.status} no modelo ${currentModel}`;
-          const err = new Error(msg);
-          err.status = res.status;
-          err.model = currentModel;
-          err.isRetryable = isRetryableGeminiError(res.status, msg);
-          throw err;
-        }
-
-        const data = await res.json();
-        return { data, modelUsed: currentModel, isFallback: !isPrimary };
-      } catch (err) {
-        if (err.isRetryable === undefined) {
-          err.isRetryable = isRetryableGeminiError(err.status, err.message);
-        }
-        lastError = err;
-        if (!err.isRetryable) {
-          throw err;
-        }
-
-        if (attempt < maxAttempts) {
-          const delay = Math.min(6500, 1200 * Math.pow(1.6, attempt - 1) + Math.random() * 400);
-          if (onNotice) {
-            onNotice(`⏳ Alta demanda no modelo ${currentModel}. Tentando novamente em ${(delay/1000).toFixed(1)}s (tentativa ${attempt}/${maxAttempts})…`);
-          }
-          await new Promise(r => setTimeout(r, delay));
-        } else if (mIdx < modelsToTry.length - 1) {
-          const nextModel = modelsToTry[mIdx + 1];
-          if (onNotice) {
-            onNotice(`⚠️ O modelo ${currentModel} segue sobrecarregado. Alternando automaticamente para ${nextModel} sem perder o contexto…`);
-          }
-          await new Promise(r => setTimeout(r, 800));
-        }
-      }
-    }
-  }
-
-  throw lastError || new Error("Não foi possível obter resposta após tentativas e fallbacks.");
-}
-
-async function chatWithGemini(userPrompt) {
-  const apiKey = storage.getItem(KEY_GEMINI);
-  if (!apiKey) throw new Error("Chave de API não configurada. Abra Configurações e informe a chave.");
-  const primaryModel = getChatModel();
-  const turn = [{ role: "user", parts: [{ text: userPrompt }] }];
-  const hoje = new Date();
-  const system = { parts: [{ text: `Você é o Assistente Operacional do sistema "Meu cantinho", um CRM de gestão de atendimentos (fluxo de requerimentos junto ao INSS, com acompanhamento de documentos, guias, análise, deferimento e pagamento).
-Hoje é ${hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})} (${hoje.toISOString().slice(0,10)}).
-
-OBJETIVO DO SISTEMA: organizar cada atendimento (contato) por mês de atendimento e etapa do fluxo, para que nada fique esquecido.
-
-ESTRUTURA COMPLETA DO BANCO DE DADOS ('db'):
-Você conhece o banco de dados interno da aplicação ('db') e executa qualquer comando diretamente nele via ferramenta 'executar_no_banco':
-- db.cards[id]: dicionário de contatos indexado por ID. Cada contato tem:
-  * id: string única (ex: 'm' + Date.now().toString(36))
-  * nome: string em MAIÚSCULAS
-  * mes: 'AAAA-MM' ou '' para "Sem data"
-  * etapa: 'triagem', 'docs', 'guia', 'entrada', 'inss', 'deferido', 'fim', 'indef' (Etapas: ${S.map(s=>s[0]+' = '+s[1]).join('; ')})
-  * labels: array de strings com nomes das etiquetas (ex: ['URGENTE'])
-  * obs: anotações do contato (texto rico ou html)
-  * parto: 'AAAA-MM-DD' (ou vazio)
-  * saque: 'AAAA-MM-DD' (ou vazio)
-  * hist: array de ocorrências [{ d: ISOString ou null, t: 'texto' }]
-  * arq: boolean (true se arquivado, false se ativo)
-- db.meses: array de meses cadastrados ['AAAA-MM', ...]
-- db.labels: objeto de etiquetas { 'Nome': 'cor' }
-- db.mnotes: anotações e pendências dos meses { 'AAAA-MM': { n: 'texto', v: boolean } }
-
-COMO TRABALHAR:
-1. EXECUTE DIRETO NO BANCO: Sua ferramenta principal e prioritária é 'executar_no_banco'. Em vez de executar uma a uma as funções individuais da interface, execute JavaScript diretamente no banco 'db' para qualquer comando, busca avançada, alteração em lote, movimentação entre meses, cadastro ou cálculo que o usuário pedir. É muito mais rápido, poderoso e resolve em um único passo.
-2. NO ESCOPO DE 'executar_no_banco': Você tem acesso a: db, all() (retorna array de todos os contatos), cur (contatos visíveis no filtro atual), st (filtros/estado), S, SN, ML, save(), render(), toast(msg), etc. As alterações salvas em 'db' atualizam a interface automaticamente.
-
-REGRA MANDATÓRIA DE CONFIRMAÇÃO PARA AÇÕES DE PERIGO:
-- Caso o usuário peça qualquer ação de perigo — especialmente EXCLUIR MÚLTIPLOS CONTATOS (ex.: "apagar todos os contatos arquivados", "excluir os contatos sem data", "limpar todos de janeiro", "apagar o banco"):
-  * NÃO execute a exclusão imediatamente!
-  * Primeiro consulte o banco (ex: all().filter(...)) para apurar a quantidade exata de contatos afetados.
-  * Responda ao usuário com uma confirmação curta, direta e resumida:
-    "Você pediu para apagar [descrição da ação] ([X] contatos). Posso prosseguir?"
-  * Somente após o usuário confirmar na próxima mensagem (disser "sim", "pode", "prossiga", "confirmo", etc.), execute a exclusão no banco passando confirmado_pelo_usuario: true.
-  * Se o usuário disser "não" ou cancelar, responda confirmando que nada foi apagado.
-- Para exclusão de apenas 1 contato específico que o usuário já pediu explicitamente pelo nome ou ID, execute diretamente.
-- Responda em português do Brasil de forma clara, prestativa e objetiva.` }] };
-
-  let activeNoticeEl = null;
-  const updateNotice = (msg) => {
-    if (!activeNoticeEl) {
-      activeNoticeEl = appendAiMessage(msg, 'notice');
-    } else {
-      activeNoticeEl.textContent = msg;
-      const chat = $('#ai-chat');
-      if (chat) chat.scrollTop = chat.scrollHeight;
-    }
-  };
-  const clearNotice = () => {
-    if (activeNoticeEl) {
-      activeNoticeEl.remove();
-      activeNoticeEl = null;
-    }
-  };
-
-  try {
-    for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
-      const contentsPayload = windowForModel([...conversationHistory, ...turn]);
-
-      const { data, modelUsed, isFallback } = await fetchGeminiWithRetry({
-        apiKey,
-        primaryModel,
-        contents: contentsPayload,
-        tools: GEMINI_TOOLS,
-        systemInstruction: system,
-        onNotice: updateNotice
-      });
-      clearNotice();
-
-      const candidate = data.candidates?.[0]?.content;
-      if (!candidate?.parts?.length) throw new Error("O modelo não retornou resposta.");
-      const calls = candidate.parts.filter(p => p.functionCall);
-
-      if (!calls.length) {
-        turn.push(candidate);
-        conversationHistory.push(...turn);
-        saveChatStorage();
-        let finalText = candidate.parts.map(p => p.text || '').join('\n').trim();
-        if (isFallback) {
-          finalText += `\n\n*(Respondido automaticamente via **${modelUsed}** devido à alta demanda temporária no modelo principal)*`;
-        }
-        return finalText;
-      }
-
-      if (round === MAX_TOOL_ROUNDS) {
-        turn.push({ role: "model", parts: [{ text: "Parei após o limite de ações desta mensagem." }] });
-        conversationHistory.push(...turn);
-        saveChatStorage();
-        return "Parei após o limite de ações desta mensagem. Peça de novo se faltou algo.";
-      }
-
-      turn.push(candidate);
-      const responses = [];
-      for (const { functionCall: { name, args } } of calls) {
-        const lbl = TOOL_LABEL[name] || ['Executando ação…','Ação concluída'];
-        const line = appendAiMessage(lbl[0], 'tool');
-        let result;
-        try { result = await executeLocalTool(name, args || {}, apiKey); }
-        catch (e) { result = { erro: String(e.message || e) }; }
-        line.textContent = result.erro ? `Não foi possível concluir: ${lbl[1].toLowerCase()}` : lbl[1];
-        responses.push({ functionResponse: { name, response: result } });
-      }
-      turn.push({ role: "user", parts: responses });
-    }
-  } finally {
-    clearNotice();
-  }
-}
-
-function saveChatStorage() {
-  try {
-    storage.setItem(KEY_CHAT_HISTORY, JSON.stringify(conversationHistory));
-    const msgs = Array.from($('#ai-chat').querySelectorAll('.ai-msg:not(.notice):not(.tool)')).map(el => ({
-      html: el.innerHTML,
-      className: el.className
-    }));
-    storage.setItem(KEY_CHAT_UI_MSGS, JSON.stringify(msgs.slice(-40)));
-  } catch (e) {
-    console.warn('Falha ao salvar chat:', e);
-  }
-}
-
-function restoreChat() {
-  const chatEl = $('#ai-chat');
-  if (!chatEl) return;
-  chatEl.textContent = '';
-  try {
-    const rawHist = storage.getItem(KEY_CHAT_HISTORY);
-    const rawMsgs = storage.getItem(KEY_CHAT_UI_MSGS);
-    if (rawHist) {
-      const parsed = JSON.parse(rawHist);
-      if (Array.isArray(parsed) && parsed.length) {
-        conversationHistory.length = 0;
-        conversationHistory.push(...parsed);
-      }
-    }
-    if (rawMsgs) {
-      const parsedMsgs = JSON.parse(rawMsgs);
-      if (Array.isArray(parsedMsgs) && parsedMsgs.length > 0) {
-        parsedMsgs.forEach(m => {
-          const d = document.createElement('div');
-          d.className = m.className || 'ai-msg bot';
-          d.innerHTML = m.html;
-          chatEl.appendChild(d);
-        });
-        chatEl.scrollTop = chatEl.scrollHeight;
-        return;
-      }
-    }
-  } catch (e) {
-    console.warn('Falha ao restaurar chat:', e);
-  }
-  appendAiMessage('O assistente envia o conteúdo necessário para a API do Google. O contexto da conversa é preservado mesmo ao alternar de modelo ou recarregar.', 'notice');
-}
-
-function resetChat() {
-  conversationHistory.length = 0;
-  storage.removeItem(KEY_CHAT_HISTORY);
-  storage.removeItem(KEY_CHAT_UI_MSGS);
-  const chatEl = $('#ai-chat');
-  if (chatEl) {
-    chatEl.textContent = '';
-    appendAiMessage('Nova conversa iniciada. O contexto foi reiniciado.', 'notice');
-  }
-}
-
-const AI_TAGS = /^(STRONG|EM|UL|LI|BR|H2|H3|H4|CODE|BUTTON)$/;
-function safeAiNodes(html) {
-  const t = document.createElement('template');
-  t.innerHTML = html;
-  (function walk(n) {
-    [...n.childNodes].forEach(k => {
-      if (k.nodeType === 3) return;
-      if (k.nodeType !== 1) { k.remove(); return; }
-      walk(k);
-      const id = k.dataset?.id || '';
-      if (!AI_TAGS.test(k.tagName) || (k.tagName === 'BUTTON' && !/^m[a-z0-9]{5,15}$/i.test(id))) { k.replaceWith(...k.childNodes); return; }
-      const keep = k.tagName === 'BUTTON' ? { class: 'ai-contact-btn', 'data-id': id, type: 'button' } : /^(UL|H\d|CODE)$/.test(k.tagName) ? { class: k.className.replace(/[^\w -]/g, '') } : {};
-      [...k.attributes].forEach(a => k.removeAttribute(a.name));
-      Object.entries(keep).forEach(([a, v]) => v && k.setAttribute(a, v));
-    });
-  })(t.content);
-  return t.content;
-}
-
-function renderMarkdown(md) {
-  if (!md) return '';
-  let s = esc(md);
-  s = s.replace(/^### (.*$)/gim, '<h4 class="ai-h">$1</h4>').replace(/^## (.*$)/gim, '<h3 class="ai-h">$1</h3>').replace(/^# (.*$)/gim, '<h2 class="ai-h">$1</h2>');
-  s = s.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/__(.*?)__/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/_([^_]+)_/g, '<em>$1</em>');
-  s = s.replace(/`([^`]+)`/g, '<code class="ai-code">$1</code>');
-  s = s.replace(/<code class="ai-code">(m[a-z0-9]{5,15})<\/code>/gi, '<button class="ai-contact-btn" data-id="$1">Abrir contato $1</button>');
-  s = s.replace(/((?:^(?:[\*\-]|\d+\.) .*(?:\r?\n|$))+)/gm, m => '<ul class="ai-list">' + m.trim().split(/\r?\n/).map(l => `<li>${l.replace(/^(?:[\*\-]|\d+\.)\s+/, '')}</li>`).join('') + '</ul>');
-  s = s.replace(/\r?\n/g, '<br>').replace(/<br>\s*<ul/g, '<ul').replace(/<\/ul>\s*<br>/g, '</ul>').replace(/<br>\s*<h/g, '<h').replace(/<\/h(\d)>\s*<br>/g, '</h$1>');
-  return s;
-}
-
-function appendAiMessage(text, type = 'bot', rich = false) {
-  const chat = $('#ai-chat'), d = document.createElement('div');
-  d.className = `ai-msg ${type}`;
-  if (rich) d.appendChild(safeAiNodes(renderMarkdown(text)));
-  else d.textContent = text;
-  chat.appendChild(d);
-  chat.scrollTop = chat.scrollHeight;
-  return d;
-}
-
-async function updateRagConfigStatus() {
-  const vecs = await getAllVectors();
-  window._vectorCount = vecs.length;
-  const total = Object.keys(db.cards).length;
-  const statusEl = $('#cfg-rag-status');
-  if (statusEl) {
-    statusEl.innerHTML = `<b>${vecs.length}</b> de <b>${total}</b> contatos prontos para busca por significado`;
-  }
-  const curModel = getChatModel();
-  const descEl = $('#ai-wh-model-desc');
-  if (descEl) {
-    descEl.textContent = curModel;
-  }
-  const selectEl = $('#ai-model-select');
-  if (selectEl && selectEl.value !== curModel) {
-    selectEl.value = curModel;
-  }
-}
-
 function openSettingsModal() {
-  $('#cfg-key').value = storage.getItem(KEY_GEMINI) || '';
-  $('#cfg-chat-model').value = getChatModel();
-  $('#cfg-embed-model').value = getEmbedModel();
-  updateRagConfigStatus();
   if(!$('#cfg-dlg').open)$('#cfg-dlg').showModal();
 }
-
 // =========================================================================
 // SISTEMA PRINCIPAL
 // =========================================================================
@@ -2308,8 +1357,8 @@ function importTrello(j){
   const p=parseName(c.name),mes=mkey(ln),hist=[];
   if(p.extra)hist.push({d:null,t:p.extra});
   if(!mes&&ln)hist.push({d:null,t:'Lista no Trello: '+ln});
-  const nc=normCard({id:c.id,nome:p.nome,mes,etapa:stage(lab,ln),labels:lab,tl:lab,obs:toHtml(typeof c.desc==='string'?c.desc:''),rich:1,td:typeof c.desc==='string'?c.desc:'',saque:p.saque,parto:'',hist,arq:!!c.closed});if(nc){db.cards[c.id]=nc;n++}}
- save();toast(`Importação concluída: ${n} adicionados.`);syncEmbeddings()}
+  const nc=normCard({id:c.id,nome:p.nome,mes,etapa:stage(lab,ln),labels:lab,tl:lab,obs:toHtml(typeof c.desc==='string'?c.desc:''),rich:1,td:typeof c.desc==='string'?c.desc:'',saque:p.saque,parto:'',hist,arq:!!c.closed,pend:false});if(nc){db.cards[c.id]=nc;n++}}
+ save();toast(`Importação concluída: ${n} adicionados.`);}
 
 function mergeBackup(j){if(!j||typeof j!=='object')throw new Error('Backup inválido.');let n=0,k=0;
  Object.values(j.cards||{}).forEach(c=>{c=normCard(c);if(!c)return;if(db.cards[c.id]){k++;return}if(db.del.includes(c.id))return;c.labels=c.labels.filter(l=>!db.gone.includes(l));db.cards[c.id]=c;n++});
@@ -2317,12 +1366,12 @@ function mergeBackup(j){if(!j||typeof j!=='object')throw new Error('Backup invá
  all().forEach(c=>c.labels.forEach(l=>{if(l&&!db.labels[l]&&!db.gone.includes(l))db.labels[l]='black'}));
  (Array.isArray(j.meses)?j.meses:[]).filter(okm).forEach(m=>{if(!db.meses.includes(m))db.meses.push(m)});
  Object.entries(j.mnotes||{}).forEach(([m,v])=>{if(!db.mnotes[m])db.mnotes[m]=v});
- save();toast(`Backup mesclado.`);syncEmbeddings()}
+ save();toast(`Backup mesclado.`);}
 
 function load(file){const r=new FileReader();r.onload=async()=>{try{const j=JSON.parse(r.result);
  if(Array.isArray(j.cards)&&j.lists)importTrello(j);
  else if(j.app==='sm'){const r=await ask('Importar backup: "mesclar" mantém dados ou "substituir"?',{ok:'Mesclar',alt:'Substituir tudo'});
- if(r==='alt'){const cards={};Object.values(j.cards||{}).forEach(c=>{c=normCard(c);if(c)cards[c.id]=c});const prev=db;const labels=(j.labels&&typeof j.labels==='object')?j.labels:{};const safeLabels={};Object.keys(labels).forEach(l=>{if(l)safeLabels[String(l)]=safeLabelColor(labels[l])});Object.values(cards).forEach(c=>c.labels.forEach(l=>{if(l&&!safeLabels[l])safeLabels[l]='black'}));db={cards,labels:safeLabels,meses:(Array.isArray(j.meses)?j.meses:[]).filter(okm),mnotes:(j.mnotes&&typeof j.mnotes==='object')?j.mnotes:{},gone:Array.isArray(j.gone)?j.gone.map(String):[],del:Array.isArray(j.del)?j.del.map(String):[],bk:j.bk};if(save()){toast('Backup restaurado.');syncEmbeddings(true)}else db=prev}
+ if(r==='alt'){const cards={};Object.values(j.cards||{}).forEach(c=>{c=normCard(c);if(c)cards[c.id]=c});const prev=db;const labels=(j.labels&&typeof j.labels==='object')?j.labels:{};const safeLabels={};Object.keys(labels).forEach(l=>{if(l)safeLabels[String(l)]=safeLabelColor(labels[l])});Object.values(cards).forEach(c=>c.labels.forEach(l=>{if(l&&!safeLabels[l])safeLabels[l]='black'}));db={cards,labels:safeLabels,meses:(Array.isArray(j.meses)?j.meses:[]).filter(okm),mnotes:(j.mnotes&&typeof j.mnotes==='object')?j.mnotes:{},gone:Array.isArray(j.gone)?j.gone.map(String):[],del:Array.isArray(j.del)?j.del.map(String):[],bk:j.bk};if(save()){toast('Backup restaurado.')}else db=prev}
  else if(r)mergeBackup(j)}
  else toast('Arquivo não reconhecido.');
  render()}catch(e){toast('Erro: '+e.message)}};r.readAsText(file)}
@@ -2340,12 +1389,21 @@ function backupAgeDays(){
 function monthNotes(){
   return Object.entries(db.mnotes||{}).filter(([k,v])=>/^\d{4}-\d{2}$/.test(k)&&v&&((v.n||'').trim()||v.v));
 }
-function getPartoNotifications(){
+function getTodayStr(){
   const now=new Date();
   const pad=n=>String(n).padStart(2,'0');
-  const todayStr=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+  return `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+}
+function getTomorrowStr(){
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,'0');
   const tmrw=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
-  const tomorrowStr=`${tmrw.getFullYear()}-${pad(tmrw.getMonth()+1)}-${pad(tmrw.getDate())}`;
+  return `${tmrw.getFullYear()}-${pad(tmrw.getMonth()+1)}-${pad(tmrw.getDate())}`;
+}
+const isCardPend=c=>!c.arq&&(c.pend||(c.parto&&!c.parto_ok&&c.parto<=getTomorrowStr()));
+function getPartoNotifications(){
+  const todayStr=getTodayStr();
+  const tomorrowStr=getTomorrowStr();
 
   const list=all().filter(c=>!c.arq&&c.parto&&!c.parto_ok&&c.parto<=tomorrowStr);
   list.sort((a,b)=>a.parto.localeCompare(b.parto));
@@ -2388,6 +1446,19 @@ function renderNotifications(){
     });
   });
 
+  const pendingCards=all().filter(c=>!c.arq&&c.pend);
+  pendingCards.forEach(c=>{
+    items.push({
+      kind:'warn',
+      title:`Pendência: ${c.nome}`,
+      text:`Contato com pendência marcada${c.mes?' • '+mlabel(c.mes):''}.`,
+      action:'contact',
+      contactId:c.id,
+      month:c.mes,
+      label:'Abrir contato'
+    });
+  });
+
   monthNotes().filter(([k,v])=>v.v).slice(0,8).forEach(([k,v])=>items.push({kind:'warn',title:`Pendência em ${mlabel(k)}`,text:(v.n||'Mês marcado como pendente.').trim(),action:'month',month:k,label:'Abrir mês'}));
   const noDate=all().filter(c=>!c.mes&&!c.arq).length;
   if(noDate)items.push({kind:'warn',title:`${noDate} atendimento${noDate===1?'':'s'} sem mês`,text:'Existem contatos que ainda precisam ser associados a um período.',action:'no-date',label:'Ver sem data'});
@@ -2400,14 +1471,15 @@ function renderContext(cs,base,sk){
   const sum=$('#context-summary');
   if(sum){
     const act=c=>!c.arq&&c.etapa!=='fim';
-    const pending=Object.values(db.mnotes||{}).filter(v=>v&&v.v).length;
+    const pendingMonths=Object.values(db.mnotes||{}).filter(v=>v&&v.v).length;
+    const pendingCards=cs.filter(c=>!c.arq&&c.pend).length;
     const noDate=cs.filter(c=>!c.mes&&!c.arq).length;
-    sum.innerHTML=`<div class="context-stat"><b>${cs.filter(act).length}</b><span>Em andamento</span></div><div class="context-stat"><b>${pending}</b><span>Meses pendentes</span></div><div class="context-stat"><b>${base.length}</b><span>No período</span></div><div class="context-stat"><b>${noDate}</b><span>Sem mês</span></div>`;
+    sum.innerHTML=`<div class="context-stat"><b>${cs.filter(act).length}</b><span>Em andamento</span></div><div class="context-stat"><b>${pendingCards}</b><span>Contatos pendentes</span></div><div class="context-stat"><b>${pendingMonths}</b><span>Meses pendentes</span></div><div class="context-stat"><b>${noDate}</b><span>Sem mês</span></div>`;
   }
   const sys=$('#context-system');
   if(sys){
-    const age=backupAgeDays(),vc=Number.isFinite(window._vectorCount)?window._vectorCount:'—';
-    sys.innerHTML=`<div class="context-system-row"><span>Backup</span><span class="status-pill ${!db.bk||age>7?'warn':'good'}">${!db.bk?'Não realizado':age>7?age+' dias':'Em dia'}</span></div><div class="context-system-row"><span>Armazenamento</span><span class="status-pill ${storage.persistent?'good':'warn'}">${storage.persistent?'Local':'Sessão'}</span></div><div class="context-system-row"><span>Busca semântica</span><span class="status-pill">${vc}/${cs.length||0}</span></div>`;
+    const age=backupAgeDays();
+    sys.innerHTML=`<div class="context-system-row"><span>Backup</span><span class="status-pill ${!db.bk||age>7?'warn':'good'}">${!db.bk?'Não realizado':age>7?age+' dias':'Em dia'}</span></div><div class="context-system-row"><span>Armazenamento</span><span class="status-pill ${storage.persistent?'good':'warn'}">${storage.persistent?'Local':'Sessão'}</span></div>`;
   }
 }
 
@@ -2515,17 +1587,17 @@ function render(){
 
  const has=c=>!st.lb.length||(st.mode==='e'?st.lb.every(l=>c.labels.includes(l)):st.lb.some(l=>c.labels.includes(l)));
  const pre=cs.filter(c=>inMes(c)&&hit(c)),base=pre.filter(has),cnt=f=>base.filter(f).length;
- const ch=[['ativos','Em andamento',cnt(act)],['todos','Todos',cnt(c=>!c.arq)],...S.map(s=>[s[0],s[1],cnt(c=>c.etapa===s[0]&&!c.arq)]),['arq','Arquivados',cnt(c=>c.arq)]];
+ const ch=[['ativos','Em andamento',cnt(act)],['pendentes','Pendentes',cnt(isCardPend)],['todos','Todos',cnt(c=>!c.arq)],...S.map(s=>[s[0],s[1],cnt(c=>c.etapa===s[0]&&!c.arq)]),['arq','Arquivados',cnt(c=>c.arq)]];
  const activeMonthLabel=st.mes==='*'?'Todos os meses':mlabel(st.mes);
  const activeScopeLabel=ch.find(x=>x[0]===st.et)?.[1]||'Em andamento';
  const qs=st.q?` Busca: “${esc(st.q)}”`:'';
  const titleEl=$('#page-title'),subEl=$('#page-subtitle'),statsEl=$('#page-stats');
  if(titleEl)titleEl.textContent=activeMonthLabel;
  if(subEl)subEl.textContent=`${activeScopeLabel}${st.lb.length?' · '+st.lb.length+' filtro(s) por etiqueta':''}${qs}`;
- if(statsEl)statsEl.innerHTML=`<div class="page-stat"><b>${cnt(act)}</b><span>Em andamento</span></div><div class="page-stat"><b>${base.length}</b><span>No período</span></div><div class="page-stat"><b>${cs.filter(c=>c.arq).length}</b><span>Arquivados</span></div>`;
+ if(statsEl)statsEl.innerHTML=`<div class="page-stat"><b>${cnt(act)}</b><span>Em andamento</span></div><div class="page-stat ${st.et==='pendentes'?'stat-active':''}" style="cursor:pointer" data-e="${st.et==='pendentes'?'ativos':'pendentes'}" title="Clique para filtrar pendências"><b>${cnt(isCardPend)}</b><span>Pendentes</span></div><div class="page-stat"><b>${base.length}</b><span>No período</span></div><div class="page-stat"><b>${cs.filter(c=>c.arq).length}</b><span>Arquivados</span></div>`;
  const chipsEl=$('#chips');if(chipsEl)chipsEl.innerHTML='';
 
- const ef=c=>st.et==='ativos'?act(c):st.et==='todos'?!c.arq:st.et==='arq'?c.arq:c.etapa===st.et&&!c.arq;
+ const ef=c=>st.et==='ativos'?act(c):st.et==='pendentes'?isCardPend(c):st.et==='todos'?!c.arq:st.et==='arq'?c.arq:c.etapa===st.et&&!c.arq;
  const rows=base.filter(ef).sort(SORT[st.sort]||SORT.etapa);
  cur=rows;
 
@@ -2535,6 +1607,9 @@ function render(){
  $('#lf').innerHTML=`<div class="filter-primary">
    <button type="button" class="chip ${st.lopen?'on':''}" data-a="lbo" aria-expanded="${st.lopen}">
      Etiquetas${st.lb.length?' ('+st.lb.length+')':''} ▾
+   </button>
+   <button type="button" class="chip chip-pend ${st.et==='pendentes'?'on pend-chip-on':''}" data-e="${st.et==='pendentes'?'ativos':'pendentes'}" title="Filtrar pendências">
+     ⚠️ Pendentes (${cnt(isCardPend)})
    </button>
    ${st.lb.length>1?`<span class="seg" role="group" aria-label="Combinação de labels"><button type="button" class="${st.mode==='e'?'on':''}" data-a="lbm" data-v="e" aria-pressed="${st.mode==='e'}">Todas</button><button type="button" class="${st.mode==='o'?'on':''}" data-a="lbm" data-v="o" aria-pressed="${st.mode==='o'}">Qualquer uma</button></span>`:''}
    ${st.lb.map(l=>`<button type="button" class="lab" ${lb(l)} aria-label="Remover filtro ${esc(l)}">${esc(l)} ✕</button>`).join('')}
@@ -2559,10 +1634,11 @@ function render(){
     const s=SN[c.etapa]||S[0],last=(hs(c)[0]||{}).h;
     const isSel=st.bulk&&st.sel.includes(c.id);
     const cbHtml=st.bulk?`<span class="row-cb-wrap"><input type="checkbox" class="row-cb" data-cb-id="${esc(c.id)}" ${isSel?'checked':''} aria-label="Selecionar ${esc(c.nome)}"></span>`:'';
-    return `<button type="button" class="row ${st.bulk?'bulk-mode':''} ${isSel?'selected-for-bulk':''}" style="--sc:${s[2]}" data-id="${esc(c.id)}" aria-label="Abrir atendimento de ${esc(c.nome)}">
+    const pendMkr=c.pend?'<span class="mk pend" role="img" aria-label="Pendente de validação" title="Contato marcado como pendente">●</span>':'';
+    return `<button type="button" class="row ${c.pend?'has-pending':''} ${st.bulk?'bulk-mode':''} ${isSel?'selected-for-bulk':''}" style="--sc:${s[2]}" data-id="${esc(c.id)}" aria-label="Abrir atendimento de ${esc(c.nome)}">
       ${cbHtml}
       <span class="row-main">
-        <span class="row-title"><b>${esc(c.nome)}</b></span>
+        <span class="row-title"><b>${esc(c.nome)}</b>${pendMkr}</span>
         <span class="row-labels">${labs(c.labels)}</span>
       </span>
       <span class="row-meta">
@@ -2688,16 +1764,21 @@ function drawer(id){
         <label>Mês de Atendimento<select id="f-mes">${mopts(c.mes)}</select></label>
         <label>Etapa Atual<select id="f-et">${S.map(s=>`<option value="${s[0]}" ${s[0]===c.etapa?'selected':''}>${s[1]}</option>`).join('')}</select></label>
         <div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;gap:6px">
-            <span style="font-size:11.5px;font-weight:600;color:var(--mut)">Data Prevista do Parto</span>
-            <label style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:${c.parto_ok?'#16a34a':'var(--mut)'};cursor:pointer;margin:0" title="Marcar como parto confirmado/acompanhado">
-              <input type="checkbox" id="f-parto-ok" ${c.parto_ok?'checked':''} style="accent-color:#16a34a;cursor:pointer;width:14px;height:14px;margin:0">
-              <span>${c.parto_ok?'✓ Confirmado':'Confirmar'}</span>
+          <div style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;min-height:22px;margin-bottom:6px;gap:6px">
+            <span style="font-size:11.5px;font-weight:600;color:var(--mut);line-height:1.2">Data Prevista do Parto</span>
+            <label class="dr-inline-label" style="display:inline-flex !important;flex-direction:row !important;align-items:center !important;gap:5px !important;font-size:11px;font-weight:600;color:${c.parto_ok?'#16a34a':'var(--mut)'};cursor:pointer;margin:0 !important;line-height:1;white-space:nowrap" title="Marcar como parto confirmado">
+              <input type="checkbox" id="f-parto-ok" ${c.parto_ok?'checked':''} style="accent-color:#16a34a;cursor:pointer;width:14px;height:14px;margin:0 !important;flex-shrink:0">
+              <span style="user-select:none">${c.parto_ok?'✓ Confirmado':'Confirmar'}</span>
             </label>
           </div>
           <input type="date" id="f-parto" value="${c.parto||''}" style="width:100%">
         </div>
-        <label>Data de Pagamento (Saque)<input type="date" id="f-saque" value="${c.saque||''}"></label>
+        <div>
+          <div style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;min-height:22px;margin-bottom:6px">
+            <span style="font-size:11.5px;font-weight:600;color:var(--mut);line-height:1.2">Data de Pagamento (Saque)</span>
+          </div>
+          <input type="date" id="f-saque" value="${c.saque||''}" style="width:100%">
+        </div>
       </div>
     </div>
 
@@ -2719,7 +1800,13 @@ function drawer(id){
     </div>
 
     <div class="dr-card">
-      <div class="dr-card-title">Anotações do Contato</div>
+      <div class="dr-card-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>Anotações do Contato</span>
+        <label class="dr-inline-label" style="display:inline-flex !important;flex-direction:row !important;align-items:center !important;gap:6px !important;font-size:12px;font-weight:600;color:${c.pend?'#b45309':'var(--mut)'};cursor:pointer;margin:0 !important;white-space:nowrap" title="Marcar este contato como pendente">
+          <input type="checkbox" id="f-pend" ${c.pend?'checked':''} style="accent-color:#f59e0b;cursor:pointer;width:15px;height:15px;margin:0 !important;flex-shrink:0">
+          <span style="user-select:none">${c.pend?'● Pendência marcada':'Marcar pendência'}</span>
+        </label>
+      </div>
       <div class="tb" role="toolbar" aria-label="Formatação de texto">
         ${[['bold','<b>N</b>'],['italic','<i>I</i>'],['underline','<u>S</u>'],['strikeThrough','<s>T</s>'],['insertUnorderedList','• Lista'],['insertOrderedList','1. Lista'],['removeFormat','Limpar']].map(o=>`<button data-x="${o[0]}" title="${o[0]}">${o[1]}</button>`).join('')}
       </div>
@@ -2775,11 +1862,10 @@ function newCard(){
    id,nome:'NOVO CONTATO',parto:'',rich:1,
    mes:/^\d/.test(st.mes)?st.mes:'',
    etapa:'triagem',labels:[],tl:[],obs:'',td:'',saque:'',
-   hist:[{d:now(),t:'Contato criado'}],arq:false,parto_ok:false
+   hist:[{d:now(),t:'Contato criado'}],arq:false,parto_ok:false,pend:false
  };
  save();render();drawer(id);
  const inp=$('#f-nome');if(inp)inp.select();
- queueCardEmbedding(db.cards[id]);
 }
 
 // GESTÃO DE EVENTOS (CLIQUE GLOBAL)
@@ -2788,7 +1874,7 @@ document.addEventListener('click',e=>{
  const np=$('#notif-panel'),nw=$('#notif-wrap');
  if(np&&!e.target.closest('#notif-wrap')){np.hidden=true;$('#notif-btn')?.setAttribute('aria-expanded','false')}
 
- const t=e.target.closest('[data-a],[data-m],[data-e],[data-id],[data-x],[data-q],[data-dlg],[data-preset],[data-retry]');
+ const t=e.target.closest('[data-a],[data-m],[data-e],[data-id],[data-x],[data-dlg]');
  if(!t)return;
  const D=t.dataset,c=db.cards[st.open];
 
@@ -2832,19 +1918,10 @@ document.addEventListener('click',e=>{
  else if(D.a==='toggle-bulk'){st.bulk=!st.bulk;if(!st.bulk)st.sel=[];render()}
  else if(D.a==='bulk-delete')bulkDeleteCards();
  else if(D.a==='new')newCard();
- else if(D.a==='home'){st.mes='*';st.et='ativos';st.q='';st.lb=[];st.lopen=false;$('#q').value='';drawer(null);$('#ai-window').hidden=true;render()}
+ else if(D.a==='home'){st.mes='*';st.et='ativos';st.q='';st.lb=[];st.lopen=false;$('#q').value='';drawer(null);render()}
  else if(D.a==='dlg-close'){const dg=t.closest('dialog');if(dg)dg.close()}
- else if(D.preset!==undefined){$(D.preset).value=D.v}
- else if(D.a==='ai-new')resetChat();
- else if(D.retry!==undefined){
-   const rp=D.retry;
-   t.closest('.ai-msg')?.remove();
-   if(rp){$('#ai-prompt').value=rp;$('#ai-form').dispatchEvent(new Event('submit'))}
- }
- else if(t.classList.contains('ai-contact-btn')&&D.id){drawer(D.id)}
  else if(D.a==='imp')$('#fi').click();
  else if(D.a==='cfg')openSettingsModal();
- else if(D.a==='ai-close'){$('#ai-window').hidden=true}
  else if(D.a==='lbo'){st.lopen=!st.lopen;render()}
  else if(D.a==='lbt'){const i=st.lb.indexOf(D.l);i<0?st.lb.push(D.l):st.lb.splice(i,1);render()}
  else if(D.a==='lbm'){st.mode=D.v;render()}
@@ -2872,19 +1949,18 @@ document.addEventListener('click',e=>{
      const n=S[ix+1];
      log(c,`Etapa avançada: ${SN[c.etapa][1]} → ${n[1]}`);
      c.etapa=n[0];
-     save();drawer(c.id);render();queueCardEmbedding(c);
+     save();drawer(c.id);render();
      toast(`Etapa avançada para "${n[1]}".`);
    }
  }
  else if(D.a==='close'){drawer(null)}
  else if(D.dlg==='close'){$('#cfg-dlg').close()}
  else if(D.a==='exp'){db.bk=now();save();dl(JSON.stringify({app:'sm',v:1,...db}),'application/json','cantinho-backup-'+now().slice(0,10)+'.json');render()}
- else if(c&&D.a==='lab'){const i=c.labels.indexOf(D.l);i<0?c.labels.push(D.l):c.labels.splice(i,1);save();drawer(c.id);render();queueCardEmbedding(c)}
+ else if(c&&D.a==='lab'){const i=c.labels.indexOf(D.l);i<0?c.labels.push(D.l):c.labels.splice(i,1);save();drawer(c.id);render()}
  else if(c&&D.a==='q'){const i=$('#f-h');i.value=D.t;i.focus();if(!D.t.endsWith(': '))addh()}
  else if(c&&D.a==='addh')addh();
  else if(c&&D.a==='nl')addl();
- else if(c&&D.a==='arq'){c.arq=!c.arq;log(c,c.arq?'Contato arquivado':'Contato restaurado');save();drawer(c.id);render();queueCardEmbedding(c)}
- else if(D.q){$('#ai-prompt').value=D.q;$('#ai-form').dispatchEvent(new Event('submit'))}
+ else if(c&&D.a==='arq'){c.arq=!c.arq;log(c,c.arq?'Contato arquivado':'Contato restaurado');save();drawer(c.id);render()}
 });
 
 function dl(txt,type,name){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([txt],{type}));a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
@@ -2902,13 +1978,13 @@ function addl(){
  const nome=Object.keys(db.labels).find(l=>norm(l)===norm(n))||n;
  if(!db.labels[nome])db.labels[nome]=$('#f-nc').value;
  if(!c.labels.includes(nome))c.labels.push(nome);
- save();drawer(c.id);render();queueCardEmbedding(c);
+ save();drawer(c.id);render();
 }
 
 function addh(){
  const c=db.cards[st.open],v=$('#f-h').value.trim(),dv=$('#f-hd').value;if(!c||!v)return;
  c.hist.unshift(dv?{d:new Date(dv+'T12:00:00').toISOString(),o:1,t:v}:{d:now(),t:v});
- save();drawer(c.id);render();queueCardEmbedding(c);
+ save();drawer(c.id);render();
  toast('Ocorrência adicionada ao histórico.');
 }
 
@@ -2919,13 +1995,13 @@ async function editHist(c,i){
  const trimmed=newText.trim();
  if(!trimmed)return toast('O texto não pode ser vazio.');
  item.t=trimmed;
- save();drawer(c.id);render();queueCardEmbedding(c);
+ save();drawer(c.id);render();
  toast('Ocorrência atualizada.');
 }
 
 let obsSaveTimer=null;
 function saveObs(immediate=true){
- const commit=()=>{const c=db.cards[st.open],el=$('#f-obs');if(c&&el){const html=clean(el.innerHTML);if(html!==c.obs){c.obs=html;save();queueCardEmbedding(c)}}};
+ const commit=()=>{const c=db.cards[st.open],el=$('#f-obs');if(c&&el){const html=clean(el.innerHTML);if(html!==c.obs){c.obs=html;save()}}};
  clearTimeout(obsSaveTimer);
  if(immediate)commit();else obsSaveTimer=setTimeout(commit,350);
 }
@@ -2934,12 +2010,12 @@ async function delCard(c){
  if(!await ask(`Excluir definitivamente o contato "${c.nome}"?`,{ok:'Excluir',danger:true}))return;
  delete db.cards[c.id];
  if(!db.del.includes(c.id))db.del.push(c.id);
- save();deleteVector(c.id);drawer(null);render();updateRagConfigStatus();toast('Contato excluído.');
+ save();drawer(null);render();toast('Contato excluído.');
 }
 
 async function delHist(c,i){
  if(!await ask('Apagar esta ocorrência do histórico?',{ok:'Apagar',danger:true}))return;
- c.hist.splice(i,1);save();drawer(c.id);render();queueCardEmbedding(c);toast('Ocorrência removida.');
+ c.hist.splice(i,1);save();drawer(c.id);render();toast('Ocorrência removida.');
 }
 
 function openNewMonthModal(){
@@ -2972,11 +2048,11 @@ async function delMes(k){
  else if(isNoDate)r=await ask(`"Sem data" possui ${n} contato${n>1?'s':''}. Deseja excluir definitivamente todos esses contatos?`,{ok:`Excluir ${n} contato${n>1?'s':''}`,danger:true});
  else r=await ask(`${mlabel(k)} possui ${n} contatos vinculados. O que deseja fazer?`,{ok:'Mover para "Sem data"',alt:'Excluir contatos e mês',danger:true});
  if(!r)return;
- if(r==='alt'||(isNoDate&&r===true))cs.forEach(c=>{delete db.cards[c.id];deleteVector(c.id);if(!db.del.includes(c.id))db.del.push(c.id)});
+ if(r==='alt'||(isNoDate&&r===true))cs.forEach(c=>{delete db.cards[c.id];if(!db.del.includes(c.id))db.del.push(c.id)});
  else if(!isNoDate)cs.forEach(c=>{log(c,`Mês alterado: ${mlabel(k)} → Sem data`);c.mes=''});
  if(!isNoDate)db.meses=db.meses.filter(m=>m!==k);
  delete db.mnotes[k];if(st.mes===k)st.mes='*';
- save();drawer(db.cards[st.open]?st.open:null);render();updateRagConfigStatus();toast(isNoDate?'Contatos sem data excluídos.':'Mês excluído.');
+ save();drawer(db.cards[st.open]?st.open:null);render();toast(isNoDate?'Contatos sem data excluídos.':'Mês excluído.');
 }
 
 async function bulkDeleteCards(){
@@ -2985,12 +2061,11 @@ async function bulkDeleteCards(){
  if(!await ask(`Excluir definitivamente os ${count} contatos selecionados?`,{ok:`Excluir ${count} contatos`,danger:true,title:'Exclusão em Lote'}))return;
  st.sel.forEach(id=>{
    delete db.cards[id];
-   deleteVector(id);
    if(!db.del.includes(id))db.del.push(id);
  });
  st.sel=[];
  st.bulk=false;
- save();drawer(null);render();updateRagConfigStatus();
+ save();drawer(null);render();
  toast(`${count} contato${count>1?'s':''} excluído${count>1?'s':''} com sucesso.`);
 }
 
@@ -3071,11 +2146,12 @@ document.addEventListener('change',e=>{
  if(e.target.id==='f-nome')c.nome=up(v.trim())||c.nome;
  else if(e.target.id==='f-parto'){if(okd(v))c.parto=v}
  else if(e.target.id==='f-parto-ok'){c.parto_ok=e.target.checked;log(c,c.parto_ok?'Data do parto confirmada':'Confirmação do parto desmarcada');save();render();renderNotifications();drawer(c.id);toast(c.parto_ok?'Parto confirmado. Pendência removida!':'Confirmação do parto desmarcada.');return}
+ else if(e.target.id==='f-pend'){c.pend=e.target.checked;log(c,c.pend?'Contato marcado como pendente':'Pendência do contato removida');save();render();renderNotifications();drawer(c.id);toast(c.pend?'Contato marcado como pendente.':'Pendência do contato removida.');return}
  else if(e.target.id==='f-saque'){if(okd(v))c.saque=v}
  else if(e.target.id==='f-mes'){log(c,`Mês alterado: ${mlabel(c.mes)} → ${mlabel(v)}`);c.mes=v}
  else if(e.target.id==='f-et'){log(c,`Etapa: ${SN[c.etapa][1]} → ${SN[v][1]}`);c.etapa=v}
  else return;
- save();render();queueCardEmbedding(c);if(/f-(mes|et)/.test(e.target.id))drawer(c.id);
+ save();render();if(/f-(mes|et)/.test(e.target.id))drawer(c.id);
 });
 
 document.addEventListener('keydown',e=>{
@@ -3091,7 +2167,6 @@ document.addEventListener('keydown',e=>{
  if(e.target.id==='lgn-name'&&e.key==='Enter')$('#lgn-add-btn').click();
  if(e.key==='Escape'&&!$('#dg').open&&!$('#cfg-dlg').open&&!$('#dlg-mes').open&&!$('#dlg-label').open){
    if(st.open)drawer(null);
-   $('#ai-window').hidden=true;
  }
 });
 
@@ -3108,7 +2183,7 @@ document.addEventListener('focusout',e=>{
  if(e.target.id==='f-parto'){
    const c=db.cards[st.open];
    if(c&&c.parto&&!c.mes){
-     c.mes=c.parto.slice(0,7);save();queueCardEmbedding(c);
+     c.mes=c.parto.slice(0,7);save();
      const m=$('#f-mes');if(m)m.innerHTML=mopts(c.mes);render();
    }
  }
@@ -3122,102 +2197,11 @@ $('#dg').addEventListener('cancel',e=>{e.preventDefault();if(_a)_a(false)});
 $('#dg').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='dgi'){e.preventDefault();if(_a)_a(true)}});
 let qt;$('#q').addEventListener('input',e=>{clearTimeout(qt);const v=e.target.value;qt=setTimeout(()=>{st.q=v;render()},180)});
 
-// Controle do Chat IA
-$('#ai-fab').addEventListener('click', () => {
-  const win = $('#ai-window');
-  win.hidden = !win.hidden;
-  if (!win.hidden) $('#ai-prompt').focus();
-});
-
-$('#ai-model-select')?.addEventListener('change', e => {
-  const newModel = e.target.value.trim();
-  if (newModel) {
-    storage.setItem(KEY_CHAT_MODEL, newModel);
-    storage.setItem('gemini_chat_model_migrated_v2', '1');
-    const cfgChat = $('#cfg-chat-model');
-    if (cfgChat) cfgChat.value = newModel;
-    toast(`Modelo alterado para ${newModel}. Histórico e contexto preservados.`);
-  }
-});
-
-$('#ai-prompt')?.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    if ($('#ai-form').requestSubmit) $('#ai-form').requestSubmit();
-    else $('#ai-form').dispatchEvent(new Event('submit'));
-  }
-});
-
-$('#ai-form').addEventListener('submit', async e => {
-  e.preventDefault();
-  const inp = $('#ai-prompt');
-  const txt = inp.value.trim();
-  if (!txt) return;
-
-  inp.value = '';
-  appendAiMessage(txt, 'user');
-  saveChatStorage();
-
-  try {
-    const resp = await chatWithGemini(txt);
-    appendAiMessage(resp || 'Sem resposta.', 'bot', true);
-    saveChatStorage();
-  } catch (err) {
-    const isRetry = err.isRetryable !== undefined ? err.isRetryable : isRetryableGeminiError(err.status, err.message);
-    const errDiv = appendAiMessage(`⚠️ ${err.message || 'Erro ao processar com a IA.'}`, 'bot');
-    if (isRetry) {
-      const retryBtn = document.createElement('button');
-      retryBtn.type = 'button';
-      retryBtn.className = 'ai-retry-btn';
-      retryBtn.dataset.retry = txt;
-      retryBtn.innerHTML = '🔄 Tentar novamente agora';
-      retryBtn.addEventListener('click', () => {
-        errDiv.remove();
-        inp.value = txt;
-        $('#ai-form').dispatchEvent(new Event('submit'));
-      });
-      errDiv.appendChild(document.createElement('br'));
-      errDiv.appendChild(retryBtn);
-    }
-    saveChatStorage();
-  }
-});
-
-// Eventos de Configurações
-$('#cfg-close-btn').addEventListener('click', () => $('#cfg-dlg').close());
-$('#cfg-key-toggle').addEventListener('click', () => {
-  const inp = $('#cfg-key');
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-});
-$('#cfg-save-btn').addEventListener('click', () => {
-  const key = $('#cfg-key').value.trim();
-  const chatModel = $('#cfg-chat-model').value.trim();
-  const embedModel = $('#cfg-embed-model').value.trim();
-
-  if (key) storage.setItem(KEY_GEMINI, key);
-  else storage.removeItem(KEY_GEMINI);
-
-  if (chatModel) {
-    storage.setItem(KEY_CHAT_MODEL, chatModel);
-    storage.setItem('gemini_chat_model_migrated_v2', '1');
-    const selectEl = $('#ai-model-select');
-    if (selectEl) selectEl.value = chatModel;
-  }
-  if (embedModel) storage.setItem(KEY_EMBED_MODEL, embedModel);
-
-  toast('Configurações salvas.');
-  updateRagConfigStatus();
-  $('#cfg-dlg').close();
-  syncEmbeddings();
-});
-
-$('#cfg-reindex-btn').addEventListener('click', async () => {
-  toast('Atualizando a busca por significado…');
-  await syncEmbeddings(true);
-});
+// Limpeza de chaves legadas de IA se existirem no navegador
+['gemini_api_key_v1','gemini_chat_model_v1','gemini_embed_model_v1','gemini_chat_history_v1','gemini_chat_ui_msgs_v1','sm_ai_reports_v1','gemini_chat_model_migrated_v2'].forEach(k=>storage.removeItem(k));
+try{indexedDB.deleteDatabase('cantinho_vectors_db')}catch(e){}
 
 // Inicialização
-restoreChat();
 Object.keys(db.cards).forEach(id=>{const c=normCard(db.cards[id]);if(c){c.nome=up(c.nome);db.cards[id]=c}});save();
 try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 new ResizeObserver(()=>document.documentElement.style.setProperty('--hh',$('header').offsetHeight+'px')).observe($('header'));
@@ -3232,24 +2216,49 @@ if (mainEl) {
 }
 render();
 
-function checkInitialPartoAlerts(){
+function checkInitialAlerts(){
   const due = getPartoNotifications();
   const tm = due.filter(x => x.status === 'tomorrow');
-  if (tm.length === 1) {
-    toast(`🔔 Parto amanhã: ${tm[0].c.nome} (${fx(tm[0].c.parto)}). Confira nas notificações.`);
-  } else if (tm.length > 1) {
-    toast(`🔔 Atenção: ${tm.length} contatos têm parto previsto para amanhã! Confira nas notificações.`);
-  } else if (due.length === 1) {
-    toast(`🔔 Parto pendente de confirmação: ${due[0].c.nome} (${fx(due[0].c.parto)}).`);
-  } else if (due.length > 1) {
-    toast(`🔔 Atenção: ${due.length} contatos com parto pendente de confirmação.`);
-  }
-}
-checkInitialPartoAlerts();
+  const otherPartos = due.filter(x => x.status !== 'tomorrow');
+  const pendingCards = all().filter(c => !c.arq && c.pend);
+  const pendingMonths = monthNotes().filter(([k, v]) => v.v);
 
-// Indexação inicial
-syncEmbeddings();
-updateRagConfigStatus();
+  const total = due.length + pendingCards.length + pendingMonths.length;
+  if (!total) return;
+
+  if (tm.length > 0) {
+    const tmText = tm.length === 1
+      ? `Parto amanhã: ${tm[0].c.nome} (${fx(tm[0].c.parto)})`
+      : `${tm.length} contatos têm parto previsto para amanhã`;
+    const others = total - tm.length;
+    if (others > 0) {
+      toast(`🔔 ${tmText} (+ ${others} pendência${others > 1 ? 's' : ''}). Confira nas notificações.`);
+    } else {
+      toast(`🔔 ${tmText}. Confira nas notificações.`);
+    }
+    return;
+  }
+
+  if (total === 1) {
+    if (pendingCards.length === 1) {
+      toast(`🔔 Contato com pendência: ${pendingCards[0].nome}. Confira nas notificações.`);
+    } else if (pendingMonths.length === 1) {
+      toast(`🔔 Mês com pendência: ${mlabel(pendingMonths[0][0])}. Confira nas notificações.`);
+    } else if (otherPartos.length === 1) {
+      toast(`🔔 Parto pendente de confirmação: ${otherPartos[0].c.nome} (${fx(otherPartos[0].c.parto)}).`);
+    }
+    return;
+  }
+
+  const parts = [];
+  if (due.length) parts.push(`${due.length} parto${due.length > 1 ? 's' : ''}`);
+  if (pendingCards.length) parts.push(`${pendingCards.length} cartão(ões)`);
+  if (pendingMonths.length) parts.push(`${pendingMonths.length} mês(es)`);
+
+  toast(`🔔 Atenção: você tem ${total} pendências ativas (${parts.join(', ')}). Confira nas notificações.`);
+}
+const checkInitialPartoAlerts = checkInitialAlerts;
+checkInitialAlerts();
 </script>
 </body>
 </html>
