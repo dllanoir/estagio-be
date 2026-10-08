@@ -771,6 +771,25 @@ button.lab.off{opacity:.38}
 .ai-form{padding:10px}
 .ai-form textarea{height:44px}
 
+/* Ações em lote e seleção múltipla de contatos */
+.bulk-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;margin-bottom:12px;grid-column:1/-1}
+.bulk-toolbar-left{display:flex;align-items:center;gap:10px}
+.bulk-all-label{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--ink);cursor:pointer;user-select:none}
+.bulk-count-badge{background:var(--p);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:99px}
+.bulk-toolbar-right{display:flex;align-items:center;gap:6px}
+.bulk-action-btn{height:30px;font-size:11.5px;padding:0 10px;border-radius:7px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;border:1px solid var(--ln);background:#fff;color:var(--ink);white-space:nowrap;box-sizing:border-box;transition:all .15s ease}
+.bulk-action-btn svg{width:13px;height:13px;flex-shrink:0}
+.bulk-action-btn:hover{background:#f1f5f9;border-color:#94a3b8}
+.bulk-del-btn{background:#dc2626 !important;color:#fff !important;border-color:#b91c1c !important}
+.bulk-del-btn:hover:not(:disabled){background:#b91c1c !important}
+.bulk-del-btn:disabled{opacity:.45;cursor:not-allowed}
+.row.selected-for-bulk{background:#eff6ff !important;border-color:#3b82f6 !important;box-shadow:0 0 0 1px #3b82f6, 0 4px 12px rgba(59,130,246,.12)}
+.row-cb-wrap{display:flex;align-items:center;margin-right:4px;grid-row:1/-1;align-self:center}
+.row-cb{width:16px;height:16px;cursor:pointer;accent-color:#2563eb}
+.row.bulk-mode, .row:has(.row-cb-wrap){grid-template-columns:auto minmax(0,1fr) auto !important}
+.row.bulk-mode .row-note, .row:has(.row-cb-wrap) .row-note{grid-column:1/-1}
+.notif-dot.parto{background:#ec4899}
+
 .cfg-link{font-size:12.5px;color:var(--ai);font-weight:700;text-decoration:none}
 .cfg-link:hover{text-decoration:underline}
 .cfg-sec{padding:16px;border-radius:13px}
@@ -1448,10 +1467,10 @@ function normCard(c){
  c.labels=Array.isArray(c.labels)?c.labels.map(String):[];c.tl=Array.isArray(c.tl)?c.tl.map(String):[];
  c.hist=Array.isArray(c.hist)?c.hist.filter(h=>h&&typeof h==='object').map(h=>({...h,d:h.d?String(h.d):null,t:String(h.t??'')})):[];
  if(!c.rich){c.obs=toHtml(c.obs);c.rich=1}else c.obs=clean(String(c.obs??''));
- c.td=String(c.td??'');c.arq=!!c.arq;return c}
+ c.td=String(c.td??'');c.arq=!!c.arq;c.parto_ok=!!c.parto_ok;return c}
 let db,persisted=storage.getItem(KEY);try{db=JSON.parse(persisted)}catch(e){}
 db=(db&&typeof db==='object')?db:{cards:{},labels:{}};db.cards=(db.cards&&typeof db.cards==='object')?db.cards:{};db.labels=(db.labels&&typeof db.labels==='object')?Object.fromEntries(Object.entries(db.labels).map(([l,v])=>[String(l),safeLabelColor(v)]).filter(([l])=>l)):{};db.meses=Array.isArray(db.meses)?db.meses.filter(okm):[];db.mnotes=(db.mnotes&&typeof db.mnotes==='object')?db.mnotes:{};db.gone=Array.isArray(db.gone)?db.gone.map(String):[];db.del=Array.isArray(db.del)?db.del.map(String):[];Object.values(db.cards).forEach(c=>{if(c&&Array.isArray(c.labels))c.labels.map(String).forEach(l=>{if(l&&!db.labels[l])db.labels[l]='black'})});persisted=persisted||JSON.stringify(db);
-let st={mes:'*',et:'ativos',q:'',lb:[],mode:'e',lopen:false,sort:'etapa',ls:[],lq:'',mm:false,open:null};
+let st={mes:'*',et:'ativos',q:'',lb:[],mode:'e',lopen:false,sort:'etapa',ls:[],lq:'',mm:false,open:null,bulk:false,sel:[]};
 let cur=[];
 
 function save(){
@@ -1687,6 +1706,7 @@ async function runCardEmbedding(id){
 
 const GEMINI_TOOLS = [
   { functionDeclarations: [
+    { name:"executar_no_banco", description:"Executa código JavaScript diretamente no banco de dados 'db' da aplicação. Ferramenta principal e prioritária para realizar qualquer comando ou consulta que o usuário pedir (criar contatos, consultar, filtrar, alterar em lote, mover meses, adicionar ocorrências, excluir em lote, calcular estatísticas, etc.). Retorna o resultado para você responder. IMPORTANTE: para ações de perigo que excluam múltiplos contatos ou apaguem dados em massa, você DEVE primeiro verificar a quantidade e pedir confirmação curta e resumida ao usuário antes de executar.", parameters:{type:"OBJECT",properties:{codigo_js:{type:"STRING",description:"Código JavaScript a executar com acesso direto a db, all(), cur, st, S, SN, ML, save(), render(), toast(), deleteVector(), queueCardEmbedding(), updateRagConfigStatus(). Pode usar return para retornar dados."},descricao:{type:"STRING",description:"Breve descrição da operação."},confirmado_pelo_usuario:{type:"BOOLEAN",description:"Defina como true SOMENTE se o usuário já tiver confirmado a ação de perigo expressamente."}},required:["codigo_js"]} },
     { name:"estado_sistema", description:"Lê o estado completo e atual do aplicativo: contatos, etapas, meses, etiquetas, filtros atuais, pendências do mês e status do backup.", parameters:{type:"OBJECT",properties:{}} },
     { name:"buscar_contatos", description:"Busca contatos por significado, texto, nome, etapa, mês, etiquetas, datas, anotações ou histórico. Use esta ferramenta quando o usuário não fornecer um ID exato.", parameters:{type:"OBJECT",properties:{consulta:{type:"STRING",description:"Consulta em linguagem natural"},limite:{type:"INTEGER",description:"Quantidade máxima de resultados, de 1 a 20"}},required:["consulta"]} },
     { name:"ler_contato", description:"Retorna todos os dados de um contato, incluindo etiquetas, anotações e histórico completo. Pode localizar por ID ou nome.", parameters:{type:"OBJECT",properties:{id:{type:"STRING"},nome:{type:"STRING"}}} },
@@ -1744,9 +1764,75 @@ async function saveToolRefresh(c=null){
   if(c){if(st.open===c.id)drawer(c.id);queueCardEmbedding(c)}
   return true;
 }
-function setStSafe(){render();}
+async function executeDbScript(code, confirmado = false) {
+  if (!code || typeof code !== 'string') return { erro: 'Código JavaScript não fornecido.' };
+
+  const prevDbJson = JSON.stringify(db);
+  const initialCardsCount = Object.keys(db.cards).length;
+  const prevCards = { ...db.cards };
+
+  const scope = {
+    db, all, cur, st, S, SN, ML, MN, mlabel, mkey, norm, up, now,
+    save, render, toast, drawer, deleteVector, queueCardEmbedding,
+    syncEmbeddings, updateRagConfigStatus, normCard
+  };
+
+  try {
+    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+    const fn = new AsyncFunction(...Object.keys(scope), code);
+    const result = await fn(...Object.values(scope));
+
+    const finalCardsCount = Object.keys(db.cards).length;
+    const deletedCount = initialCardsCount - finalCardsCount;
+
+    // Proteção de segurança: se a operação excluiu múltiplos contatos sem confirmação prévia
+    if (deletedCount > 1 && !confirmado) {
+      db = JSON.parse(prevDbJson);
+      save();
+      render();
+      return {
+        bloqueado_requer_confirmacao: true,
+        contatos_afetados: deletedCount,
+        alerta: `Ação de perigo detectada: ${deletedCount} contatos seriam excluídos. Solicite confirmação curta ao usuário antes de prosseguir (exemplo: 'Você pediu para apagar [descrição da ação] (${deletedCount} contatos). Posso prosseguir?'). NÃO exclua nada até que o usuário responda confirmando.`
+      };
+    }
+
+    // Sincronização automática de vetores e log de exclusão
+    const curCardIds = new Set(Object.keys(db.cards));
+    Object.keys(prevCards).forEach(id => {
+      if (!curCardIds.has(id)) {
+        deleteVector(id);
+        if (!db.del.includes(id)) db.del.push(id);
+      }
+    });
+    curCardIds.forEach(id => {
+      if (!prevCards[id]) {
+        queueCardEmbedding(db.cards[id]);
+      }
+    });
+
+    if (JSON.stringify(db) !== prevDbJson) {
+      save();
+      render();
+      updateRagConfigStatus();
+    }
+
+    return {
+      sucesso: true,
+      resultado: result !== undefined ? result : 'Operação executada diretamente no banco com sucesso.'
+    };
+  } catch (err) {
+    db = JSON.parse(prevDbJson);
+    save();
+    render();
+    return { erro: String(err.message || err) };
+  }
+}
 
 async function executeLocalTool(name,args,apiKey){
+  if(name==='executar_no_banco'){
+    return await executeDbScript(args.codigo_js, !!args.confirmado_pelo_usuario);
+  }
   if(name==='estado_sistema'){
     const cs=all(),act=c=>!c.arq&&c.etapa!=='fim',pending=Object.entries(db.mnotes||{}).filter(([k,v])=>v&&v.v).map(([k,v])=>({mes:k,mes_nome:mlabel(k),texto:v.n||''}));
     return {filtros:{mes:st.mes,etapa:st.et,busca:st.q,etiquetas:[...st.lb],modo_etiquetas:st.mode,ordenacao:st.sort},totais:{contatos:cs.length,ativos:cs.filter(act).length,arquivados:cs.filter(c=>c.arq).length,sem_mes:cs.filter(c=>!c.mes&&!c.arq).length},etapas:Object.fromEntries(S.map(s=>[s[0],cs.filter(c=>!c.arq&&c.etapa===s[0]).length])),meses:db.meses.map(k=>({chave:k,nome:mlabel(k),nota:db.mnotes[k]?.n||'',pendente:!!db.mnotes[k]?.v})),etiquetas:Object.keys(db.labels),pendencias_mes:pending,backup:{ultimo:db.bk||null,dias:backupAgeDays()}};
@@ -1870,6 +1956,7 @@ async function executeLocalTool(name,args,apiKey){
 const conversationHistory = [];
 const MAX_TOOL_ROUNDS = 12, MAX_SENT = 30;
 const TOOL_LABEL = {
+  executar_no_banco: ['Executando no banco de dados…','Operação concluída no banco'],
   buscar_contatos: ['Buscando contatos…','Contatos consultados'],
   criar_contato: ['Criando contato…','Contato criado'],
   atualizar_contato: ['Atualizando contato…','Contato atualizado'],
@@ -1958,28 +2045,41 @@ async function chatWithGemini(userPrompt) {
   const turn = [{ role: "user", parts: [{ text: userPrompt }] }];
   const hoje = new Date();
   const system = { parts: [{ text: `Você é o Assistente Operacional do sistema "Meu cantinho", um CRM de gestão de atendimentos (fluxo de requerimentos junto ao INSS, com acompanhamento de documentos, guias, análise, deferimento e pagamento).
-Você tem o mesmo poder do usuário: tudo o que a interface permite (criar, ler, editar, mover, arquivar, excluir, filtrar, importar, exportar, configurar), você executa pelas ferramentas. Hoje é ${hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})} (${hoje.toISOString().slice(0,10)}); use isso para "este mês", "mês que vem", "semana passada" etc.
+Hoje é ${hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})} (${hoje.toISOString().slice(0,10)}).
 
-OBJETIVO DO SISTEMA: organizar cada atendimento (contato) por mês de atendimento e etapa do fluxo, para que nada fique esquecido: cobrar documentos, emitir/pagar guias, dar entrada, acompanhar análise e pagamento, e registrar o histórico.
+OBJETIVO DO SISTEMA: organizar cada atendimento (contato) por mês de atendimento e etapa do fluxo, para que nada fique esquecido.
 
-MODELO DE DADOS
-- Contato: id, nome, mês (AAAA-MM ou vazio = "Sem data"), etapa, data prevista do parto (parto), data de pagamento/saque (saque), etiquetas, anotações (texto rico), histórico (registros com data e texto) e estado de arquivado.
-- Etapas do fluxo, em ordem: ${S.map(s=>s[0]+' = '+s[1]).join('; ')}.
-- Mês de atendimento: agrupa contatos; pode ter anotação e marca de pendência/validação (aparece no menu lateral e nas notificações).
-- Etiquetas: nome + cor (${COLORS.map(c=>c[0]).join(', ')}).
-- Visão: filtros por mês, etapa, busca, etiquetas (modo "e" = todas, "o" = qualquer) e ordenação (etapa, nome, parto, atividade).
-- Também existem: backup JSON, exportação CSV da visão filtrada, importação de backup ou Trello JSON, configurações (modelos de chat/busca) e índice semântico local.
+ESTRUTURA COMPLETA DO BANCO DE DADOS ('db'):
+Você conhece o banco de dados interno da aplicação ('db') e executa qualquer comando diretamente nele via ferramenta 'executar_no_banco':
+- db.cards[id]: dicionário de contatos indexado por ID. Cada contato tem:
+  * id: string única (ex: 'm' + Date.now().toString(36))
+  * nome: string em MAIÚSCULAS
+  * mes: 'AAAA-MM' ou '' para "Sem data"
+  * etapa: 'triagem', 'docs', 'guia', 'entrada', 'inss', 'deferido', 'fim', 'indef' (Etapas: ${S.map(s=>s[0]+' = '+s[1]).join('; ')})
+  * labels: array de strings com nomes das etiquetas (ex: ['URGENTE'])
+  * obs: anotações do contato (texto rico ou html)
+  * parto: 'AAAA-MM-DD' (ou vazio)
+  * saque: 'AAAA-MM-DD' (ou vazio)
+  * hist: array de ocorrências [{ d: ISOString ou null, t: 'texto' }]
+  * arq: boolean (true se arquivado, false se ativo)
+- db.meses: array de meses cadastrados ['AAAA-MM', ...]
+- db.labels: objeto de etiquetas { 'Nome': 'cor' }
+- db.mnotes: anotações e pendências dos meses { 'AAAA-MM': { n: 'texto', v: boolean } }
 
-COMO TRABALHAR
-- Na dúvida sobre o estado atual, comece por estado_sistema. Sem ID, localize o contato com buscar_contatos ou ler_contato antes de alterar ou excluir; nunca invente IDs, etiquetas ou meses.
-- Pedidos com vários itens (ex.: "crie 5 contatos", "mova todos de outubro para novembro"): execute todos, um por um, e só então responda. Se faltar uma informação essencial, pergunte uma única vez; se for opcional, use um padrão sensato e diga qual usou.
-- Se o mês pedido não existir, crie-o com criar_mes antes de usá-lo.
-- Nunca diga que fez algo sem ter chamado a ferramenta correspondente e conferido que retornou sucesso. Se uma ferramenta retornar erro, explique o motivo e tente corrigir.
-- Ações destrutivas (excluir contato, histórico, mês, etiqueta; substituir dados) exibem confirmação na interface: não tente contornar. Se o usuário cancelar, informe que nada foi alterado.
-- Limites por segurança: você não vê nem altera a chave de API (o usuário gerencia nas Configurações).
-- Datas: AAAA-MM-DD. Meses: AAAA-MM. Etiquetas: use o nome exato retornado pelo sistema.
-- Ao citar contatos criados, alterados ou encontrados, mostre nome, etapa e mês e, quando útil, o ID entre crases.
-- Responda em português do Brasil, de forma objetiva, explicando o que foi feito e sugerindo o próximo passo quando fizer sentido.` }] };
+COMO TRABALHAR:
+1. EXECUTE DIRETO NO BANCO: Sua ferramenta principal e prioritária é 'executar_no_banco'. Em vez de executar uma a uma as funções individuais da interface, execute JavaScript diretamente no banco 'db' para qualquer comando, busca avançada, alteração em lote, movimentação entre meses, cadastro ou cálculo que o usuário pedir. É muito mais rápido, poderoso e resolve em um único passo.
+2. NO ESCOPO DE 'executar_no_banco': Você tem acesso a: db, all() (retorna array de todos os contatos), cur (contatos visíveis no filtro atual), st (filtros/estado), S, SN, ML, save(), render(), toast(msg), etc. As alterações salvas em 'db' atualizam a interface automaticamente.
+
+REGRA MANDATÓRIA DE CONFIRMAÇÃO PARA AÇÕES DE PERIGO:
+- Caso o usuário peça qualquer ação de perigo — especialmente EXCLUIR MÚLTIPLOS CONTATOS (ex.: "apagar todos os contatos arquivados", "excluir os contatos sem data", "limpar todos de janeiro", "apagar o banco"):
+  * NÃO execute a exclusão imediatamente!
+  * Primeiro consulte o banco (ex: all().filter(...)) para apurar a quantidade exata de contatos afetados.
+  * Responda ao usuário com uma confirmação curta, direta e resumida:
+    "Você pediu para apagar [descrição da ação] ([X] contatos). Posso prosseguir?"
+  * Somente após o usuário confirmar na próxima mensagem (disser "sim", "pode", "prossiga", "confirmo", etc.), execute a exclusão no banco passando confirmado_pelo_usuario: true.
+  * Se o usuário disser "não" ou cancelar, responda confirmando que nada foi apagado.
+- Para exclusão de apenas 1 contato específico que o usuário já pediu explicitamente pelo nome ou ID, execute diretamente.
+- Responda em português do Brasil de forma clara, prestativa e objetiva.` }] };
 
   let activeNoticeEl = null;
   const updateNotice = (msg) => {
@@ -2240,6 +2340,22 @@ function backupAgeDays(){
 function monthNotes(){
   return Object.entries(db.mnotes||{}).filter(([k,v])=>/^\d{4}-\d{2}$/.test(k)&&v&&((v.n||'').trim()||v.v));
 }
+function getPartoNotifications(){
+  const now=new Date();
+  const pad=n=>String(n).padStart(2,'0');
+  const todayStr=`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`;
+  const tmrw=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+  const tomorrowStr=`${tmrw.getFullYear()}-${pad(tmrw.getMonth()+1)}-${pad(tmrw.getDate())}`;
+
+  const list=all().filter(c=>!c.arq&&c.parto&&!c.parto_ok&&c.parto<=tomorrowStr);
+  list.sort((a,b)=>a.parto.localeCompare(b.parto));
+  return list.map(c=>{
+    let status='overdue';
+    if(c.parto===tomorrowStr) status='tomorrow';
+    else if(c.parto===todayStr) status='today';
+    return {c,status};
+  });
+}
 function renderNotifications(){
   const badge=$('#notif-badge'),list=$('#notif-list'),summary=$('#notif-summary');
   if(!badge||!list||!summary)return;
@@ -2247,12 +2363,37 @@ function renderNotifications(){
   const age=backupAgeDays();
   if(!db.bk)items.push({kind:'danger',title:'Backup ainda não realizado',text:'Faça um backup para ter uma cópia dos seus dados.',action:'exp',label:'Fazer backup agora'});
   else if(age>7)items.push({kind:'warn',title:'Backup desatualizado',text:`O último backup tem ${age} dias.`,action:'exp',label:'Atualizar backup'});
+
+  const partos=getPartoNotifications();
+  partos.forEach(({c,status})=>{
+    let title,text;
+    if(status==='tomorrow'){
+      title=`Parto amanhã: ${c.nome}`;
+      text=`Parto previsto para amanhã (${fx(c.parto)})${c.mes?' • '+mlabel(c.mes):''}. Confirme após o nascimento.`;
+    }else if(status==='today'){
+      title=`Parto hoje: ${c.nome}`;
+      text=`Parto previsto para hoje (${fx(c.parto)})${c.mes?' • '+mlabel(c.mes):''}. Confirme se ocorreu.`;
+    }else{
+      title=`Parto pendente: ${c.nome}`;
+      text=`Data prevista: ${fx(c.parto)} (${c.mes?mlabel(c.mes):'Sem mês'}). Confirme para retirar o aviso.`;
+    }
+    items.push({
+      kind:'parto',
+      title,
+      text,
+      action:'contact',
+      contactId:c.id,
+      month:c.mes,
+      label:'Ir para contato'
+    });
+  });
+
   monthNotes().filter(([k,v])=>v.v).slice(0,8).forEach(([k,v])=>items.push({kind:'warn',title:`Pendência em ${mlabel(k)}`,text:(v.n||'Mês marcado como pendente.').trim(),action:'month',month:k,label:'Abrir mês'}));
   const noDate=all().filter(c=>!c.mes&&!c.arq).length;
   if(noDate)items.push({kind:'warn',title:`${noDate} atendimento${noDate===1?'':'s'} sem mês`,text:'Existem contatos que ainda precisam ser associados a um período.',action:'no-date',label:'Ver sem data'});
   badge.hidden=!items.length;badge.textContent=items.length>9?'9+':String(items.length);
   summary.textContent=items.length?`${items.length} pendência${items.length===1?'':'s'}`:'Tudo certo';
-  list.innerHTML=items.length?items.map((it,i)=>`<div class="notif-item"><span class="notif-dot ${it.kind==='danger'?'danger':''}"></span><div class="notif-body"><strong>${esc(it.title)}</strong><p>${esc(it.text)}</p><button type="button" class="btn" data-a="notif-action" data-notif="${i}">${esc(it.label)}</button></div></div>`).join(''):'<div class="notif-item"><span class="notif-dot ok"></span><div class="notif-body"><strong>Nenhuma pendência</strong><p>Seu sistema está em dia.</p></div></div>';
+  list.innerHTML=items.length?items.map((it,i)=>`<div class="notif-item"><span class="notif-dot ${it.kind==='danger'?'danger':it.kind==='parto'?'parto':''}"></span><div class="notif-body"><strong>${esc(it.title)}</strong><p>${esc(it.text)}</p><button type="button" class="btn" data-a="notif-action" data-notif="${i}">${esc(it.label)}</button></div></div>`).join(''):'<div class="notif-item"><span class="notif-dot ok"></span><div class="notif-body"><strong>Nenhuma pendência</strong><p>Seu sistema está em dia.</p></div></div>';
   window._notifications=items;
 }
 function renderContext(cs,base,sk){
@@ -2288,7 +2429,7 @@ function render(){
 
  // Renderização refinada do Navigation Rail (Sidebar com rolagem preservada)
  const PENCIL='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
- const TRASH_ICON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v5M14 11v5"/></svg>';
+ const TRASH_ICON='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v5M14 11v5"/></svg>';
  const NOTEICO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
 
  const monthsCardsHtml = ks.map(k=>{
@@ -2296,10 +2437,10 @@ function render(){
    const mkr=pend?'<span class="mk pend" role="img" aria-label="Pendente de validação" title="Pendente de validação">●</span>':'';
    const nm=k?ML[+k.slice(5)-1]:'Sem data', yr=k?k.slice(0,4):'';
    const count=cs.filter(c=>c.mes===k&&act(c)).length;
-   const slot=(st.mm&&k)
+   const slot=st.mm
      ? `<div class="month-manage-actions" role="group" aria-label="Ações de ${mlabel(k)}">
-          <button type="button" class="mx pe" data-a="emes" data-k="${k}" aria-label="Editar nota de ${mlabel(k)}" title="Editar nota do mês">${PENCIL}</button>
-          <button type="button" class="mx del" data-a="dmes" data-k="${k}" aria-label="Excluir ${mlabel(k)}" title="Excluir mês">${TRASH_ICON}</button>
+          <button type="button" class="mx pe" data-a="emes" data-k="${k}" aria-label="Editar nota de ${mlabel(k)}" title="Editar nota">${PENCIL}</button>
+          <button type="button" class="mx del" data-a="dmes" data-k="${k}" aria-label="Excluir ${mlabel(k)}" title="${k?'Excluir mês':'Excluir contatos sem data'}">${TRASH_ICON}</button>
         </div>`
      : `<span class="month-count" title="Contatos ativos">${count}</span>`;
    const note=txt?`<div class="month-note" title="${esc(txt)}">${NOTEICO}<span class="month-note-text">${esc(txt)}</span></div>`:'';
@@ -2400,6 +2541,7 @@ function render(){
    ${st.lb.length?'<button type="button" class="chip" data-a="lbx">Limpar filtro</button>':''}
  </div>
  <div class="filter-actions">
+   <button type="button" class="chip ${st.bulk?'on':''}" data-a="toggle-bulk" title="Selecionar múltiplos contatos para exclusão em lote">${st.bulk?'✕ Cancelar seleção':'☑ Selecionar em lote'}</button>
    <select id="se" class="${st.et!=='ativos'?'active-filter':''}" aria-label="Filtrar por etapa">${ch.map(x=>`<option value="${x[0]}" ${st.et===x[0]?'selected':''}>Etapa: ${x[1]} (${x[2]})</option>`).join('')}</select>
    <select id="so" aria-label="Ordenar">${[['etapa','Ordenar: Etapa'],['nome','Nome (A–Z)'],['parto','Data do parto'],['ativ','Atividade recente']].map(o=>`<option value="${o[0]}" ${st.sort===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select>
  </div>`;
@@ -2410,10 +2552,15 @@ function render(){
  $('#lp').hidden=!st.lopen;
  $('#lp').innerHTML=`<small class="sp0">${E&&st.lb.length?'Etiquetas filtradas':'Todas as etiquetas disponíveis'}</small>`+lo.map(l=>`<button class="lab ${st.lb.includes(l)?'':'off'}" ${lb(l)}>${esc(l)} (${lc[l]||0})</button>`).join('')||'Nenhuma label cadastrada.';
 
+ const bulkBarHtml=(st.bulk&&rows.length)?`<div class="bulk-toolbar" role="region" aria-label="Ações em lote"><div class="bulk-toolbar-left"><label class="bulk-all-label"><input type="checkbox" id="bulk-toggle-all" ${rows.length>0&&rows.every(c=>st.sel.includes(c.id))?'checked':''}><span>Selecionar todos da lista (${rows.length})</span></label><span class="bulk-count-badge">${st.sel.length} selecionado(s)</span></div><div class="bulk-toolbar-right"><button type="button" class="bulk-action-btn bulk-del-btn" data-a="bulk-delete" ${st.sel.length===0?'disabled':''}>${TRASH_ICON} Excluir selecionados (${st.sel.length})</button><button type="button" class="bulk-action-btn" data-a="toggle-bulk">Fechar</button></div></div>`:'';
+
  $('#list').innerHTML=!cs.length?'<div class="empty"><h2>Nenhum contato cadastrado</h2><p>Comece criando um atendimento ou importando seus dados existentes.</p><button type="button" class="btn p" data-a="new">+ Novo contato</button></div>'
-  :rows.map(c=>{
+  :(bulkBarHtml+(rows.map(c=>{
     const s=SN[c.etapa]||S[0],last=(hs(c)[0]||{}).h;
-    return `<button type="button" class="row" style="--sc:${s[2]}" data-id="${esc(c.id)}" aria-label="Abrir atendimento de ${esc(c.nome)}">
+    const isSel=st.bulk&&st.sel.includes(c.id);
+    const cbHtml=st.bulk?`<span class="row-cb-wrap"><input type="checkbox" class="row-cb" data-cb-id="${esc(c.id)}" ${isSel?'checked':''} aria-label="Selecionar ${esc(c.nome)}"></span>`:'';
+    return `<button type="button" class="row ${st.bulk?'bulk-mode':''} ${isSel?'selected-for-bulk':''}" style="--sc:${s[2]}" data-id="${esc(c.id)}" aria-label="Abrir atendimento de ${esc(c.nome)}">
+      ${cbHtml}
       <span class="row-main">
         <span class="row-title"><b>${esc(c.nome)}</b></span>
         <span class="row-labels">${labs(c.labels)}</span>
@@ -2425,7 +2572,7 @@ function render(){
       </span>
       ${last?`<span class="row-note">${esc(last.t)}</span>`:''}
     </button>`;
-  }).join('')||`<div class="empty"><h2>Nenhum atendimento encontrado</h2><p>Tente remover algum filtro ou pesquisar por outro termo.</p>${(st.q||st.lb.length)?'<button type="button" class="btn" data-a="home">Limpar filtros</button>':''}</div>`;
+  }).join('')||`<div class="empty"><h2>Nenhum atendimento encontrado</h2><p>Tente remover algum filtro ou pesquisar por outro termo.</p>${(st.q||st.lb.length)?'<button type="button" class="btn" data-a="home">Limpar filtros</button>':''}</div>`));
 
  renderLabelsModal();
 
@@ -2540,7 +2687,16 @@ function drawer(id){
       <div class="dr-grid">
         <label>Mês de Atendimento<select id="f-mes">${mopts(c.mes)}</select></label>
         <label>Etapa Atual<select id="f-et">${S.map(s=>`<option value="${s[0]}" ${s[0]===c.etapa?'selected':''}>${s[1]}</option>`).join('')}</select></label>
-        <label>Data Prevista do Parto<input type="date" id="f-parto" value="${c.parto||''}"></label>
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;gap:6px">
+            <span style="font-size:11.5px;font-weight:600;color:var(--mut)">Data Prevista do Parto</span>
+            <label style="display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:${c.parto_ok?'#16a34a':'var(--mut)'};cursor:pointer;margin:0" title="Marcar como parto confirmado/acompanhado">
+              <input type="checkbox" id="f-parto-ok" ${c.parto_ok?'checked':''} style="accent-color:#16a34a;cursor:pointer;width:14px;height:14px;margin:0">
+              <span>${c.parto_ok?'✓ Confirmado':'Confirmar'}</span>
+            </label>
+          </div>
+          <input type="date" id="f-parto" value="${c.parto||''}" style="width:100%">
+        </div>
         <label>Data de Pagamento (Saque)<input type="date" id="f-saque" value="${c.saque||''}"></label>
       </div>
     </div>
@@ -2619,7 +2775,7 @@ function newCard(){
    id,nome:'NOVO CONTATO',parto:'',rich:1,
    mes:/^\d/.test(st.mes)?st.mes:'',
    etapa:'triagem',labels:[],tl:[],obs:'',td:'',saque:'',
-   hist:[{d:now(),t:'Contato criado'}],arq:false
+   hist:[{d:now(),t:'Contato criado'}],arq:false,parto_ok:false
  };
  save();render();drawer(id);
  const inp=$('#f-nome');if(inp)inp.select();
@@ -2647,12 +2803,34 @@ document.addEventListener('click',e=>{
    if(item.action==='exp')document.querySelector('[data-a="exp"]')?.click();
    else if(item.action==='month'){st.mes=item.month;render()}
    else if(item.action==='no-date'){st.mes='';st.et='ativos';render()}
+   else if(item.action==='contact'){
+     const tc=db.cards[item.contactId];
+     if(tc){
+       st.mes=tc.mes||'*';
+       if(tc.etapa==='fim'||tc.etapa==='indef') st.et='todos';
+     }else if(item.month!==undefined){
+       st.mes=item.month||'*';
+     }
+     render();
+     if(item.contactId) drawer(item.contactId);
+   }
    if(panel)panel.hidden=true;
    $('#notif-btn')?.setAttribute('aria-expanded','false');
  }
  else if(D.m!==undefined){st.mes=D.m;render()}
  else if(D.e){st.et=D.e;render()}
- else if(D.id)drawer(D.id);
+ else if(D.id){
+   if(st.bulk){
+     const idx=st.sel.indexOf(D.id);
+     if(idx<0) st.sel.push(D.id);
+     else st.sel.splice(idx,1);
+     render();
+   } else {
+     drawer(D.id);
+   }
+ }
+ else if(D.a==='toggle-bulk'){st.bulk=!st.bulk;if(!st.bulk)st.sel=[];render()}
+ else if(D.a==='bulk-delete')bulkDeleteCards();
  else if(D.a==='new')newCard();
  else if(D.a==='home'){st.mes='*';st.et='ativos';st.q='';st.lb=[];st.lopen=false;$('#q').value='';drawer(null);$('#ai-window').hidden=true;render()}
  else if(D.a==='dlg-close'){const dg=t.closest('dialog');if(dg)dg.close()}
@@ -2785,17 +2963,35 @@ $('#dlg-mes-confirm').addEventListener('click',()=>{
 
 const grow=t=>{if(t){t.style.height='auto';t.style.height=t.scrollHeight+'px'}};
 
-function setMes(k,f){if(!k)return;const m=db.mnotes[k]||{n:'',v:false};f(m);if(m.n.trim()||m.v)db.mnotes[k]=m;else delete db.mnotes[k];save()}
+function setMes(k,f){const m=db.mnotes[k]||{n:'',v:false};f(m);if(m.n.trim()||m.v)db.mnotes[k]=m;else delete db.mnotes[k];save()}
 
 async function delMes(k){
+ const isNoDate = !k;
  const cs=all().filter(c=>c.mes===k),n=cs.length;let r;
- if(!n)r=await ask(`Excluir o mês ${mlabel(k)}?`,{ok:'Excluir',danger:true});
+ if(!n)r=await ask(isNoDate?'Remover a seção "Sem data"?':`Excluir o mês ${mlabel(k)}?`,{ok:'Remover',danger:true});
+ else if(isNoDate)r=await ask(`"Sem data" possui ${n} contato${n>1?'s':''}. Deseja excluir definitivamente todos esses contatos?`,{ok:`Excluir ${n} contato${n>1?'s':''}`,danger:true});
  else r=await ask(`${mlabel(k)} possui ${n} contatos vinculados. O que deseja fazer?`,{ok:'Mover para "Sem data"',alt:'Excluir contatos e mês',danger:true});
  if(!r)return;
- if(r==='alt')cs.forEach(c=>{delete db.cards[c.id];deleteVector(c.id);if(!db.del.includes(c.id))db.del.push(c.id)});
- else cs.forEach(c=>{log(c,`Mês alterado: ${mlabel(k)} → Sem data`);c.mes=''});
- db.meses=db.meses.filter(m=>m!==k);delete db.mnotes[k];if(st.mes===k)st.mes='*';
- save();drawer(db.cards[st.open]?st.open:null);render();updateRagConfigStatus();toast('Mês excluído.');
+ if(r==='alt'||(isNoDate&&r===true))cs.forEach(c=>{delete db.cards[c.id];deleteVector(c.id);if(!db.del.includes(c.id))db.del.push(c.id)});
+ else if(!isNoDate)cs.forEach(c=>{log(c,`Mês alterado: ${mlabel(k)} → Sem data`);c.mes=''});
+ if(!isNoDate)db.meses=db.meses.filter(m=>m!==k);
+ delete db.mnotes[k];if(st.mes===k)st.mes='*';
+ save();drawer(db.cards[st.open]?st.open:null);render();updateRagConfigStatus();toast(isNoDate?'Contatos sem data excluídos.':'Mês excluído.');
+}
+
+async function bulkDeleteCards(){
+ const count=st.sel.length;
+ if(!count)return;
+ if(!await ask(`Excluir definitivamente os ${count} contatos selecionados?`,{ok:`Excluir ${count} contatos`,danger:true,title:'Exclusão em Lote'}))return;
+ st.sel.forEach(id=>{
+   delete db.cards[id];
+   deleteVector(id);
+   if(!db.del.includes(id))db.del.push(id);
+ });
+ st.sel=[];
+ st.bulk=false;
+ save();drawer(null);render();updateRagConfigStatus();
+ toast(`${count} contato${count>1?'s':''} excluído${count>1?'s':''} com sucesso.`);
 }
 
 async function delLabels(a){
@@ -2849,6 +3045,24 @@ document.addEventListener('change',e=>{
      toast(`Cor da etiqueta "${l}" atualizada.`);
    }
  }
+ if(e.target.id==='bulk-toggle-all'){
+   if(e.target.checked){
+     st.sel=[...new Set([...st.sel, ...cur.map(c=>c.id)])];
+   } else {
+     const inViewIds=new Set(cur.map(c=>c.id));
+     st.sel=st.sel.filter(id=>!inViewIds.has(id));
+   }
+   render();
+   return;
+ }
+ if(e.target.dataset&&e.target.dataset.cbId){
+   const id=e.target.dataset.cbId;
+   const idx=st.sel.indexOf(id);
+   if(e.target.checked && idx<0) st.sel.push(id);
+   else if(!e.target.checked && idx>=0) st.sel.splice(idx,1);
+   render();
+   return;
+ }
  if(e.target.id==='fi'){if(e.target.files[0])load(e.target.files[0]);e.target.value='';return}
  if(e.target.id==='se'){st.et=e.target.value;render();return}
  if(e.target.id==='so'){st.sort=e.target.value;render();return}
@@ -2856,6 +3070,7 @@ document.addEventListener('change',e=>{
  const c=db.cards[st.open];if(!c)return;const v=e.target.value;if(e.target.id==='f-et'&&!SN[v])return;
  if(e.target.id==='f-nome')c.nome=up(v.trim())||c.nome;
  else if(e.target.id==='f-parto'){if(okd(v))c.parto=v}
+ else if(e.target.id==='f-parto-ok'){c.parto_ok=e.target.checked;log(c,c.parto_ok?'Data do parto confirmada':'Confirmação do parto desmarcada');save();render();renderNotifications();drawer(c.id);toast(c.parto_ok?'Parto confirmado. Pendência removida!':'Confirmação do parto desmarcada.');return}
  else if(e.target.id==='f-saque'){if(okd(v))c.saque=v}
  else if(e.target.id==='f-mes'){log(c,`Mês alterado: ${mlabel(c.mes)} → ${mlabel(v)}`);c.mes=v}
  else if(e.target.id==='f-et'){log(c,`Etapa: ${SN[c.etapa][1]} → ${SN[v][1]}`);c.etapa=v}
@@ -2922,6 +3137,14 @@ $('#ai-model-select')?.addEventListener('change', e => {
     const cfgChat = $('#cfg-chat-model');
     if (cfgChat) cfgChat.value = newModel;
     toast(`Modelo alterado para ${newModel}. Histórico e contexto preservados.`);
+  }
+});
+
+$('#ai-prompt')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    if ($('#ai-form').requestSubmit) $('#ai-form').requestSubmit();
+    else $('#ai-form').dispatchEvent(new Event('submit'));
   }
 });
 
@@ -3008,6 +3231,21 @@ if (mainEl) {
   }, { passive: true });
 }
 render();
+
+function checkInitialPartoAlerts(){
+  const due = getPartoNotifications();
+  const tm = due.filter(x => x.status === 'tomorrow');
+  if (tm.length === 1) {
+    toast(`🔔 Parto amanhã: ${tm[0].c.nome} (${fx(tm[0].c.parto)}). Confira nas notificações.`);
+  } else if (tm.length > 1) {
+    toast(`🔔 Atenção: ${tm.length} contatos têm parto previsto para amanhã! Confira nas notificações.`);
+  } else if (due.length === 1) {
+    toast(`🔔 Parto pendente de confirmação: ${due[0].c.nome} (${fx(due[0].c.parto)}).`);
+  } else if (due.length > 1) {
+    toast(`🔔 Atenção: ${due.length} contatos com parto pendente de confirmação.`);
+  }
+}
+checkInitialPartoAlerts();
 
 // Indexação inicial
 syncEmbeddings();
