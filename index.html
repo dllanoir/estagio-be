@@ -21,6 +21,9 @@
   --ac-light: #e6f4f7;
   --ln: #e2e8f0;
   --ln-light: #f1f5f9;
+  --ai: #6366f1;
+  --ai-hover: #4f46e5;
+  --ai-grad: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
   --danger: #dc2626;
   --danger-light: #fef2f2;
   --warning: #f59e0b;
@@ -215,6 +218,8 @@ nav small{
 }
 nav .mt{display:flex;align-items:center;gap:6px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 nav .np{display:block;font-style:normal;font-size:11.5px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mk{font-size:10px;line-height:1}
+.mk.pend{color:var(--warning);font-size:12px;margin-left:3px;vertical-align:middle;display:inline-flex;align-items:center;flex-shrink:0}
 nav .mk{font-size:10px;line-height:1}
 nav .mk.pend{color:var(--warning)}
 
@@ -535,32 +540,120 @@ dialog::backdrop{
 .hist-txt{color:var(--ink);word-break:break-word}
 
 .dr-footer{
-  padding:14px 20px;border-top:1px solid var(--ln);background:var(--pn-alt);
-  display:flex;gap:10px;justify-content:space-between;
+  padding:12px 20px;border-top:1px solid var(--ln);background:#fff;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
 }
+.dr-footer-left{display:flex;align-items:center;gap:8px}
+.dr-footer-right{display:flex;align-items:center;gap:8px;margin-left:auto}
+.dr-footer .btn{font-size:13px;padding:7px 14px;height:36px;display:inline-flex;align-items:center;justify-content:center}
+.dr-footer .btn.p{padding:7px 18px;font-weight:600}
 
-/* --- ESTILOS DE PENDÊNCIA NOS CARDS --- */
-.row.has-pending{
-  border-color:#fcd34d !important;background:#fffdf5 !important;
-  box-shadow:0 0 0 1px #f59e0b, var(--shadow-sm);
+/* --- BARRA DE SINCRONIZAÇÃO DE IA --- */
+#ai-sync-bar{
+  display:none;background:#f3f0ff;color:#493ca8;
+  padding:8px 24px;font-size:13px;font-weight:500;border-bottom:1px solid #dcd5f5;
+  justify-content:space-between;align-items:center;
 }
-.row.has-pending:hover{
-  border-color:#f59e0b !important;
-  box-shadow:0 0 0 1px #f59e0b, 0 8px 18px rgba(245,158,11,.15);
+#ai-sync-bar.on{display:flex}
+.sync-pulse{
+  width:8px;height:8px;border-radius:50%;background:#818cf8;
+  display:inline-block;margin-right:6px;animation:pulse 1.2s infinite;
 }
-.row .mk.pend{color:var(--warning);font-size:11px;margin-left:6px;vertical-align:middle}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.2)}}
 
-/* --- TOAST NOTIFICATION (CANTO SUPERIOR DIREITO) --- */
+/* --- BOTÃO FLUTUANTE DA IA (FAB) --- */
+.ai-fab{
+  position:fixed;right:24px;bottom:24px;width:56px;height:56px;border-radius:50%;
+  background:var(--ai-grad);color:#fff;border:0;
+  box-shadow:0 8px 24px rgba(79,70,229,.35);
+  display:grid;place-items:center;z-index:40;cursor:pointer;
+  transition:all .2s cubic-bezier(.34,1.56,.64,1);
+}
+.ai-fab:hover{transform:scale(1.08);box-shadow:0 12px 28px rgba(79,70,229,.45)}
+.ai-fab svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ai-fab-dot{position:absolute;top:3px;right:3px;width:12px;height:12px;background:#10b981;border:2px solid #fff;border-radius:50%}
+
+/* --- JANELA DO CHAT IA FLUTUANTE --- */
+#ai-window{
+  position:fixed;bottom:92px;right:24px;width:min(440px,calc(100vw - 32px));height:600px;max-height:calc(100dvh - 110px);
+  background:var(--pn);border-radius:var(--radius-xl);box-shadow:var(--shadow-xl);border:1px solid var(--ln);
+  display:flex;flex-direction:column;z-index:42;overflow:hidden;
+  animation:aiPop .2s cubic-bezier(.16,1,.3,1);
+}
+#ai-window[hidden]{display:none}
+@keyframes aiPop{from{opacity:0;transform:translateY(14px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+
+.ai-wh{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--ai-grad);color:#fff}
+.ai-wh-avatar{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:20px}
+.ai-wh-info{flex:1;min-width:0}
+.ai-wh-info h3{font-size:16px;color:#fff;line-height:1.2;font-weight:700}
+.ai-wh-info small{color:rgba(255,255,255,.85);font-size:12px;display:flex;align-items:center;gap:4px}
+.ai-wh-close{background:none;border:0;color:#fff;font-size:20px;opacity:.8;padding:4px;cursor:pointer}
+.ai-wh-close:hover{opacity:1}
+
+.ai-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;background:#f8fafc}
+.ai-msg{max-width:88%;padding:11px 15px;border-radius:14px;font-size:13.5px;line-height:1.5;word-break:break-word}
+.ai-msg strong{color:var(--ink);font-weight:700}
+.ai-msg.user{align-self:flex-end;background:var(--ai);color:#fff;border-bottom-right-radius:3px}
+.ai-msg.user strong{color:#fff}
+.ai-msg.bot{align-self:flex-start;background:var(--pn);color:var(--ink);border:1px solid var(--ln);border-bottom-left-radius:3px;box-shadow:var(--shadow-xs)}
+.ai-msg.tool{align-self:center;font-size:12px;color:var(--mut);background:var(--pn-alt);padding:5px 12px;border-radius:99px;border:1px solid var(--ln)}
+.ai-list{margin:6px 0;padding-left:18px}
+.ai-list li{margin-bottom:4px;line-height:1.45}
+.ai-code{padding:2px 6px;border-radius:5px;background:#e2e8f0;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;font-size:12px;color:var(--ink);font-weight:600}
+.ai-contact-btn{display:inline-flex;align-items:center;gap:5px;margin:3px 0;padding:4px 10px;border-radius:6px;background:var(--ac-light);border:1px solid rgba(15,92,110,.25);color:var(--ac);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s ease}
+.ai-contact-btn:hover{background:#d0ebf1;border-color:var(--ac);transform:translateY(-1px)}
+
+.ai-suggestions{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px;background:var(--pn);border-top:1px solid var(--ln-light)}
+.ai-suggestion-chip{
+  padding:4px 9px;border:1px solid var(--ln);border-radius:99px;
+  background:var(--pn-alt);font-size:11.5px;color:var(--ai);font-weight:600;cursor:pointer;
+}
+.ai-suggestion-chip:hover{background:#e0e7ff;border-color:#c7d2fe}
+
+.ai-form{display:flex;gap:8px;padding:12px;background:var(--pn);border-top:1px solid var(--ln)}
+.ai-form textarea{
+  flex:1;height:42px;resize:none;padding:10px 14px;
+  border:1px solid var(--ln);border-radius:22px;font-size:13.5px;outline:none;
+}
+.ai-form textarea:focus{border-color:var(--ai);box-shadow:0 0 0 3px rgba(99,102,241,.12)}
+.ai-send{
+  width:42px;height:42px;border-radius:50%;border:0;background:var(--ai);
+  color:#fff;display:grid;place-items:center;transition:transform .15s ease;
+}
+.ai-send:hover{background:var(--ai-hover);transform:scale(1.05)}
+
+/* --- TOAST NOTIFICATION CONTAINER (CANTO SUPERIOR DIREITO) --- */
 #tt{
-  position:fixed;right:22px;top:22px;left:auto;bottom:auto;transform:none;
-  padding:12px 20px;border-radius:var(--radius-md);
-  background:var(--ink);color:#fff;z-index:9999;
-  font-size:13.5px;font-weight:600;box-shadow:var(--shadow-xl);
-  display:flex;align-items:center;gap:8px;animation:toastSlideIn .22s cubic-bezier(.16,1,.3,1);
-  max-width:min(460px,calc(100vw - 32px));line-height:1.4;
+  position:fixed;
+  top:max(20px,env(safe-area-inset-top));
+  right:max(20px,env(safe-area-inset-right));
+  left:auto;bottom:auto;transform:none;
+  z-index:10000;
+  display:flex;flex-direction:column;gap:8px;
+  pointer-events:none;
+  max-width:min(420px,calc(100vw - 32px));
 }
 #tt:empty{display:none}
-@keyframes toastSlideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+.toast-item{
+  pointer-events:auto;
+  background:#0f172a;color:#fff;
+  padding:11px 16px;border-radius:11px;
+  font-size:13px;font-weight:500;
+  box-shadow:0 10px 25px -4px rgba(0,0,0,0.3),0 4px 6px -2px rgba(0,0,0,0.15);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  border-left:4px solid var(--ac,#0f766e);
+  animation:toastSlideIn .22s cubic-bezier(.16,1,.3,1);
+  transition:opacity .2s ease,transform .2s ease;
+}
+.toast-item.warn{border-left-color:#f59e0b}
+.toast-item.danger{border-left-color:#ef4444}
+.toast-item-txt{flex:1;min-width:0;line-height:1.4;word-break:break-word}
+.toast-item-close{
+  background:none;border:0;color:#94a3b8;font-size:15px;line-height:1;cursor:pointer;padding:0 2px;flex:none;
+}
+.toast-item-close:hover{color:#fff}
+@keyframes toastSlideIn{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:translateX(0)}}
 
 /* --- RESPONSIVIDADE --- */
 @media(max-width:960px){
@@ -575,6 +668,12 @@ dialog::backdrop{
   #dr{width:100%}
 }
 button.brand{background:none;border:0;font:inherit;color:inherit;text-align:left;cursor:pointer;padding:0;display:flex;align-items:center;gap:10px}
+.ai-h{margin:8px 0 2px;font-size:14px;font-weight:600}
+.ai-msg.notice{align-self:stretch;max-width:100%;background:transparent;border:1px dashed var(--ln);color:var(--mut);font-size:12.5px}
+.ai-msg.bot,.ai-msg.user{white-space:pre-wrap}
+.ai-msg.bot .ai-list,.ai-msg.bot .ai-h{white-space:normal}
+button.cfg-preset-chip{font:inherit;cursor:pointer}
+.ai-title{font-size:14px;font-weight:600;margin:0}
 .dr-card-title{text-transform:none;letter-spacing:0}
 
 
@@ -662,6 +761,40 @@ main{min-width:0}
 .row-meta .st{font-size:12.5px;line-height:1.25}
 .row-date{font-size:11.5px;color:var(--mut);white-space:nowrap}
 .row-note{grid-column:1/-1;padding-top:8px;border-top:1px dashed var(--ln);color:var(--mut);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row.has-pending{
+  border-color:#e4c77a !important;
+  border-left:5px solid var(--warning) !important;
+  background:#fffdf5 !important;
+  box-shadow:0 2px 10px rgba(245,158,11,.09);
+}
+.row.has-pending:hover{
+  border-color:#d97706 !important;
+  border-left-color:#d97706 !important;
+  background:#fffbeb !important;
+  box-shadow:0 8px 22px rgba(245,158,11,.15);
+}
+.row.has-pending .row-note{
+  border-top-color:#f1dfad;
+  background:#fff9ea;
+  color:#7a5a12;
+  border-radius:6px;
+  padding:5px 9px;
+  margin-top:2px;
+}
+.row-pend-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  font-size:11px;
+  font-weight:700;
+  color:#92400e;
+  background:#fef3c7;
+  border:1px solid #f59e0b;
+  padding:2px 7px;
+  border-radius:999px;
+  white-space:nowrap;
+  line-height:1.2;
+}
 
 .empty{padding:56px 24px;border-radius:16px}
 .empty p{margin:6px auto 16px;max-width:520px}
@@ -675,6 +808,15 @@ button.lab.off{opacity:.38}
 .dr-header input{text-transform:none;font-size:21px}
 .dr-body{padding:18px 20px;gap:14px;background:linear-gradient(180deg,#f8fafc 0%,#fff 18%)}
 .dr-card{padding:15px;border-radius:14px}
+.dr-card.pend, #dr-card-obs.pend{
+  background:#fffbeb !important;
+  border-color:#f3d78b !important;
+  box-shadow:inset 3px 0 0 var(--warning) !important;
+}
+.dr-card.pend .ed, #dr-card-obs.pend .ed{
+  background:#fff !important;
+  border-color:#f1dfad !important;
+}
 .dr-card-title{font-size:11px;color:#718096}
 .dr-grid{gap:10px}
 .dr-grid label{font-size:11.5px}
@@ -683,6 +825,24 @@ button.lab.off{opacity:.38}
 .page-stat.stat-active{border-color:#f59e0b !important;background:#fffbeb !important;box-shadow:0 0 0 2px rgba(245,158,11,.22) !important}
 .adv-card{margin-bottom:0}
 .dr-footer{padding:13px 20px;background:#fff}
+
+#ai-window{width:min(460px,calc(100vw - 24px));height:min(680px,calc(100dvh - 110px));right:20px;bottom:88px;border-radius:18px}
+.ai-wh{padding:13px 15px;background:linear-gradient(135deg,#6671f2,#5144d4);gap:10px}
+.ai-wh-avatar{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:rgba(255,255,255,.18);font-size:16px}
+.ai-wh-info{gap:2px}
+.ai-wh-info h3{font-size:15px}
+.ai-wh-info small{font-size:11px}
+.ai-new-btn{align-self:flex-start;padding:4px 8px;border-radius:7px;color:#fff;background:rgba(255,255,255,.12);font-size:11px;font-weight:700;border:0;cursor:pointer;transition:background-color .15s ease}
+.ai-new-btn:hover{background:rgba(255,255,255,.24)}
+.ai-model-picker{appearance:none;background:rgba(255,255,255,.16) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 7px center;color:#fff;border:1px solid rgba(255,255,255,.28);border-radius:6px;font-size:11px;font-weight:700;padding:2px 22px 2px 7px;cursor:pointer;outline:none}
+.ai-model-picker:hover{background-color:rgba(255,255,255,.24);border-color:rgba(255,255,255,.45)}
+.ai-model-picker option{background:#1e1b4b;color:#fff}
+.ai-ctx-pill{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.9);background:rgba(255,255,255,.14);padding:2px 6px;border-radius:99px;white-space:nowrap;letter-spacing:.02em}
+.ai-retry-btn{display:inline-flex;align-items:center;gap:5px;margin-top:8px;padding:6px 13px;border-radius:8px;background:var(--ai-grad);color:#fff;border:0;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 2px 8px rgba(99,102,241,.3);transition:all .15s ease}
+.ai-retry-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(99,102,241,.4)}
+.ai-msgs{padding:14px;background:#f6f8fc}
+.ai-form{padding:10px}
+.ai-form textarea{height:44px}
 
 /* Ações em lote e seleção múltipla de contatos */
 .bulk-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:10px;margin-bottom:12px;grid-column:1/-1}
@@ -703,6 +863,30 @@ button.lab.off{opacity:.38}
 .row.bulk-mode .row-note, .row:has(.row-cb-wrap) .row-note{grid-column:1/-1}
 .notif-dot.parto{background:#ec4899}
 
+/* Card de Relatório PDF gerado no Chat */
+.ai-msg.report{align-self:flex-start;max-width:92%;background:#fff;border:1px solid #cbd5e1;border-left:4px solid var(--ai);border-radius:12px;box-shadow:0 2px 8px rgba(15,23,42,.06);padding:14px;white-space:normal}
+.ai-report-card{display:flex;flex-direction:column;gap:10px}
+.ai-report-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.ai-report-badge{font-size:10px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;background:var(--ai-grad);color:#fff;padding:2px 8px;border-radius:99px;display:inline-flex;align-items:center;gap:4px}
+.ai-report-title{font-size:13.5px;font-weight:700;color:var(--ink);margin:4px 0 2px;line-height:1.3}
+.ai-report-sub{font-size:11.5px;color:var(--mut);line-height:1.4;margin:0}
+.ai-report-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:6px;margin:4px 0}
+.ai-report-kpi{background:#f8fafc;border:1px solid var(--ln);border-radius:8px;padding:6px 8px;text-align:center}
+.ai-report-kpi b{display:block;font-size:14px;font-weight:700;color:var(--ink)}
+.ai-report-kpi span{display:block;font-size:10.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.02em;margin-top:2px}
+.ai-report-kpi.sucesso b{color:var(--success)}
+.ai-report-kpi.alerta b{color:var(--warning)}
+.ai-report-kpi.perigo b{color:var(--danger)}
+.ai-report-summary-box{font-size:11.5px;color:#334155;background:#f1f5f9;border-radius:7px;padding:8px 10px;line-height:1.45}
+.ai-report-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:4px}
+.ai-report-btn{height:30px;padding:0 12px;font-size:11.5px;font-weight:600;border-radius:7px;display:inline-flex;align-items:center;gap:6px;cursor:pointer;border:1px solid transparent;transition:all .15s ease}
+.ai-report-btn.primary{background:var(--ai);color:#fff;box-shadow:0 1px 2px rgba(99,102,241,.2)}
+.ai-report-btn.primary:hover{background:var(--ai-hover);transform:translateY(-1px)}
+.ai-report-btn.secondary{background:#fff;border-color:var(--ln);color:var(--ink)}
+.ai-report-btn.secondary:hover{background:#f8fafc;border-color:#94a3b8}
+
+.cfg-link{font-size:12.5px;color:var(--ai);font-weight:700;text-decoration:none}
+.cfg-link:hover{text-decoration:underline}
 .cfg-sec{padding:16px;border-radius:13px}
 .cfg-sec-title{font-size:14px}
 .cfg-stat-box{gap:10px}
@@ -716,7 +900,7 @@ button.lab.off{opacity:.38}
 .label-mgr-create select{flex:0 1 150px}
 .label-mgr-create .btn{flex:0 0 auto}
 
-#tt{top:max(16px,env(safe-area-inset-top));right:max(16px,env(safe-area-inset-right));}
+.ai-fab{right:max(20px,env(safe-area-inset-right));bottom:max(20px,env(safe-area-inset-bottom));}
 
 @media(max-width:1180px){
   .search-wrap{width:min(320px,29vw)}
@@ -761,6 +945,8 @@ button.lab.off{opacity:.38}
   #dr{width:100%;border-left:0}
   .dr-grid{grid-template-columns:1fr}
   .dr-footer{padding-bottom:max(13px,env(safe-area-inset-bottom))}
+  .ai-fab{width:52px;height:52px;right:14px;bottom:14px}
+  #ai-window{right:12px;left:12px;width:auto;bottom:76px;max-height:calc(100dvh - 90px)}
   .modal-body{padding:15px}
   .modal-footer{padding:12px 15px;position:sticky;bottom:0}
   .cfg-stat-box{align-items:flex-start;flex-direction:column}
@@ -853,11 +1039,12 @@ main{
 #dr[hidden]{display:block;visibility:hidden}.dr-body{padding:17px 18px;gap:11px}.dr-card{padding:13px;border-radius:12px}.dr-footer{padding:11px 18px}.dr-header{padding:14px 18px}.dr-header input{font-size:19px}
 
 @media(max-width:1240px) and (min-width:961px){
-  .app{grid-template-columns:250px minmax(0,1fr) 280px;gap:14px;padding:12px 16px}
+  .app{grid-template-columns:240px minmax(0,1fr) 270px;gap:14px;padding:12px 16px}
 }
 @media(max-width:960px) and (min-width:721px){
-  .app{grid-template-columns:250px minmax(0,1fr);gap:14px;padding:12px 14px}
-  #context-panel{display:none}
+  .app{grid-template-columns:205px minmax(0,1fr) 235px;gap:10px;padding:10px 12px}
+  #context-panel{display:flex !important}
+  #list{grid-template-columns:1fr}
 }
 @media(max-width:720px){
   html, body{height:auto;max-height:none;overflow-y:auto}
@@ -948,9 +1135,15 @@ nav#rail .month-card.has-pending .month-note svg{color:var(--warning)}
   .rail-months-scroll{max-height:180px}
 }
 </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
+
+<div id="ai-sync-bar">
+  <span><span class="sync-pulse"></span> Indexando base no navegador com modelo de embeddings...</span>
+  <small id="ai-sync-count"></small>
+</div>
 
 <!-- HEADER / NAVBAR MODERNA -->
 <header>
@@ -1074,13 +1267,111 @@ nav#rail .month-card.has-pending .month-note svg{color:var(--warning)}
 <div id="dr-backdrop" data-a="close"></div>
 <aside id="dr" role="dialog" aria-modal="true" aria-label="Detalhes do contato" hidden></aside>
 
-<!-- MODAL DE DADOS E BACKUPS -->
+<!-- BOTÃO FLUTUANTE DA IA -->
+<button class="ai-fab" id="ai-fab" aria-label="Abrir Assistente Inteligente" title="Assistente Gemini">
+  <span class="ai-fab-dot"></span>
+  <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+</button>
+
+<!-- JANELA DO CHAT FLUTUANTE GEMINI -->
+<div id="ai-window" hidden role="dialog" aria-labelledby="ai-window-title">
+  <div class="ai-wh">
+    <div class="ai-wh-avatar" aria-hidden="true">✦</div>
+    <div class="ai-wh-info">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <h2 id="ai-window-title" class="ai-title">Assistente</h2>
+        <button type="button" class="ai-new-btn" data-a="ai-new" title="Iniciar nova conversa limpa">Nova conversa</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;margin-top:3px;flex-wrap:wrap">
+        <select id="ai-model-select" class="ai-model-picker" aria-label="Escolher modelo Gemini">
+          <option value="gemini-3.5-flash-lite">gemini-3.5-flash-lite (Padrão)</option>
+          <option value="gemini-3.8-flash">gemini-3.8-flash</option>
+          <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite</option>
+          <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite</option>
+        </select>
+        <span class="ai-ctx-pill" title="Histórico da conversa preservado mesmo ao trocar de modelo">✓ contexto ativo</span>
+      </div>
+    </div>
+    <button class="ai-wh-close" data-a="ai-close" aria-label="Fechar chat">✕</button>
+  </div>
+  <div class="ai-msgs" id="ai-chat">
+    
+  </div>
+  <div class="ai-suggestions">
+    <button class="ai-suggestion-chip" data-q="Quais contatos faltam documentos?">Faltam documentos</button>
+    <button class="ai-suggestion-chip" data-q="Faça um resumo geral dos contatos ativos">Resumo geral</button>
+    <button class="ai-suggestion-chip" data-q="Criar contato MARIA SILVA etapa triagem">Cadastrar contato</button>
+  </div>
+  <form class="ai-form" id="ai-form">
+    <textarea id="ai-prompt" placeholder="Digite uma dúvida ou comando..." rows="1"></textarea>
+    <button type="submit" class="ai-send" aria-label="Enviar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+    </button>
+  </form>
+</div>
+
+<!-- MODAL DE CONFIGURAÇÕES -->
 <dialog id="cfg-dlg" aria-labelledby="cfg-title">
   <div class="modal-header">
-    <h2 id="cfg-title">Gestão de Dados & Backups</h2>
+    <h2 id="cfg-title">Configurações</h2>
     <button class="modal-close" data-dlg="close" aria-label="Fechar">✕</button>
   </div>
   <div class="modal-body">
+    <div class="cfg-sec">
+      <div class="cfg-sec-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Google Gemini API Key
+      </div>
+      <small>Fica armazenada somente neste navegador. As consultas enviadas ao assistente são processadas pela API do Google. Para uso em produção, prefira um proxy/backend para proteger a chave.</small>
+      <div class="cfg-input-grp">
+        <input type="password" id="cfg-key" placeholder="AIzaSy...">
+        <button class="btn" id="cfg-key-toggle" type="button" title="Mostrar ou ocultar a chave" aria-label="Mostrar ou ocultar a chave">Mostrar</button>
+      </div>
+      <div style="margin-top:8px">
+        <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="cfg-link">
+          Gerenciar chave no Google AI Studio ↗
+        </a>
+      </div>
+    </div>
+
+    <div class="cfg-sec">
+      <div class="cfg-sec-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        Modelos do assistente
+      </div>
+      <small>Os dados enviados ao assistente passam pela API do Google.</small>
+      <label style="display:block;margin-bottom:12px;font-size:13px;font-weight:600;color:var(--ink)">
+        Modelo de Chat e Ferramentas (Flash):
+        <input type="text" id="cfg-chat-model" style="width:100%;margin-top:4px;padding:8px 12px;border:1px solid var(--ln);border-radius:8px;font-size:13.5px" placeholder="gemini-3.5-flash-lite">
+        <div class="cfg-presets">
+          <button type="button" class="cfg-preset-chip" data-preset="#cfg-chat-model" data-v="gemini-3.5-flash-lite">gemini-3.5-flash-lite (Padrão)</button>
+          <button type="button" class="cfg-preset-chip" data-preset="#cfg-chat-model" data-v="gemini-3.8-flash">gemini-3.8-flash</button>
+          <button type="button" class="cfg-preset-chip" data-preset="#cfg-chat-model" data-v="gemini-3.1-flash-lite">gemini-3.1-flash-lite</button>
+          <button type="button" class="cfg-preset-chip" data-preset="#cfg-chat-model" data-v="gemini-2.5-flash-lite">gemini-2.5-flash-lite</button>
+        </div>
+        <small style="display:block;margin-top:6px;color:var(--mut);font-weight:400">O contexto da conversa é mantido automaticamente ao alternar entre modelos. Se um modelo enfrentar alta demanda temporária, o sistema tenta novamente e recorre a modelos alternativos sem perda de dados.</small>
+      </label>
+      <label style="display:block;font-size:13px;font-weight:600;color:var(--ink)">
+        Modelo para busca por significado:
+        <input type="text" id="cfg-embed-model" style="width:100%;margin-top:4px;padding:8px 12px;border:1px solid var(--ln);border-radius:8px;font-size:13.5px" placeholder="gemini-embedding-2">
+        <div class="cfg-presets">
+          <button type="button" class="cfg-preset-chip" data-preset="#cfg-embed-model" data-v="gemini-embedding-2">gemini-embedding-2</button>
+        </div>
+      </label>
+    </div>
+
+    <div class="cfg-sec">
+      <div class="cfg-sec-title">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Banco de Vetores Local (IndexedDB)
+      </div>
+      <small>Mantém os vetores localmente para agilizar a busca semântica dos contatos.</small>
+      <div class="cfg-stat-box">
+        <span id="cfg-rag-status" style="font-size:13.5px">Carregando status...</span>
+        <button class="btn" id="cfg-reindex-btn" type="button">Reindexar Tudo</button>
+      </div>
+    </div>
+
     <div class="cfg-sec">
       <div class="cfg-sec-title">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
@@ -1110,19 +1401,20 @@ nav#rail .month-card.has-pending .month-note svg{color:var(--warning)}
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border:1px solid var(--ln);border-radius:10px;background:var(--bg)">
           <div>
-            <strong style="display:block;font-size:13px;color:var(--ink)">Exportar Planilha (CSV)</strong>
-            <span style="font-size:11.5px;color:var(--mut)">Exporta a lista filtrada no momento para formato de planilha Excel / CSV.</span>
+            <strong style="display:block;font-size:13px;color:var(--ink)">Exportar Todo o Banco (CSV)</strong>
+            <span style="font-size:11.5px;color:var(--mut)">Exporta todos os contatos cadastrados no banco de dados para planilha Excel / CSV.</span>
           </div>
-          <button type="button" class="btn" data-a="csv" style="flex:none">
+          <button type="button" class="btn" data-a="csv-all" style="flex:none">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-            Exportar CSV
+            Exportar Todo o Banco
           </button>
         </div>
       </div>
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn p" data-dlg="close" type="button">Fechar</button>
+    <button class="btn" id="cfg-close-btn" type="button">Cancelar</button>
+    <button class="btn p" id="cfg-save-btn" type="button">Salvar Configurações</button>
   </div>
 </dialog>
 
@@ -1241,6 +1533,25 @@ const colorOpts=sel=>COLORS.map(c=>`<option value="${c[0]}"${c[0]===sel?' select
 const safeLabelColor=v=>{const [base,mode]=String(v??'black').split('_');return COLORS.some(c=>c[0]===base)?base+(mode==='light'||mode==='dark'?'_'+mode:''):'black'};
 const storage=(()=>{const memory=new Map();let native=null;try{const probe='__cantinho_storage_probe__';localStorage.setItem(probe,'1');localStorage.removeItem(probe);native=localStorage}catch(e){}return{persistent:!!native,getItem:k=>{try{return native?native.getItem(k):memory.get(k)??null}catch(e){return memory.get(k)??null}},setItem:(k,v)=>{try{if(native)native.setItem(k,v);else memory.set(k,String(v))}catch(e){memory.set(k,String(v));throw e}},removeItem:k=>{try{if(native)native.removeItem(k);else memory.delete(k)}catch(e){memory.delete(k)}}}})();
 const KEY='sm_atendimentos_v1';
+const KEY_GEMINI='gemini_api_key_v1';
+const KEY_CHAT_MODEL='gemini_chat_model_v1';
+const KEY_EMBED_MODEL='gemini_embed_model_v1';
+const KEY_CHAT_HISTORY='gemini_chat_history_v1';
+const KEY_CHAT_UI_MSGS='gemini_chat_ui_msgs_v1';
+const KEY_REPORTS='sm_ai_reports_v1';
+const DEFAULT_CHAT_MODEL='gemini-3.5-flash-lite';
+const DEFAULT_EMBED_MODEL='gemini-embedding-2';
+
+function getChatModel() {
+  const m = storage.getItem(KEY_CHAT_MODEL);
+  return m ? m : DEFAULT_CHAT_MODEL;
+}
+
+function getEmbedModel() {
+  const m = storage.getItem(KEY_EMBED_MODEL);
+  return m ? m : DEFAULT_EMBED_MODEL;
+}
+
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -1265,7 +1576,7 @@ function normCard(c){
  c.labels=Array.isArray(c.labels)?c.labels.map(String):[];c.tl=Array.isArray(c.tl)?c.tl.map(String):[];
  c.hist=Array.isArray(c.hist)?c.hist.filter(h=>h&&typeof h==='object').map(h=>({...h,d:h.d?String(h.d):null,t:String(h.t??'')})):[];
  if(!c.rich){c.obs=toHtml(c.obs);c.rich=1}else c.obs=clean(String(c.obs??''));
- c.td=String(c.td??'');c.arq=!!c.arq;c.parto_ok=!!c.parto_ok;c.pend=!!c.pend;return c}
+ c.td=String(c.td??'');c.arq=!!c.arq;c.parto_ok=!!c.parto_ok;return c}
 let db,persisted=storage.getItem(KEY);try{db=JSON.parse(persisted)}catch(e){}
 db=(db&&typeof db==='object')?db:{cards:{},labels:{}};db.cards=(db.cards&&typeof db.cards==='object')?db.cards:{};db.labels=(db.labels&&typeof db.labels==='object')?Object.fromEntries(Object.entries(db.labels).map(([l,v])=>[String(l),safeLabelColor(v)]).filter(([l])=>l)):{};db.meses=Array.isArray(db.meses)?db.meses.filter(okm):[];db.mnotes=(db.mnotes&&typeof db.mnotes==='object')?db.mnotes:{};db.gone=Array.isArray(db.gone)?db.gone.map(String):[];db.del=Array.isArray(db.del)?db.del.map(String):[];Object.values(db.cards).forEach(c=>{if(c&&Array.isArray(c.labels))c.labels.map(String).forEach(l=>{if(l&&!db.labels[l])db.labels[l]='black'})});persisted=persisted||JSON.stringify(db);
 let st={mes:'*',et:'ativos',q:'',lb:[],mode:'e',lopen:false,sort:'etapa',ls:[],lq:'',mm:false,open:null,bulk:false,sel:[]};
@@ -1279,7 +1590,20 @@ function save(){
   if(persisted){try{db=JSON.parse(persisted)}catch(_){}}
   toast(q?'O armazenamento do navegador está cheio. A última alteração foi desfeita para não perder dados. Baixe um backup e exclua contatos antigos para liberar espaço.':'Não foi possível salvar. A última alteração foi desfeita.');
   return false}}
-let tm;function toast(m){$('#tt').textContent=m;clearTimeout(tm);tm=setTimeout(()=>$('#tt').textContent='',4500)}
+function toast(m,type='info',duration=5000){
+  const c=$('#tt');if(!c)return;
+  const it=document.createElement('div');
+  it.className='toast-item'+(type==='warn'?' warn':type==='danger'?' danger':'');
+  const sp=document.createElement('div');
+  sp.className='toast-item-txt';
+  sp.textContent=m;
+  const btn=document.createElement('button');
+  btn.type='button';btn.className='toast-item-close';btn.textContent='✕';btn.title='Fechar';
+  btn.onclick=()=>{it.style.opacity='0';it.style.transform='translateX(25px)';setTimeout(()=>it.remove(),200)};
+  it.appendChild(sp);it.appendChild(btn);
+  c.appendChild(it);
+  setTimeout(()=>{if(it.isConnected){it.style.opacity='0';it.style.transform='translateX(25px)';setTimeout(()=>it.remove(),200)}},duration);
+}
 function ls(n){const [b,v]=(db.labels[n]||'black').split('_');const lt=v==='light',dk=v==='dark',h=HEX[b]||HEX.black;
  return `background:color-mix(in srgb,${h} ${dk?'65%,#000':lt?'55%,#fff':'100%,#000'});color:${lt||['yellow','lime','sky'].includes(b)?'#1b2a38':'#fff'}`}
 
@@ -1307,10 +1631,14 @@ function ask(msg,o={}){return new Promise(res=>{
   a.hidden=!o.alt;
   a.style.display=o.alt?'inline-flex':'none';
   a.textContent=o.alt||'';
+  a.className='btn '+(o.altDanger===false?'':'dng');
+  const cBtn=d.querySelector('[data-d="no"]');
+  if(cBtn) cBtn.textContent=o.cancel||'Cancelar';
   _a=ok=>{
     _a=null;
     try{d.close()}catch(e){}
     d.removeAttribute('open');
+    if(cBtn) cBtn.textContent='Cancelar';
     res(ok==='alt'?'alt':ok?(o.input?i.value.trim():true):null);
   };
   try{d.showModal()}catch(e){d.setAttribute('open','')}
@@ -1324,7 +1652,12 @@ const fd=(iso,o)=>iso?new Date(iso).toLocaleString('pt-BR',o?{day:'2-digit',mont
 const fs=s=>s?s.split('-').reverse().map((x,i)=>i==2?x.slice(2):x).join('/'):'';
 
 function openSettingsModal() {
-  if(!$('#cfg-dlg').open)$('#cfg-dlg').showModal();
+  const dlg = document.getElementById('cfg-dlg');
+  if ($('#cfg-key')) $('#cfg-key').value = storage.getItem(KEY_GEMINI) || '';
+  if ($('#cfg-chat-model')) $('#cfg-chat-model').value = getChatModel();
+  if ($('#cfg-embed-model')) $('#cfg-embed-model').value = getEmbedModel();
+  if (typeof updateRagConfigStatus === 'function') updateRagConfigStatus();
+  if (dlg && !dlg.open) dlg.showModal();
 }
 // =========================================================================
 // SISTEMA PRINCIPAL
@@ -1357,8 +1690,8 @@ function importTrello(j){
   const p=parseName(c.name),mes=mkey(ln),hist=[];
   if(p.extra)hist.push({d:null,t:p.extra});
   if(!mes&&ln)hist.push({d:null,t:'Lista no Trello: '+ln});
-  const nc=normCard({id:c.id,nome:p.nome,mes,etapa:stage(lab,ln),labels:lab,tl:lab,obs:toHtml(typeof c.desc==='string'?c.desc:''),rich:1,td:typeof c.desc==='string'?c.desc:'',saque:p.saque,parto:'',hist,arq:!!c.closed,pend:false});if(nc){db.cards[c.id]=nc;n++}}
- save();toast(`Importação concluída: ${n} adicionados.`);}
+  const nc=normCard({id:c.id,nome:p.nome,mes,etapa:stage(lab,ln),labels:lab,tl:lab,obs:toHtml(typeof c.desc==='string'?c.desc:''),rich:1,td:typeof c.desc==='string'?c.desc:'',saque:p.saque,parto:'',hist,arq:!!c.closed});if(nc){db.cards[c.id]=nc;n++}}
+ save();toast(`Importação concluída: ${n} adicionados.`);syncEmbeddings()}
 
 function mergeBackup(j){if(!j||typeof j!=='object')throw new Error('Backup inválido.');let n=0,k=0;
  Object.values(j.cards||{}).forEach(c=>{c=normCard(c);if(!c)return;if(db.cards[c.id]){k++;return}if(db.del.includes(c.id))return;c.labels=c.labels.filter(l=>!db.gone.includes(l));db.cards[c.id]=c;n++});
@@ -1366,12 +1699,12 @@ function mergeBackup(j){if(!j||typeof j!=='object')throw new Error('Backup invá
  all().forEach(c=>c.labels.forEach(l=>{if(l&&!db.labels[l]&&!db.gone.includes(l))db.labels[l]='black'}));
  (Array.isArray(j.meses)?j.meses:[]).filter(okm).forEach(m=>{if(!db.meses.includes(m))db.meses.push(m)});
  Object.entries(j.mnotes||{}).forEach(([m,v])=>{if(!db.mnotes[m])db.mnotes[m]=v});
- save();toast(`Backup mesclado.`);}
+ save();toast(`Backup mesclado.`);syncEmbeddings()}
 
 function load(file){const r=new FileReader();r.onload=async()=>{try{const j=JSON.parse(r.result);
  if(Array.isArray(j.cards)&&j.lists)importTrello(j);
  else if(j.app==='sm'){const r=await ask('Importar backup: "mesclar" mantém dados ou "substituir"?',{ok:'Mesclar',alt:'Substituir tudo'});
- if(r==='alt'){const cards={};Object.values(j.cards||{}).forEach(c=>{c=normCard(c);if(c)cards[c.id]=c});const prev=db;const labels=(j.labels&&typeof j.labels==='object')?j.labels:{};const safeLabels={};Object.keys(labels).forEach(l=>{if(l)safeLabels[String(l)]=safeLabelColor(labels[l])});Object.values(cards).forEach(c=>c.labels.forEach(l=>{if(l&&!safeLabels[l])safeLabels[l]='black'}));db={cards,labels:safeLabels,meses:(Array.isArray(j.meses)?j.meses:[]).filter(okm),mnotes:(j.mnotes&&typeof j.mnotes==='object')?j.mnotes:{},gone:Array.isArray(j.gone)?j.gone.map(String):[],del:Array.isArray(j.del)?j.del.map(String):[],bk:j.bk};if(save()){toast('Backup restaurado.')}else db=prev}
+ if(r==='alt'){const cards={};Object.values(j.cards||{}).forEach(c=>{c=normCard(c);if(c)cards[c.id]=c});const prev=db;const labels=(j.labels&&typeof j.labels==='object')?j.labels:{};const safeLabels={};Object.keys(labels).forEach(l=>{if(l)safeLabels[String(l)]=safeLabelColor(labels[l])});Object.values(cards).forEach(c=>c.labels.forEach(l=>{if(l&&!safeLabels[l])safeLabels[l]='black'}));db={cards,labels:safeLabels,meses:(Array.isArray(j.meses)?j.meses:[]).filter(okm),mnotes:(j.mnotes&&typeof j.mnotes==='object')?j.mnotes:{},gone:Array.isArray(j.gone)?j.gone.map(String):[],del:Array.isArray(j.del)?j.del.map(String):[],bk:j.bk};if(save()){toast('Backup restaurado.');syncEmbeddings(true)}else db=prev}
  else if(r)mergeBackup(j)}
  else toast('Arquivo não reconhecido.');
  render()}catch(e){toast('Erro: '+e.message)}};r.readAsText(file)}
@@ -1446,18 +1779,8 @@ function renderNotifications(){
     });
   });
 
-  const pendingCards=all().filter(c=>!c.arq&&c.pend);
-  pendingCards.forEach(c=>{
-    items.push({
-      kind:'warn',
-      title:`Pendência: ${c.nome}`,
-      text:`Contato com pendência marcada${c.mes?' • '+mlabel(c.mes):''}.`,
-      action:'contact',
-      contactId:c.id,
-      month:c.mes,
-      label:'Abrir contato'
-    });
-  });
+  const pends=all().filter(c=>!c.arq&&c.pend);
+  pends.slice(0,8).forEach(c=>items.push({kind:'warn',title:`Pendência: ${c.nome}`,text:(plain(c.obs)||'Contato marcado como pendente.').trim(),action:'contact',contactId:c.id,month:c.mes,label:'Ver contato'}));
 
   monthNotes().filter(([k,v])=>v.v).slice(0,8).forEach(([k,v])=>items.push({kind:'warn',title:`Pendência em ${mlabel(k)}`,text:(v.n||'Mês marcado como pendente.').trim(),action:'month',month:k,label:'Abrir mês'}));
   const noDate=all().filter(c=>!c.mes&&!c.arq).length;
@@ -1471,15 +1794,14 @@ function renderContext(cs,base,sk){
   const sum=$('#context-summary');
   if(sum){
     const act=c=>!c.arq&&c.etapa!=='fim';
-    const pendingMonths=Object.values(db.mnotes||{}).filter(v=>v&&v.v).length;
-    const pendingCards=cs.filter(c=>!c.arq&&c.pend).length;
+    const pending=Object.values(db.mnotes||{}).filter(v=>v&&v.v).length;
     const noDate=cs.filter(c=>!c.mes&&!c.arq).length;
-    sum.innerHTML=`<div class="context-stat"><b>${cs.filter(act).length}</b><span>Em andamento</span></div><div class="context-stat"><b>${pendingCards}</b><span>Contatos pendentes</span></div><div class="context-stat"><b>${pendingMonths}</b><span>Meses pendentes</span></div><div class="context-stat"><b>${noDate}</b><span>Sem mês</span></div>`;
+    sum.innerHTML=`<div class="context-stat"><b>${cs.filter(act).length}</b><span>Em andamento</span></div><div class="context-stat"><b>${pending}</b><span>Meses pendentes</span></div><div class="context-stat"><b>${base.length}</b><span>No período</span></div><div class="context-stat"><b>${noDate}</b><span>Sem mês</span></div>`;
   }
   const sys=$('#context-system');
   if(sys){
-    const age=backupAgeDays();
-    sys.innerHTML=`<div class="context-system-row"><span>Backup</span><span class="status-pill ${!db.bk||age>7?'warn':'good'}">${!db.bk?'Não realizado':age>7?age+' dias':'Em dia'}</span></div><div class="context-system-row"><span>Armazenamento</span><span class="status-pill ${storage.persistent?'good':'warn'}">${storage.persistent?'Local':'Sessão'}</span></div>`;
+    const age=backupAgeDays(),vc=Number.isFinite(window._vectorCount)?window._vectorCount:'—';
+    sys.innerHTML=`<div class="context-system-row"><span>Backup</span><span class="status-pill ${!db.bk||age>7?'warn':'good'}">${!db.bk?'Não realizado':age>7?age+' dias':'Em dia'}</span></div><div class="context-system-row"><span>Armazenamento</span><span class="status-pill ${storage.persistent?'good':'warn'}">${storage.persistent?'Local':'Sessão'}</span></div><div class="context-system-row"><span>Busca semântica</span><span class="status-pill">${vc}/${cs.length||0}</span></div>`;
   }
 }
 
@@ -1505,8 +1827,13 @@ function render(){
  const NOTEICO='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
 
  const monthsCardsHtml = ks.map(k=>{
-   const nt=db.mnotes[k], on=st.mes===k, pend=!!(nt&&nt.v), txt=(nt&&nt.n?String(nt.n):'').trim();
-   const mkr=pend?'<span class="mk pend" role="img" aria-label="Pendente de validação" title="Pendente de validação">●</span>':'';
+   const nt=db.mnotes[k], on=st.mes===k;
+   const hasCardPend=cs.some(c=>c.mes===k&&act(c)&&isCardPend(c));
+   const isMonthPend=!!(nt&&nt.v);
+   const pend=isMonthPend||hasCardPend;
+   const txt=(nt&&nt.n?String(nt.n):'').trim();
+   const pendTitle=isMonthPend&&hasCardPend?'Mês e contatos com pendências':isMonthPend?'Pendente de validação':'Possui contatos com pendências';
+   const mkr=pend?`<span class="mk pend" role="img" aria-label="${pendTitle}" title="${pendTitle}">●</span>`:'';
    const nm=k?ML[+k.slice(5)-1]:'Sem data', yr=k?k.slice(0,4):'';
    const count=cs.filter(c=>c.mes===k&&act(c)).length;
    const slot=st.mm
@@ -1633,16 +1960,18 @@ function render(){
   :(bulkBarHtml+(rows.map(c=>{
     const s=SN[c.etapa]||S[0],last=(hs(c)[0]||{}).h;
     const isSel=st.bulk&&st.sel.includes(c.id);
+    const pend=isCardPend(c);
+    const mkr=pend?'<span class="mk pend" role="img" aria-label="Contato com pendência" title="Contato com pendência">●</span>':'';
     const cbHtml=st.bulk?`<span class="row-cb-wrap"><input type="checkbox" class="row-cb" data-cb-id="${esc(c.id)}" ${isSel?'checked':''} aria-label="Selecionar ${esc(c.nome)}"></span>`:'';
-    const pendMkr=c.pend?'<span class="mk pend" role="img" aria-label="Pendente de validação" title="Contato marcado como pendente">●</span>':'';
-    return `<button type="button" class="row ${c.pend?'has-pending':''} ${st.bulk?'bulk-mode':''} ${isSel?'selected-for-bulk':''}" style="--sc:${s[2]}" data-id="${esc(c.id)}" aria-label="Abrir atendimento de ${esc(c.nome)}">
+    return `<button type="button" class="row ${pend?'has-pending':''} ${st.bulk?'bulk-mode':''} ${isSel?'selected-for-bulk':''}" style="--sc:${s[2]}" data-id="${esc(c.id)}" aria-label="Abrir atendimento de ${esc(c.nome)}">
       ${cbHtml}
       <span class="row-main">
-        <span class="row-title"><b>${esc(c.nome)}</b>${pendMkr}</span>
+        <span class="row-title"><b>${esc(c.nome)}</b>${mkr}</span>
         <span class="row-labels">${labs(c.labels)}</span>
       </span>
       <span class="row-meta">
         <span class="st">${s[1]}</span>
+        ${pend?'<span class="row-pend-tag" title="Contato com pendência">⚠️ Pendente</span>':''}
         ${c.parto?`<span class="row-date">Parto ${fs(c.parto)}</span>`:''}
         ${c.saque?`<span class="row-date">Pagamento ${fs(c.saque)}</span>`:''}
       </span>
@@ -1726,23 +2055,238 @@ function mopts(cur){
  return[...ks].sort((a,b)=>!a?1:!b?-1:a<b?-1:1).map(k=>`<option value="${k}" ${k===cur?'selected':''}>${mlabel(k)}</option>`).join('');
 }
 
+function getDrawerSnapshot(c) {
+  if (!c) return null;
+  const obsEl = $('#f-obs');
+  return {
+    nome: c.nome ? up(c.nome.trim()) : '',
+    mes: c.mes || '',
+    etapa: c.etapa || 'triagem',
+    parto: c.parto || '',
+    parto_ok: !!c.parto_ok,
+    saque: c.saque || '',
+    pend: !!c.pend,
+    obs: obsEl ? clean(obsEl.innerHTML) : clean(c.obs || ''),
+    labels: [...(c.labels || [])]
+  };
+}
+
+function hasDrawerUnsavedChanges() {
+  if (!st.open || !st.drawerOriginal) return false;
+
+  const currentNome = $('#f-nome') ? up($('#f-nome').value.trim()) : '';
+  const currentMes = $('#f-mes') ? $('#f-mes').value : '';
+  const currentEtapa = $('#f-et') ? $('#f-et').value : '';
+  const currentParto = $('#f-parto') ? $('#f-parto').value : '';
+  const currentPartoOk = !!$('#f-parto-ok')?.checked;
+  const currentSaque = $('#f-saque') ? $('#f-saque').value : '';
+  const currentPend = !!$('#f-pend')?.checked;
+  const currentObs = $('#f-obs') ? clean($('#f-obs').innerHTML) : '';
+  const currentLabels = st.drawerDraftLabels ? [...st.drawerDraftLabels] : [];
+
+  const orig = st.drawerOriginal;
+
+  if (st.open === 'new') {
+    return !!(currentNome || currentParto || currentSaque || plain(currentObs).trim() || currentPend || currentPartoOk || currentLabels.length);
+  }
+
+  if (currentNome !== (orig.nome || '')) return true;
+  if (currentMes !== (orig.mes || '')) return true;
+  if (currentEtapa !== (orig.etapa || '')) return true;
+  if (currentParto !== (orig.parto || '')) return true;
+  if (currentPartoOk !== !!orig.parto_ok) return true;
+  if (currentSaque !== (orig.saque || '')) return true;
+  if (currentPend !== !!orig.pend) return true;
+  if (currentObs !== (orig.obs || '')) return true;
+
+  const origLabels = orig.labels || [];
+  if (currentLabels.length !== origLabels.length) return true;
+  const origSet = new Set(origLabels);
+  if (currentLabels.some(l => !origSet.has(l))) return true;
+
+  return false;
+}
+
+function renderDrawerLabels() {
+  const wrap = $('#dr-labels-wrap');
+  if (!wrap) return;
+  const selected = st.drawerDraftLabels || [];
+  wrap.innerHTML = Object.keys(db.labels).map(l =>
+    `<button class="lab ${selected.includes(l) ? '' : 'off'}" data-a="lab" data-l="${esc(l)}" style="${ls(l)}">${selected.includes(l) ? '✓ ' : ''}${esc(l)}</button>`
+  ).join('');
+}
+
+function updateDrawerAdvCard(curEt) {
+  const wrap = $('#dr-adv-wrap');
+  if (!wrap) return;
+  const ix = S.findIndex(s => s[0] === curEt);
+  const nextStage = (st.open !== 'new' && ix >= 0 && ix < S.length - 1) ? S[ix + 1] : null;
+  wrap.innerHTML = nextStage ? `
+    <div class="adv-card" data-a="adv" title="Clique para avançar etapa">
+      <span>Avançar etapa para <b>${nextStage[1]}</b></span>
+      <span>→</span>
+    </div>
+  ` : '';
+}
+
+function renderDrawerHistory(c) {
+  const ul = $('#dr-hist-list');
+  if (!ul) return;
+  ul.innerHTML = hs(c).map(({h,i})=>`
+    <li>
+      <div class="hist-hdr">
+        <time>${fd(h.d,h.o)}</time>
+        <div class="hist-actions">
+          <button class="icon-btn" data-a="eh" data-i="${i}" title="Editar registro" aria-label="Editar registro">${PENCIL}</button>
+          <button class="icon-btn dng" data-a="dh" data-i="${i}" title="Apagar registro" aria-label="Apagar registro">✕</button>
+        </div>
+      </div>
+      <div class="hist-txt">${esc(h.t)}</div>
+    </li>
+  `).join('');
+}
+
+function saveDrawerCard() {
+  const id = st.open;
+  if (!id) return false;
+
+  const isNew = id === 'new';
+  const nameInput = $('#f-nome');
+  const nomeRaw = nameInput ? nameInput.value.trim() : (isNew ? (st.draft?.nome || '') : (db.cards[id]?.nome || ''));
+  if (!nomeRaw) {
+    toast('Por favor, informe o nome do contato.');
+    if (nameInput) nameInput.focus();
+    return false;
+  }
+
+  if (isNew) {
+    saveNewCard();
+    return true;
+  }
+
+  const c = db.cards[id];
+  if (!c) return false;
+
+  const nome = up(nomeRaw);
+  const mesEl = $('#f-mes');
+  const etapaEl = $('#f-et');
+  const partoEl = $('#f-parto');
+  const partoOkEl = $('#f-parto-ok');
+  const pendEl = $('#f-pend');
+  const saqueEl = $('#f-saque');
+  const obsEl = $('#f-obs');
+
+  const mes = mesEl ? mesEl.value : c.mes;
+  const etapa = etapaEl && SN[etapaEl.value] ? etapaEl.value : c.etapa;
+  const parto = partoEl ? partoEl.value : (c.parto || '');
+  const parto_ok = partoOkEl ? partoOkEl.checked : !!c.parto_ok;
+  const pend = pendEl ? pendEl.checked : !!c.pend;
+  const saque = saqueEl ? saqueEl.value : (c.saque || '');
+  const obs = obsEl ? clean(obsEl.innerHTML) : (c.obs || '');
+  const labels = st.drawerDraftLabels ? [...st.drawerDraftLabels] : [...(c.labels || [])];
+
+  if (nome !== c.nome) { c.nome = nome; }
+  if (mes !== c.mes) {
+    log(c, `Mês alterado: ${mlabel(c.mes)} → ${mlabel(mes)}`);
+    c.mes = mes;
+    if (mes && !db.meses.includes(mes)) {
+      db.meses.push(mes);
+    }
+  }
+  if (etapa !== c.etapa) {
+    log(c, `Etapa: ${SN[c.etapa][1]} → ${SN[etapa][1]}`);
+    c.etapa = etapa;
+  }
+  if (parto !== (c.parto || '')) { c.parto = parto; }
+  if (parto_ok !== !!c.parto_ok) {
+    c.parto_ok = parto_ok;
+    log(c, parto_ok ? 'Data do parto confirmada' : 'Confirmação do parto desmarcada');
+  }
+  if (saque !== (c.saque || '')) { c.saque = saque; }
+  if (pend !== !!c.pend) {
+    c.pend = pend;
+    log(c, pend ? 'Marcado como pendência' : 'Pendência do contato removida');
+  }
+  if (obs !== (c.obs || '')) {
+    c.obs = obs;
+    c.td = plain(obs);
+  }
+  c.labels = labels;
+
+  save();
+  render();
+  renderNotifications();
+  queueCardEmbedding(c);
+
+  st.drawerOriginal = null;
+  st.drawerDraftLabels = null;
+
+  toast(`Contato "${c.nome}" salvo com sucesso!`);
+  return true;
+}
+
+async function requestCloseDrawer() {
+  if (!st.open) return;
+  if (hasDrawerUnsavedChanges()) {
+    const isNew = st.open === 'new';
+    const cName = $('#f-nome')?.value.trim() || (isNew ? 'novo contato' : (db.cards[st.open]?.nome || 'contato'));
+    const ans = await ask(`Deseja salvar as alterações em "${cName}" antes de sair?`, {
+      title: 'Alterações não salvas',
+      ok: 'Salvar alterações',
+      alt: 'Sair sem salvar',
+      cancel: 'Continuar editando',
+      altDanger: true
+    });
+    if (ans === true) {
+      const saved = saveDrawerCard();
+      if (saved) drawer(null);
+    } else if (ans === 'alt') {
+      if (st.open === 'new') st.draft = null;
+      st.drawerOriginal = null;
+      st.drawerDraftLabels = null;
+      drawer(null);
+    }
+  } else {
+    if (st.open === 'new') st.draft = null;
+    st.drawerOriginal = null;
+    st.drawerDraftLabels = null;
+    drawer(null);
+  }
+}
+
 // DRAWER DE DETALHES REESTRUTURADO
 function drawer(id){
- const c=db.cards[id],d=$('#dr'),backdrop=$('#dr-backdrop');
- st.open=c?id:null;
+ const isNew = id === 'new';
+ const c = isNew ? st.draft : (id ? db.cards[id] : null);
+ const d = $('#dr'), backdrop = $('#dr-backdrop');
+ st.open = c ? id : null;
  
+ clearTimeout(window._drawerOpenTimer);
  if(!c){
+   if(isNew) st.draft = null;
+   st.drawerOriginal = null;
+   st.drawerDraftLabels = null;
    d.classList.remove('open');
    backdrop.classList.remove('open');
-   setTimeout(()=>{if(!st.open)d.hidden=true},250);
+   window._drawerCloseTimer = setTimeout(()=>{if(!st.open)d.hidden=true},250);
    return;
  }
 
+ clearTimeout(window._drawerCloseTimer);
+ st.drawerDraftLabels = [...(c.labels || [])];
+
  d.hidden=false;
- setTimeout(()=>{d.classList.add('open');backdrop.classList.add('open');const focusEl=$('#f-nome');if(focusEl)focusEl.focus()},10);
+ window._drawerOpenTimer = setTimeout(()=>{
+   if(st.open){
+     d.classList.add('open');
+     backdrop.classList.add('open');
+     const focusEl=$('#f-nome');
+     if(focusEl)focusEl.focus();
+   }
+ },10);
 
  const ix=si(c);
- const nextStage=ix>=0&&ix<S.length-1?S[ix+1]:null;
+ const nextStage=(!isNew && ix>=0 && ix<S.length-1)?S[ix+1]:null;
 
  d.innerHTML=`
   <div class="dr-header">
@@ -1751,12 +2295,14 @@ function drawer(id){
   </div>
 
   <div class="dr-body">
-    ${nextStage ? `
-      <div class="adv-card" data-a="adv" title="Clique para avançar etapa">
-        <span>Avançar etapa para <b>${nextStage[1]}</b></span>
-        <span>→</span>
-      </div>
-    ` : ''}
+    <div id="dr-adv-wrap">
+      ${nextStage ? `
+        <div class="adv-card" data-a="adv" title="Clique para avançar etapa">
+          <span>Avançar etapa para <b>${nextStage[1]}</b></span>
+          <span>→</span>
+        </div>
+      ` : ''}
+    </div>
 
     <div class="dr-card">
       <div class="dr-card-title">Dados do Atendimento</div>
@@ -1787,8 +2333,8 @@ function drawer(id){
         <span>Etiquetas</span>
         <button class="btn ghost" data-a="lg" style="font-size:12px;padding:2px 6px">Gerenciar</button>
       </div>
-      <div class="dr-labels-container">
-        ${Object.keys(db.labels).map(l=>`<button class="lab ${c.labels.includes(l)?'':'off'}" data-a="lab" data-l="${esc(l)}" style="${ls(l)}">${c.labels.includes(l)?'✓ ':''}${esc(l)}</button>`).join('')}
+      <div class="dr-labels-container" id="dr-labels-wrap">
+        ${Object.keys(db.labels).map(l=>`<button class="lab ${st.drawerDraftLabels.includes(l)?'':'off'}" data-a="lab" data-l="${esc(l)}" style="${ls(l)}">${st.drawerDraftLabels.includes(l)?'✓ ':''}${esc(l)}</button>`).join('')}
       </div>
       <div class="add-hist-row" style="margin-top:8px">
         <input id="f-nl" placeholder="Nova etiqueta rápida...">
@@ -1799,9 +2345,9 @@ function drawer(id){
       </div>
     </div>
 
-    <div class="dr-card">
+    <div class="dr-card ${c.pend?'pend':''}" id="dr-card-obs">
       <div class="dr-card-title" style="display:flex;align-items:center;justify-content:space-between">
-        <span>Anotações do Contato</span>
+        <span style="display:inline-flex;align-items:center;gap:4px">Anotações do Contato${c.pend?'<span class="mk pend" role="img" aria-label="Contato com pendência" title="Contato com pendência">●</span>':''}</span>
         <label class="dr-inline-label" style="display:inline-flex !important;flex-direction:row !important;align-items:center !important;gap:6px !important;font-size:12px;font-weight:600;color:${c.pend?'#b45309':'var(--mut)'};cursor:pointer;margin:0 !important;white-space:nowrap" title="Marcar este contato como pendente">
           <input type="checkbox" id="f-pend" ${c.pend?'checked':''} style="accent-color:#f59e0b;cursor:pointer;width:15px;height:15px;margin:0 !important;flex-shrink:0">
           <span style="user-select:none">${c.pend?'● Pendência marcada':'Marcar pendência'}</span>
@@ -1826,47 +2372,1304 @@ function drawer(id){
         Data do registro (opcional):
         <input type="date" id="f-hd" style="margin-top:3px;padding:6px 9px;border:1px solid var(--ln);border-radius:8px;width:100%">
       </label>
-      <ul class="hist">
-        ${hs(c).map(({h,i})=>`
-          <li>
-            <div class="hist-hdr">
-              <time>${fd(h.d,h.o)}</time>
-              <div class="hist-actions">
-                <button class="icon-btn" data-a="eh" data-i="${i}" title="Editar registro" aria-label="Editar registro">${PENCIL}</button>
-                <button class="icon-btn dng" data-a="dh" data-i="${i}" title="Apagar registro" aria-label="Apagar registro">✕</button>
+      ${isNew ? `
+        <p style="font-size:12px;color:var(--mut);margin:4px 0 0">O histórico será iniciado automaticamente após salvar o novo contato.</p>
+      ` : `
+        <ul class="hist" id="dr-hist-list">
+          ${hs(c).map(({h,i})=>`
+            <li>
+              <div class="hist-hdr">
+                <time>${fd(h.d,h.o)}</time>
+                <div class="hist-actions">
+                  <button class="icon-btn" data-a="eh" data-i="${i}" title="Editar registro" aria-label="Editar registro">${PENCIL}</button>
+                  <button class="icon-btn dng" data-a="dh" data-i="${i}" title="Apagar registro" aria-label="Apagar registro">✕</button>
+                </div>
               </div>
-            </div>
-            <div class="hist-txt">${esc(h.t)}</div>
-          </li>
-        `).join('')}
-      </ul>
+              <div class="hist-txt">${esc(h.t)}</div>
+            </li>
+          `).join('')}
+        </ul>
+      `}
     </div>
   </div>
 
   <div class="dr-footer">
-    <button class="btn" data-a="arq">
-      ${c.arq?'Restaurar atendimento':'Arquivar atendimento'}
-    </button>
-    <button class="btn dng" data-a="dc">
-      Excluir contato
-    </button>
+    ${isNew ? `
+      <div class="dr-footer-left"></div>
+      <div class="dr-footer-right">
+        <button type="button" class="btn ghost" data-a="close">
+          Cancelar
+        </button>
+        <button type="button" class="btn p" data-a="save-card">
+          💾 Salvar Contato
+        </button>
+      </div>
+    ` : `
+      <div class="dr-footer-left">
+        <button type="button" class="btn" data-a="arq">
+          ${c.arq?'Restaurar':'Arquivar'}
+        </button>
+        <button type="button" class="btn dng" data-a="dc">
+          Excluir contato
+        </button>
+      </div>
+      <div class="dr-footer-right">
+        <button type="button" class="btn p" data-a="save-card">
+          💾 Salvar Alterações
+        </button>
+      </div>
+    `}
   </div>
  `;
+ st.drawerOriginal = getDrawerSnapshot(c);
 }
 
 const log=(c,t)=>c.hist.unshift({d:now(),t});
 
 function newCard(){
- const id='m'+Date.now().toString(36);
- db.cards[id]={
-   id,nome:'NOVO CONTATO',parto:'',rich:1,
-   mes:/^\d/.test(st.mes)?st.mes:'',
-   etapa:'triagem',labels:[],tl:[],obs:'',td:'',saque:'',
-   hist:[{d:now(),t:'Contato criado'}],arq:false,parto_ok:false,pend:false
- };
- save();render();drawer(id);
- const inp=$('#f-nome');if(inp)inp.select();
+  const defaultMes = /^\d/.test(st.mes) ? st.mes : '';
+  st.draft = {
+    id: 'draft',
+    nome: '',
+    parto: '',
+    rich: 1,
+    mes: defaultMes,
+    etapa: 'triagem',
+    labels: [],
+    tl: [],
+    obs: '',
+    td: '',
+    saque: '',
+    hist: [],
+    arq: false,
+    parto_ok: false,
+    pend: false
+  };
+  st.open = 'new';
+  drawer('new');
+  const inp = document.getElementById('f-nome');
+  if (inp) {
+    inp.value = '';
+    inp.placeholder = 'NOME DO CONTATO';
+    inp.focus();
+  }
 }
+
+function saveNewCard(){
+  if (!st.draft) return;
+  const nameInput = document.getElementById('f-nome');
+  const nomeRaw = nameInput ? nameInput.value.trim() : (st.draft.nome || '');
+  if (!nomeRaw) {
+    toast('Por favor, informe o nome do contato.');
+    if (nameInput) nameInput.focus();
+    return;
+  }
+  const nome = up(nomeRaw);
+
+  const mesEl = document.getElementById('f-mes');
+  const etapaEl = document.getElementById('f-et');
+  const partoEl = document.getElementById('f-parto');
+  const partoOkEl = document.getElementById('f-parto-ok');
+  const pendEl = document.getElementById('f-pend');
+  const saqueEl = document.getElementById('f-saque');
+  const obsEl = document.getElementById('f-obs');
+
+  const mes = mesEl ? mesEl.value : st.draft.mes;
+  const etapa = etapaEl ? etapaEl.value : st.draft.etapa;
+  const parto = partoEl ? partoEl.value : st.draft.parto;
+  const parto_ok = partoOkEl ? partoOkEl.checked : st.draft.parto_ok;
+  const pend = pendEl ? pendEl.checked : st.draft.pend;
+  const saque = saqueEl ? saqueEl.value : st.draft.saque;
+  const obs = obsEl ? clean(obsEl.innerHTML) : st.draft.obs;
+  const labels = st.drawerDraftLabels ? [...st.drawerDraftLabels] : [...(st.draft.labels || [])];
+
+  const id = 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+  const newC = normCard({
+    id,
+    nome,
+    mes,
+    etapa: SN[etapa] ? etapa : 'triagem',
+    labels,
+    tl: [...labels],
+    obs,
+    rich: 1,
+    td: plain(obs),
+    saque,
+    parto,
+    parto_ok: !!parto_ok,
+    pend: !!pend,
+    hist: [{ d: now(), t: 'Contato criado' }],
+    arq: false
+  });
+
+  db.cards[id] = newC;
+  if (mes && !db.meses.includes(mes)) {
+    db.meses.push(mes);
+  }
+
+  st.draft = null;
+  st.drawerOriginal = null;
+  st.drawerDraftLabels = null;
+  save();
+  render();
+  drawer(null);
+  if (typeof queueCardEmbedding === 'function') queueCardEmbedding(newC);
+  toast(`Contato "${newC.nome}" criado e salvo com sucesso!`);
+}
+
+
+// =====================================================================
+// === MÓDULO DE INTELIGÊNCIA ARTIFICIAL GEMINI & RELATÓRIOS EM PDF ===
+// =====================================================================
+
+
+function contactPayload(c, detalhado = false) {
+  if (!c) return null;
+  const p = {
+    id: c.id,
+    nome: c.nome,
+    mes: c.mes,
+    etapa: c.etapa,
+    etapa_nome: SN[c.etapa] ? SN[c.etapa][1] : c.etapa,
+    labels: [...(c.labels || [])],
+    parto: c.parto || '',
+    parto_ok: !!c.parto_ok,
+    pend: !!c.pend,
+    saque: c.saque || '',
+    arq: !!c.arq
+  };
+  if (detalhado) {
+    p.obs = plain(c.obs || '');
+    p.historico = (c.hist || []).map(h => ({ data: h.d, texto: h.t }));
+  }
+  return p;
+}
+
+function resolveContact(args) {
+  if (!args) return null;
+  if (args.id && db.cards[args.id]) return db.cards[args.id];
+  if (args.nome) {
+    const q = norm(String(args.nome).trim());
+    const exact = all().find(c => norm(c.nome) === q);
+    if (exact) return exact;
+    return all().find(c => norm(c.nome).includes(q));
+  }
+  return null;
+}
+
+
+// Helper de Confirmação Obrigatória
+window._pendingAiAction = null;
+
+function showAiPendingConfirm(descricao) {
+  hideAiPendingConfirm();
+  const chat = document.getElementById('ai-chat');
+  if (!chat) return;
+  const box = document.createElement('div');
+  box.className = 'ai-confirm-card';
+  box.id = 'ai-pending-confirm';
+  box.innerHTML = `
+    <div class="ai-confirm-info">
+      <span class="ai-confirm-icon">⚠️</span>
+      <div class="ai-confirm-desc">
+        <strong>Confirmação necessária</strong>
+        <p>${esc(descricao)}</p>
+      </div>
+    </div>
+    <div class="ai-confirm-actions">
+      <button type="button" class="btn p ai-confirm-btn" data-a="ai-confirm-yes">✓ Confirmar e Aplicar</button>
+      <button type="button" class="btn ghost ai-confirm-btn" data-a="ai-confirm-no">✕ Cancelar</button>
+    </div>
+  `;
+  chat.appendChild(box);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function hideAiPendingConfirm() {
+  const box = document.getElementById('ai-pending-confirm');
+  if (box) box.remove();
+}
+
+async function confirmPendingAiAction() {
+  if (!window._pendingAiAction) return;
+  const action = window._pendingAiAction;
+  window._pendingAiAction = null;
+  hideAiPendingConfirm();
+  const res = await executeDbScript(action.code, true, action.descricao);
+  if (res.sucesso) {
+    appendAiMessage(`✓ **Confirmado e aplicado:** ${action.descricao}`, 'bot', true);
+    toast('Alteração aplicada com sucesso!');
+  } else {
+    appendAiMessage(`❌ Erro ao aplicar alteração: ${res.erro || 'Falha na execução'}`, 'bot');
+  }
+}
+
+function cancelPendingAiAction() {
+  window._pendingAiAction = null;
+  hideAiPendingConfirm();
+  appendAiMessage('Operação cancelada. Nenhuma alteração foi realizada no sistema.', 'bot');
+}
+
+
+async function executeDbScript(code, confirmado = false, descricao = '') {
+  if (!code || typeof code !== 'string') return { erro: 'Código JavaScript não fornecido.' };
+
+  const prevDbJson = JSON.stringify(db);
+  const initialCardsCount = Object.keys(db.cards).length;
+  const prevCards = { ...db.cards };
+
+  // Detecta se o código tem intenção explícita de mutação
+  const mutationPattern = /(db\.(cards|labels|meses|mnotes|del|gone)\b|delete\s+db|save\(\)|c\.(nome|etapa|mes|obs|parto|saque|pend|labels)\s*=)/i;
+  const looksLikeMutation = mutationPattern.test(code);
+
+  if (looksLikeMutation && !confirmado) {
+    const descText = descricao || 'Alteração solicitada nos dados do sistema';
+    window._pendingAiAction = { code, descricao: descText };
+    showAiPendingConfirm(descText);
+    return {
+      bloqueado_requer_confirmacao: true,
+      descricao: descText,
+      aviso: "REGRA DE SEGURANÇA: Toda e qualquer alteração de dados requer confirmação prévia do usuário. NÃO execute ainda. Fale com o usuário explicando o que será alterado e pergunte: 'Posso confirmar e realizar esta alteração?'."
+    };
+  }
+
+  const scope = {
+    db, all, cur, st, S, SN, ML, MN, mlabel, mkey, norm, up, now,
+    save, render, toast, drawer, deleteVector, queueCardEmbedding,
+    syncEmbeddings, updateRagConfigStatus, normCard,
+    gerarRelatorioPdf, baixarRelatorioPdf, visualizarRelatorioPdf
+  };
+
+  try {
+    const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+    const fn = new AsyncFunction(...Object.keys(scope), code);
+    const result = await fn(...Object.values(scope));
+
+    const dbChanged = JSON.stringify(db) !== prevDbJson;
+
+    // Se o banco foi alterado sem confirmação prévia, restaura e bloqueia
+    if (dbChanged && !confirmado) {
+      db = JSON.parse(prevDbJson);
+      save();
+      render();
+      const descText = descricao || 'Alteração detectada no banco de dados';
+      window._pendingAiAction = { code, descricao: descText };
+      showAiPendingConfirm(descText);
+      return {
+        bloqueado_requer_confirmacao: true,
+        descricao: descText,
+        aviso: "REGRA DE SEGURANÇA: Toda e qualquer alteração de dados requer confirmação prévia do usuário. O banco foi restaurado. Fale com o usuário explicando o que será alterado e peça a confirmação dele antes de aplicar."
+      };
+    }
+
+    // Se a alteração foi confirmada e aplicada com sucesso
+    if (dbChanged) {
+      const curCardIds = new Set(Object.keys(db.cards));
+      Object.keys(prevCards).forEach(id => {
+        if (!curCardIds.has(id)) {
+          deleteVector(id);
+          if (!db.del.includes(id)) db.del.push(id);
+        }
+      });
+      curCardIds.forEach(id => {
+        if (!prevCards[id]) {
+          queueCardEmbedding(db.cards[id]);
+        }
+      });
+
+      save();
+      render();
+      updateRagConfigStatus();
+      hideAiPendingConfirm();
+      window._pendingAiAction = null;
+    }
+
+    return {
+      sucesso: true,
+      resultado: result !== undefined ? result : 'Operação realizada com sucesso no banco de dados.'
+    };
+  } catch (err) {
+    db = JSON.parse(prevDbJson);
+    save();
+    render();
+    return { erro: String(err.message || err) };
+  }
+}
+
+const IDB_NAME = 'cantinho_vectors_db';
+const IDB_STORE = 'vectors';
+
+function openVecDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(IDB_STORE, { keyPath: 'id' });
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+async function putVector(id, vector, hash) {
+  try {
+    const idb = await openVecDB();
+    const tx = idb.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).put({ id, vector, hash });
+    return new Promise(res => tx.oncomplete = res);
+  } catch(e) { console.error('IDB err', e); }
+}
+
+
+async function updateRagConfigStatus() {
+  try {
+    const vecs = (typeof getAllVectors === 'function') ? await getAllVectors() : [];
+    const total = Object.keys(db.cards).length;
+    const statusEl = document.getElementById('cfg-rag-status');
+    if (statusEl) {
+      statusEl.innerHTML = '<b>' + (vecs ? vecs.length : 0) + '</b> de <b>' + total + '</b> contatos indexados';
+    }
+  } catch(e) {}
+}
+
+async function getAllVectors() {
+  try {
+    const idb = await openVecDB();
+    const tx = idb.transaction(IDB_STORE, 'readonly');
+    const req = tx.objectStore(IDB_STORE).getAll();
+    return new Promise(res => req.onsuccess = () => res(req.result || []));
+  } catch(e) { return []; }
+}
+
+async function clearAllVectors() {
+  try {
+    const idb = await openVecDB();
+    const tx = idb.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).clear();
+    return new Promise(res => tx.oncomplete = res);
+  } catch(e) {}
+}
+
+async function deleteVector(id) {
+  try {
+    const idb = await openVecDB();
+    const tx = idb.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).delete(id);
+  } catch(e) {}
+}
+
+function cardToText(c) {
+  return `Nome: ${c.nome}
+Etapa: ${(SN[c.etapa]||[])[1]||c.etapa}
+Mês: ${mlabel(c.mes)}
+Parto: ${c.parto||'Não informado'}
+Pagamento: ${c.saque||'Não informado'}
+Labels: ${c.labels.join(', ')}
+Anotações: ${txt(c.obs)}
+Histórico: ${c.hist.map(h => h.t).join('; ')}`.trim();
+}
+
+function simpleHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) hash = ((hash << 5) - hash) + str.charCodeAt(i) | 0;
+  return hash.toString();
+}
+
+function cosineSimilarity(vecA, vecB) {
+  let dot = 0, mA = 0, mB = 0;
+  for (let i = 0; i < vecA.length; i++) {
+    dot += vecA[i] * vecB[i];
+    mA += vecA[i] * vecA[i];
+    mB += vecB[i] * vecB[i];
+  }
+  return dot / (Math.sqrt(mA) * Math.sqrt(mB) || 1);
+}
+
+async function geminiCallEmbed(text, apiKey) {
+  const model = getEmbedModel();
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:embedContent?key=${apiKey}`;
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: `models/${model}`,
+      content: { parts: [{ text }] }
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(()=>({}));
+    throw new Error(err.error?.message || `Erro ${res.status} no modelo de embedding (${model})`);
+  }
+  const data = await res.json();
+  return data.embedding.values;
+}
+
+let isSyncing = false;
+async function syncEmbeddings(forceAll = false) {
+  const key = localStorage.getItem(KEY_GEMINI);
+  if (!key || isSyncing) return;
+
+  const cards = Object.values(db.cards);
+  if (!cards.length) return;
+
+  if (forceAll) await clearAllVectors();
+
+  isSyncing = true;
+  const stored = await getAllVectors();
+  const map = new Map(stored.map(s => [s.id, s.hash]));
+  const missing = cards.filter(c => map.get(c.id) !== simpleHash(cardToText(c)));
+
+  if (missing.length > 0) {
+    const bar = $('#ai-sync-bar');
+    const cnt = $('#ai-sync-count');
+    bar.classList.add('on');
+    let done = 0;
+
+    for (const c of missing) {
+      cnt.textContent = `${done + 1} de ${missing.length}`;
+      try {
+        const text = cardToText(c);
+        const vector = await geminiCallEmbed(text, key);
+        await putVector(c.id, vector, simpleHash(text));
+        done++;
+        await new Promise(r => setTimeout(r, 220));
+      } catch (e) {
+        console.warn('Embed falhou:', c.nome, e);
+        if (e.message.includes('quota') || e.message.includes('429')) break;
+      }
+    }
+    bar.classList.remove('on');
+  }
+  isSyncing = false;
+  updateRagConfigStatus();
+}
+
+async function queueCardEmbedding(c) {
+  const key = localStorage.getItem(KEY_GEMINI);
+  if (!key || !c) return;
+  try {
+    const text = cardToText(c);
+    const vector = await geminiCallEmbed(text, key);
+    await putVector(c.id, vector, simpleHash(text));
+    updateRagConfigStatus();
+  } catch (e) { console.error('Erro ao gerar embedding:', e); }
+}
+
+
+
+
+const GEMINI_TOOLS = [
+  { functionDeclarations: [
+    { name:"executar_no_banco", description:"Executa consultas ou operações no banco de dados 'db' da aplicação. REGRA OBRIGATÓRIA DE CONFIRMAÇÃO: Para QUALQUER ação que modifique, crie, edite, mova ou exclua dados no sistema (seja de 1 contato, etiquetas, etapas ou múltiplos contatos), você NUNCA deve executar a alteração no primeiro turno! Você DEVE primeiro responder ao usuário em linguagem natural explicando exatamente o que será feito e perguntando: 'Posso confirmar e realizar esta alteração?'. Defina 'confirmado_pelo_usuario: true' SOMENTE quando o usuário já tiver respondido confirmando explicitamente ('sim', 'confirmo', 'pode fazer', 'prosseguir' ou pelo botão). Para consultas de leitura (consultar dados, contar, buscar, calcular métricas sem alterar dados), execute diretamente com 'confirmado_pelo_usuario: false'.", parameters:{type:"OBJECT",properties:{codigo_js:{type:"STRING",description:"Código JavaScript a executar com acesso direto a db, all(), cur, st, S, SN, ML, save(), render(), toast(), normCard(). Retorne dados com return quando for consulta de leitura."},descricao:{type:"STRING",description:"Descrição clara e resumida da alteração que será feita."},confirmado_pelo_usuario:{type:"BOOLEAN",description:"Defina como true SOMENTE SE o usuário já tiver confirmado a realização desta alteração expressamente."}},required:["codigo_js","descricao"]} },
+    { name:"gerar_relatorio_pdf", description:"Gera e disponibiliza no chat um card interativo para baixar um relatório em PDF profissional e personalizado a partir do banco de dados ('db'). Use esta ferramenta sempre que o usuário pedir qualquer relatório, listagem em PDF, resumo executivo ou documento para baixar. Como você tem acesso total ao banco, consulte, filtre e estruture exatamente as colunas, linhas e indicadores (KPIs) pertinentes.", parameters:{type:"OBJECT",properties:{titulo:{type:"STRING",description:"Título principal do relatório (ex.: 'Relatório de Previsão de Partos - Outubro/2026', 'Acompanhamento Financeiro - Deferidos')."},subtitulo:{type:"STRING",description:"Subtítulo explicativo com período ou filtros aplicados."},periodo:{type:"STRING",description:"Referência temporal (ex.: 'Outubro de 2026', 'Últimos 90 dias', 'Todos os contatos')."},kpis:{type:"ARRAY",description:"Indicadores e estatísticas resumidas calculadas por você a partir do banco.",items:{type:"OBJECT",properties:{rotulo:{type:"STRING",description:"Nome do indicador (ex.: 'Total de Contatos', 'Partos Confirmados')"},valor:{type:"STRING",description:"Valor formatado (ex.: '12', 'R$ 35.000', '80%')"},destaque:{type:"STRING",enum:["padrao","sucesso","alerta","perigo"]}},required:["rotulo","valor"]}},colunas:{type:"ARRAY",description:"Colunas da tabela do relatório adaptadas ao pedido do usuário.",items:{type:"OBJECT",properties:{chave:{type:"STRING",description:"Chave do campo na linha (ex.: 'nome', 'etapa', 'parto', 'obs')"},rotulo:{type:"STRING",description:"Cabeçalho visível da coluna (ex.: 'Contato', 'Etapa Atual', 'Data do Parto')"},alinhamento:{type:"STRING",enum:["left","center","right"]}},required:["chave","rotulo"]}},linhas:{type:"ARRAY",description:"Lista de objetos com os dados formatados de cada linha da tabela.",items:{type:"OBJECT"}},resumo_executivo:{type:"STRING",description:"Análise textual elaborada por você com destaques, conclusões ou orientações sobre os dados do relatório."},nome_arquivo:{type:"STRING",description:"Nome do arquivo .pdf para download (ex.: 'relatorio_partos_outubro_2026.pdf')."}},required:["titulo","colunas","linhas"]} },
+    { name:"estado_sistema", description:"Lê o estado completo e atual do aplicativo: contatos, etapas, meses, etiquetas, filtros atuais, pendências do mês e status do backup.", parameters:{type:"OBJECT",properties:{}} },
+    { name:"buscar_contatos", description:"Busca contatos por significado, texto, nome, etapa, mês, etiquetas, datas, anotações ou histórico. Use esta ferramenta quando o usuário não fornecer um ID exato.", parameters:{type:"OBJECT",properties:{consulta:{type:"STRING",description:"Consulta em linguagem natural"},limite:{type:"INTEGER",description:"Quantidade máxima de resultados, de 1 a 20"}},required:["consulta"]} },
+    { name:"ler_contato", description:"Retorna todos os dados de um contato, incluindo etiquetas, anotações e histórico completo. Pode localizar por ID ou nome.", parameters:{type:"OBJECT",properties:{id:{type:"STRING"},nome:{type:"STRING"}}} },
+    { name:"navegar_sistema", description:"Altera a visão da tela (mês selecionado ou filtro de etapa) para mostrar o que o usuário quer ver.", parameters:{type:"OBJECT",properties:{mes:{type:"STRING",description:"'AAAA-MM' para um mês específico ou '*' para todos os meses"},etapa:{type:"STRING",description:"'ativos', 'todos', 'arq', ou código da etapa: 'triagem', 'coleta', 'exigencia', 'analise', 'deferido', 'indeferido', 'pagamento'"},termo_busca:{type:"STRING",description:"Termo para preencher no campo de busca"}}} }
+  ] }
+];
+
+const TOOL_LABEL = {
+  executar_no_banco: ['Executando no banco de dados…','Operação concluída no banco'],
+  gerar_relatorio_pdf: ['Estruturando relatório em PDF…','Relatório em PDF gerado'],
+  buscar_contatos: ['Buscando contatos…','Contatos consultados'],
+  ler_contato: ['Carregando dados do contato…','Dados obtidos'],
+  estado_sistema: ['Consultando estado do sistema…','Estado obtido'],
+  navegar_sistema: ['Ajustando visão do sistema…','Tela atualizada']
+};
+
+
+async function executeLocalTool(name, args, apiKey) {
+  if (name === 'executar_no_banco') {
+    return await executeDbScript(args.codigo_js, !!args.confirmado_pelo_usuario, args.descricao);
+  }
+  if (name === 'gerar_relatorio_pdf') {
+    const rep = registrarRelatorio(args);
+    appendAiReportCard(rep);
+    saveChatStorage();
+    return {
+      status: 'sucesso',
+      relatorio_id: rep.id,
+      titulo: rep.config.titulo,
+      total_registros: Array.isArray(rep.config.linhas) ? rep.config.linhas.length : 0,
+      arquivo: rep.config.nome_arquivo,
+      mensagem: 'Relatório em PDF estruturado com sucesso! O card interativo com o botão para baixar o PDF e visualizar já foi exibido no chat para o usuário.'
+    };
+  }
+  if (name === 'estado_sistema') {
+    const cs = all();
+    return {
+      total_contatos: cs.length,
+      ativos: cs.filter(c => !c.arq && c.etapa !== 'fim').length,
+      arquivados: cs.filter(c => c.arq).length,
+      etapas: S.map(s => ({ codigo: s[0], nome: s[1], contatos: cs.filter(c => c.etapa === s[0] && !c.arq).length })),
+      meses: db.meses,
+      mes_atual: st.mes,
+      filtro_etapa: st.et,
+      etiquetas: Object.keys(db.labels),
+      pendencias_mes: monthNotes().map(([m, nt]) => ({ mes: m, pendente: nt.v, texto: nt.n })),
+      backup_dias: backupAgeDays()
+    };
+  }
+  if (name === 'buscar_contatos') {
+    const q = String(args.consulta || '').trim();
+    if (!q) return { contatos: [] };
+    const max = Math.min(Math.max(1, Number(args.limite) || 10), 20);
+    const sem = await searchSimilarCards(q, apiKey, max);
+    if (sem && sem.length) {
+      return { contatos: sem.map(c => contactPayload(c)) };
+    }
+    const txt = norm(q);
+    const matches = all().filter(c => norm([c.nome, plain(c.obs), ...c.hist.map(h => h.t)].join(' ')).includes(txt)).slice(0, max);
+    return { contatos: matches.map(c => contactPayload(c)) };
+  }
+  if (name === 'ler_contato') {
+    const c = resolveContact(args);
+    if (!c) return { erro: 'Contato não encontrado' };
+    return { contato: contactPayload(c, true) };
+  }
+  if (name === 'navegar_sistema') {
+    if (args.mes !== undefined) {
+      if (args.mes === '*' || db.meses.includes(args.mes) || !args.mes) {
+        st.mes = args.mes || '';
+      }
+    }
+    if (args.etapa && (SN[args.etapa] || ['ativos', 'todos', 'arq', 'pendentes'].includes(args.etapa))) {
+      st.et = args.etapa;
+    }
+    if (args.termo_busca !== undefined) {
+      st.q = String(args.termo_busca);
+      const qInput = document.getElementById('q');
+      if (qInput) qInput.value = st.q;
+    }
+    render();
+    return { status: 'sucesso', visao_atual: { mes: st.mes, etapa: st.et, busca: st.q } };
+  }
+  return { erro: 'Ferramenta desconhecida: ' + name };
+}
+
+const AI_TAGS = /^(STRONG|EM|UL|LI|BR|H2|H3|H4|CODE|BUTTON)$/;
+function safeAiNodes(html) {
+  const t = document.createElement('template');
+  t.innerHTML = html;
+  (function walk(n) {
+    [...n.childNodes].forEach(k => {
+      if (k.nodeType === 3) return;
+      if (k.nodeType !== 1) { k.remove(); return; }
+      walk(k);
+      const id = k.dataset?.id || '';
+      if (!AI_TAGS.test(k.tagName) || (k.tagName === 'BUTTON' && !/^m[a-z0-9]{5,15}$/i.test(id))) { k.replaceWith(...k.childNodes); return; }
+      const keep = k.tagName === 'BUTTON' ? { class: 'ai-contact-btn', 'data-id': id, type: 'button' } : /^(UL|H\d|CODE)$/.test(k.tagName) ? { class: k.className.replace(/[^\w -]/g, '') } : {};
+      [...k.attributes].forEach(a => k.removeAttribute(a.name));
+      Object.entries(keep).forEach(([a, v]) => v && k.setAttribute(a, v));
+    });
+  })(t.content);
+  return t.content;
+}
+
+function renderMarkdown(md) {
+  if (!md) return '';
+  let s = esc(md);
+  s = s.replace(/^### (.*$)/gim, '<h4 class="ai-h">$1</h4>').replace(/^## (.*$)/gim, '<h3 class="ai-h">$1</h3>').replace(/^# (.*$)/gim, '<h2 class="ai-h">$1</h2>');
+  s = s.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/__(.*?)__/g, '<strong>$1</strong>').replace(/\*(.*?)\*/g, '<em>$1</em>').replace(/_([^_]+)_/g, '<em>$1</em>');
+  s = s.replace(/`([^`]+)`/g, '<code class="ai-code">$1</code>');
+  s = s.replace(/<code class="ai-code">(m[a-z0-9]{5,15})<\/code>/gi, '<button class="ai-contact-btn" data-id="$1">Abrir contato $1</button>');
+  s = s.replace(/((?:^(?:[\*\-]|\d+\.) .*(?:\r?\n|$))+)/gm, m => '<ul class="ai-list">' + m.trim().split(/\r?\n/).map(l => `<li>${l.replace(/^(?:[\*\-]|\d+\.)\s+/, '')}</li>`).join('') + '</ul>');
+  s = s.replace(/\r?\n/g, '<br>').replace(/<br>\s*<ul/g, '<ul').replace(/<\/ul>\s*<br>/g, '</ul>').replace(/<br>\s*<h/g, '<h').replace(/<\/h(\d)>\s*<br>/g, '</h$1>');
+  return s;
+}
+
+
+
+function appendAiMessage(text, type = 'bot', rich = false) {
+  const chat = $('#ai-chat'), d = document.createElement('div');
+  d.className = `ai-msg ${type}`;
+  if (rich) d.appendChild(safeAiNodes(renderMarkdown(text)));
+  else d.textContent = text;
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+  return d;
+}
+
+// --- MÓDULO DE GERAÇÃO DE RELATÓRIOS E PDF PELA IA ---
+window._reports = window._reports || {};
+
+function loadStoredReports() {
+  try {
+    const raw = storage.getItem(KEY_REPORTS);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && typeof parsed === 'object') {
+        window._reports = { ...parsed, ...(window._reports || {}) };
+      }
+    }
+  } catch (e) {}
+  if (!window._reports) window._reports = {};
+}
+
+function saveReportsStorage() {
+  try {
+    const repMap = window._reports || {};
+    const keys = Object.keys(repMap);
+    if (keys.length > 15) {
+      keys.slice(0, keys.length - 15).forEach(k => delete repMap[k]);
+    }
+    storage.setItem(KEY_REPORTS, JSON.stringify(repMap));
+  } catch (e) {
+    console.warn('Não foi possível salvar relatórios no storage:', e);
+  }
+}
+
+let _html2pdfPromise = null;
+function loadHtml2Pdf() {
+  if (window.html2pdf) return Promise.resolve(window.html2pdf);
+  if (_html2pdfPromise) return _html2pdfPromise;
+  _html2pdfPromise = new Promise(resolve => {
+    const script = document.createElement('script');
+    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+    script.onload = () => resolve(window.html2pdf || null);
+    script.onerror = () => {
+      console.warn('html2pdf não pôde ser carregado via CDN. Modo de impressão nativo ativo.');
+      resolve(null);
+    };
+    document.head.appendChild(script);
+  });
+  return _html2pdfPromise;
+}
+
+function buildReportHtml(cfg) {
+  const agora = new Date().toLocaleString('pt-BR', { dateStyle: 'long', timeStyle: 'short' });
+  const cols = Array.isArray(cfg.colunas) ? cfg.colunas : [];
+  const rows = Array.isArray(cfg.linhas) ? cfg.linhas : [];
+  const orientation = cols.length > 5 ? 'landscape' : 'portrait';
+
+  const kpisHtml = Array.isArray(cfg.kpis) && cfg.kpis.length ? `
+    <div class="rep-kpis">
+      ${cfg.kpis.map(k => `
+        <div class="rep-kpi-card ${k.destaque || ''}">
+          <div class="rep-kpi-val">${esc(k.valor)}</div>
+          <div class="rep-kpi-lbl">${esc(k.rotulo)}</div>
+        </div>
+      `).join('')}
+    </div>
+  ` : '';
+
+  const tableHeader = `
+    <thead>
+      <tr>
+        ${cols.map(c => `<th style="text-align:${c.alinhamento || 'left'}">${esc(c.rotulo)}</th>`).join('')}
+      </tr>
+    </thead>
+  `;
+
+  const tableBody = `
+    <tbody>
+      ${rows.length ? rows.map(r => `
+        <tr>
+          ${cols.map(c => {
+            const rawVal = r[c.chave] !== undefined ? r[c.chave] : (r[c.rotulo] !== undefined ? r[c.rotulo] : '');
+            const align = c.alinhamento || 'left';
+            let formatted = esc(rawVal);
+            if (c.chave === 'etapa' && SN[rawVal]) {
+              formatted = `<span class="rep-badge-et" style="background-color:${SN[rawVal][2]}15;color:${SN[rawVal][2]};border:1px solid ${SN[rawVal][2]}40">${esc(SN[rawVal][1])}</span>`;
+            }
+            return `<td style="text-align:${align}">${formatted}</td>`;
+          }).join('')}
+        </tr>
+      `).join('') : `<tr><td colspan="${cols.length || 1}" style="text-align:center;padding:20px;color:#64748b">Nenhum registro encontrado.</td></tr>`}
+    </tbody>
+  `;
+
+  const summaryHtml = cfg.resumo_executivo ? `
+    <div class="rep-section">
+      <h3 class="rep-sec-title">Resumo & Observações do Assistente</h3>
+      <div class="rep-summary-text">${toHtml(cfg.resumo_executivo)}</div>
+    </div>
+  ` : '';
+
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>${esc(cfg.titulo)}</title>
+  <style>
+    @page { size: A4 ${orientation}; margin: 12mm 14mm; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #0f172a;
+      background: #fff;
+      margin: 0;
+      padding: 16px;
+      font-size: 10pt;
+      line-height: 1.4;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .rep-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #0f5c6e;
+      margin-bottom: 16px;
+    }
+    .rep-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .rep-brand svg {
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0;
+    }
+    .rep-brand-title {
+      font-size: 15pt;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.1;
+    }
+    .rep-brand-sub {
+      font-size: 8.5pt;
+      font-weight: 700;
+      color: #0f5c6e;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .rep-meta {
+      text-align: right;
+      font-size: 8.5pt;
+      color: #64748b;
+      line-height: 1.35;
+    }
+    .rep-meta b { color: #0f172a; }
+    .rep-title-box { margin-bottom: 14px; }
+    .rep-title {
+      font-size: 14pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 4px 0;
+    }
+    .rep-sub {
+      font-size: 9.5pt;
+      color: #475569;
+      margin: 0;
+    }
+    .rep-kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .rep-kpi-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+    }
+    .rep-kpi-val {
+      font-size: 15pt;
+      font-weight: 800;
+      color: #0f5c6e;
+      line-height: 1.2;
+    }
+    .rep-kpi-lbl {
+      font-size: 8pt;
+      font-weight: 600;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .02em;
+      margin-top: 2px;
+    }
+    .rep-kpi-card.sucesso .rep-kpi-val { color: #16a34a; }
+    .rep-kpi-card.alerta .rep-kpi-val { color: #d97706; }
+    .rep-kpi-card.perigo .rep-kpi-val { color: #dc2626; }
+    table.rep-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 16px;
+      font-size: 9pt;
+    }
+    table.rep-table th {
+      background: #f1f5f9;
+      color: #334155;
+      font-weight: 700;
+      padding: 7px 9px;
+      border-top: 1px solid #cbd5e1;
+      border-bottom: 2px solid #94a3b8;
+      text-transform: uppercase;
+      font-size: 7.5pt;
+      letter-spacing: .03em;
+    }
+    table.rep-table td {
+      padding: 6px 9px;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: middle;
+    }
+    table.rep-table tbody tr:nth-child(even) {
+      background: #f8fafc;
+    }
+    .rep-badge-et {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 99px;
+      font-size: 7.5pt;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .rep-sec-title {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 6px 0;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 4px;
+    }
+    .rep-summary-text {
+      font-size: 9pt;
+      color: #334155;
+      line-height: 1.5;
+      background: #f8fafc;
+      border-left: 3px solid #0f5c6e;
+      padding: 8px 12px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 16px;
+    }
+    .rep-footer {
+      margin-top: 20px;
+      padding-top: 8px;
+      border-top: 1px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 7.5pt;
+      color: #94a3b8;
+    }
+    @media print {
+      body { padding: 0; }
+      .rep-kpi-card, table.rep-table tbody tr, .rep-summary-text {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="rep-header">
+    <div class="rep-brand">
+      <svg viewBox="0 0 102 104" fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M 19 58 C 18.5 73, 26.5 86, 45 92.5" stroke="#cbd5e1" stroke-width="2.5" />
+        <path d="M 31 25.5 L 50.5 4.5 L 70 25.5" stroke="#e1326d" stroke-width="5.5" stroke-linejoin="round" />
+        <path d="M 8.5 16 C 12 28, 14 50, 15.2 67 C 16.5 83, 29 97.5, 50.5 98" stroke="#e1326d" stroke-width="5.5" />
+        <path d="M 8.5 16 C 22 25, 40 42, 47.5 58 C 50.2 64, 50.5 76, 50.5 98" stroke="#e1326d" stroke-width="5.5" />
+        <path d="M 92.5 16 C 89 28, 87 50, 85.8 67 C 84.5 83, 72 97.5, 50.5 98" stroke="#e1326d" stroke-width="5.5" />
+        <path d="M 92.5 16 C 79 25, 61 42, 53.5 58 C 51.5 62, 50.5 64.5, 50.5 65" stroke="#e1326d" stroke-width="5.5" />
+      </svg>
+      <div>
+        <div class="rep-brand-title">Meu cantinho</div>
+        <div class="rep-brand-sub">Gestão & INSS</div>
+      </div>
+    </div>
+    <div class="rep-meta">
+      <div>Emissão: <b>${agora}</b></div>
+      ${cfg.periodo ? `<div>Referência: <b>${esc(cfg.periodo)}</b></div>` : ''}
+      <div>Total de Registros: <b>${rows.length}</b></div>
+    </div>
+  </div>
+
+  <div class="rep-title-box">
+    <h1 class="rep-title">${esc(cfg.titulo)}</h1>
+    ${cfg.subtitulo ? `<p class="rep-sub">${esc(cfg.subtitulo)}</p>` : ''}
+  </div>
+
+  ${kpisHtml}
+
+  <table class="rep-table">
+    ${tableHeader}
+    ${tableBody}
+  </table>
+
+  ${summaryHtml}
+
+  <div class="rep-footer">
+    <span>Relatório gerado pelo Assistente Operacional • Meu cantinho CRM</span>
+    <span>Documento Confidencial</span>
+  </div>
+</body>
+</html>`;
+}
+
+function registrarRelatorio(cfg) {
+  loadStoredReports();
+  const id = 'rep_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+  if (!cfg.nome_arquivo) {
+    cfg.nome_arquivo = `${norm(cfg.titulo || 'relatorio').replace(/[^a-z0-9_-]+/g, '_')}.pdf`;
+  }
+  const rep = {
+    id,
+    config: cfg,
+    criadoEm: new Date().toISOString()
+  };
+  window._reports[id] = rep;
+  saveReportsStorage();
+  return rep;
+}
+
+function appendAiReportCard(rep) {
+  const chat = $('#ai-chat');
+  if (!chat) return null;
+  const d = document.createElement('div');
+  d.className = 'ai-msg report';
+  d.dataset.reportId = rep.id;
+
+  const kpisHtml = Array.isArray(rep.config.kpis) && rep.config.kpis.length ? `
+    <div class="ai-report-kpis">
+      ${rep.config.kpis.slice(0, 4).map(k => `
+        <div class="ai-report-kpi ${k.destaque || ''}">
+          <b>${esc(k.valor)}</b>
+          <span>${esc(k.rotulo)}</span>
+        </div>
+      `).join('')}
+    </div>
+  ` : '';
+
+  const rowsCount = Array.isArray(rep.config.linhas) ? rep.config.linhas.length : 0;
+  const fileName = rep.config.nome_arquivo || 'relatorio.pdf';
+
+  d.innerHTML = `
+    <div class="ai-report-card">
+      <div class="ai-report-head">
+        <div>
+          <span class="ai-report-badge">📄 Relatório em PDF</span>
+          <h4 class="ai-report-title">${esc(rep.config.titulo)}</h4>
+          <p class="ai-report-sub">${esc(rep.config.subtitulo || (rowsCount + ' registro(s) organizados'))}</p>
+        </div>
+      </div>
+      ${kpisHtml}
+      ${rep.config.resumo_executivo ? `<div class="ai-report-summary-box">${esc(rep.config.resumo_executivo)}</div>` : ''}
+      <div class="ai-report-actions">
+        <button type="button" class="ai-report-btn primary" data-a="dl-report" data-report-id="${esc(rep.id)}">
+          📥 Baixar PDF (${esc(fileName)})
+        </button>
+        <button type="button" class="ai-report-btn secondary" data-a="view-report" data-report-id="${esc(rep.id)}">
+          🖨️ Visualizar / Imprimir
+        </button>
+      </div>
+    </div>
+  `;
+
+  chat.appendChild(d);
+  chat.scrollTop = chat.scrollHeight;
+  return d;
+}
+
+async function baixarRelatorioPdf(reportId) {
+  loadStoredReports();
+  const rep = (window._reports || {})[reportId];
+  if (!rep) {
+    toast('Relatório não encontrado ou expirado.');
+    return;
+  }
+  toast('Preparando PDF para download…');
+
+  const filename = rep.config.nome_arquivo || `${norm(rep.config.titulo || 'relatorio').replace(/[^a-z0-9_-]+/g, '_')}.pdf`;
+  const html = buildReportHtml(rep.config);
+
+  try {
+    const h2p = await loadHtml2Pdf();
+    if (h2p) {
+      const container = document.createElement('div');
+      container.style.position = 'fixed';
+      container.style.left = '-9999px';
+      container.style.top = '0';
+      container.style.width = (rep.config.colunas && rep.config.colunas.length > 5) ? '297mm' : '210mm';
+      container.style.background = '#ffffff';
+      container.innerHTML = html;
+      document.body.appendChild(container);
+
+      const opt = {
+        margin: [10, 10, 10, 10],
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: (rep.config.colunas && rep.config.colunas.length > 5) ? 'landscape' : 'portrait' }
+      };
+
+      await h2p().set(opt).from(container).save();
+      container.remove();
+      toast('PDF baixado com sucesso!');
+      return;
+    }
+  } catch (err) {
+    console.warn('Erro ao gerar com html2pdf, acionando fallback de impressão:', err);
+  }
+
+  // Fallback: abre janela de visualização e impressão nativa
+  visualizarRelatorioPdf(reportId, true);
+}
+
+function visualizarRelatorioPdf(reportId, autoPrint = false) {
+  loadStoredReports();
+  const rep = (window._reports || {})[reportId];
+  if (!rep) {
+    toast('Relatório não encontrado.');
+    return;
+  }
+  const html = buildReportHtml(rep.config);
+  const win = window.open('', '_blank');
+  if (!win) {
+    toast('O navegador bloqueou a janela pop-up. Permita pop-ups para visualizar o relatório.');
+    return;
+  }
+  win.document.open();
+  win.document.write(html);
+  win.document.close();
+  if (autoPrint) {
+    setTimeout(() => {
+      try { win.focus(); win.print(); } catch (_) {}
+    }, 500);
+  }
+}
+
+function gerarRelatorioPdf(cfg) {
+  const rep = registrarRelatorio(cfg);
+  appendAiReportCard(rep);
+  saveChatStorage();
+  return {
+    status: 'sucesso',
+    relatorio_id: rep.id,
+    arquivo: rep.config.nome_arquivo,
+    total_registros: Array.isArray(rep.config.linhas) ? rep.config.linhas.length : 0
+  };
+}
+
+async function fetchGeminiWithRetry({ apiKey, primaryModel, contents, tools, systemInstruction, onNotice }) {
+  const fallbackList = ['gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'];
+  const modelsToTry = [primaryModel];
+  for (const f of fallbackList) {
+    if (!modelsToTry.includes(f)) modelsToTry.push(f);
+  }
+
+  let lastError = null;
+
+  for (let mIdx = 0; mIdx < modelsToTry.length; mIdx++) {
+    const currentModel = modelsToTry[mIdx];
+    const isPrimary = (mIdx === 0);
+    const maxAttempts = isPrimary ? 3 : 2;
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent`;
+        const body = { contents, systemInstruction };
+        if (tools && tools.length) body.tools = tools;
+
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+          body: JSON.stringify(body)
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          const msg = errData.error?.message || `Erro ${res.status} no modelo ${currentModel}`;
+          const err = new Error(msg);
+          err.status = res.status;
+          err.model = currentModel;
+          err.isRetryable = isRetryableGeminiError(res.status, msg);
+          throw err;
+        }
+
+        const data = await res.json();
+        return { data, modelUsed: currentModel, isFallback: !isPrimary };
+      } catch (err) {
+        lastError = err;
+        if (!err.isRetryable) {
+          throw err;
+        }
+
+        if (attempt < maxAttempts) {
+          const delay = Math.min(6500, 1200 * Math.pow(1.6, attempt - 1) + Math.random() * 400);
+          if (onNotice) {
+            onNotice(`⏳ Alta demanda no modelo ${currentModel}. Tentando novamente em ${(delay/1000).toFixed(1)}s (tentativa ${attempt}/${maxAttempts})…`);
+          }
+          await new Promise(r => setTimeout(r, delay));
+        } else if (mIdx < modelsToTry.length - 1) {
+          const nextModel = modelsToTry[mIdx + 1];
+          if (onNotice) {
+            onNotice(`⚠️ O modelo ${currentModel} segue sobrecarregado. Alternando automaticamente para ${nextModel} sem perder o contexto…`);
+          }
+          await new Promise(r => setTimeout(r, 800));
+        }
+      }
+    }
+  }
+
+  throw lastError || new Error("Não foi possível obter resposta após tentativas e fallbacks.");
+}
+
+const conversationHistory = [];
+
+function initAiChat() {
+  restoreChat();
+}
+
+async function chatWithGemini(userPrompt) {
+  const apiKey = storage.getItem(KEY_GEMINI);
+  if (!apiKey) throw new Error("Chave de API não configurada. Abra Configurações e informe a chave.");
+  const primaryModel = getChatModel();
+  const turn = [{ role: "user", parts: [{ text: userPrompt }] }];
+  const hoje = new Date();
+  const system = { parts: [{ text: `Você é o Assistente Operacional do sistema "Meu cantinho", um CRM de gestão de atendimentos (fluxo de requerimentos junto ao INSS, com acompanhamento de documentos, guias, análise, deferimento e pagamento).
+Você tem o mesmo poder do usuário: tudo o que a interface permite (criar, ler, editar, mover, arquivar, excluir, filtrar, importar, exportar, configurar), você executa pelas ferramentas. Hoje é ${hoje.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'})} (${hoje.toISOString().slice(0,10)}); use isso para "este mês", "mês que vem", "semana passada" etc.
+
+OBJETIVO DO SISTEMA: organizar cada atendimento (contato) por mês de atendimento e etapa do fluxo, para que nada fique esquecido: cobrar documentos, emitir/pagar guias, dar entrada, acompanhar análise e pagamento, e registrar o histórico.
+
+MODELO DE DADOS
+- Contato: id, nome, mês (AAAA-MM ou vazio = "Sem data"), etapa, data prevista do parto (parto), data de pagamento/saque (saque), etiquetas, anotações (texto rico), histórico (registros com data e texto) e estado de arquivado.
+- Etapas do fluxo, em ordem: ${S.map(s=>s[0]+' = '+s[1]).join('; ')}.
+- Mês de atendimento: agrupa contatos; pode ter anotação e marca de pendência/validação (aparece no menu lateral e nas notificações).
+- Etiquetas: nome + cor (${COLORS.map(c=>c[0]).join(', ')}).
+- Visão: filtros por mês, etapa, busca, etiquetas (modo "e" = todas, "o" = qualquer) e ordenação (etapa, nome, parto, atividade).
+- Também existem: backup JSON, exportação CSV da visão filtrada, importação de backup ou Trello JSON, configurações (modelos de chat/busca) e índice semântico local.
+
+COMO TRABALHAR
+- Na dúvida sobre o estado atual, comece por estado_sistema. Sem ID, localize o contato com buscar_contatos ou ler_contato antes de alterar ou excluir; nunca invente IDs, etiquetas ou meses.
+- Pedidos com vários itens (ex.: "crie 5 contatos", "mova todos de outubro para novembro"): execute todos, um por um, e só então responda. Se faltar uma informação essencial, pergunte uma única vez; se for opcional, use um padrão sensato e diga qual usou.
+- Se o mês pedido não existir, crie-o com criar_mes antes de usá-lo.
+- Nunca diga que fez algo sem ter chamado a ferramenta correspondente e conferido que retornou sucesso. Se uma ferramenta retornar erro, explique o motivo e tente corrigir.
+- Ações destrutivas (excluir contato, histórico, mês, etiqueta; substituir dados) exibem confirmação na interface: não tente contornar. Se o usuário cancelar, informe que nada foi alterado.
+- Limites por segurança: você não vê nem altera a chave de API (o usuário gerencia nas Configurações).
+- Datas: AAAA-MM-DD. Meses: AAAA-MM. Etiquetas: use o nome exato retornado pelo sistema.
+- Ao citar contatos criados, alterados ou encontrados, mostre nome, etapa e mês e, quando útil, o ID entre crases.
+- Responda em português do Brasil, de forma objetiva, explicando o que foi feito e sugerindo o próximo passo quando fizer sentido.` }] };
+
+  let activeNoticeEl = null;
+  const updateNotice = (msg) => {
+    if (!activeNoticeEl) {
+      activeNoticeEl = appendAiMessage(msg, 'notice');
+    } else {
+      activeNoticeEl.textContent = msg;
+      const chat = $('#ai-chat');
+      if (chat) chat.scrollTop = chat.scrollHeight;
+    }
+  };
+  const clearNotice = () => {
+    if (activeNoticeEl) {
+      activeNoticeEl.remove();
+      activeNoticeEl = null;
+    }
+  };
+
+  try {
+    for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
+      const contentsPayload = windowForModel([...conversationHistory, ...turn]);
+
+      const { data, modelUsed, isFallback } = await fetchGeminiWithRetry({
+        apiKey,
+        primaryModel,
+        contents: contentsPayload,
+        tools: GEMINI_TOOLS,
+        systemInstruction: system,
+        onNotice: updateNotice
+      });
+      clearNotice();
+
+      const candidate = data.candidates?.[0]?.content;
+      if (!candidate?.parts?.length) throw new Error("O modelo não retornou resposta.");
+      const calls = candidate.parts.filter(p => p.functionCall);
+
+      if (!calls.length) {
+        turn.push(candidate);
+        conversationHistory.push(...turn);
+        saveChatStorage();
+        let finalText = candidate.parts.map(p => p.text || '').join('\n').trim();
+        if (isFallback) {
+          finalText += `\n\n*(Respondido automaticamente via **${modelUsed}** devido à alta demanda temporária no modelo principal)*`;
+        }
+        return finalText;
+      }
+
+      if (round === MAX_TOOL_ROUNDS) {
+        turn.push({ role: "model", parts: [{ text: "Parei após o limite de ações desta mensagem." }] });
+        conversationHistory.push(...turn);
+        saveChatStorage();
+        return "Parei após o limite de ações desta mensagem. Peça de novo se faltou algo.";
+      }
+
+      turn.push(candidate);
+      const responses = [];
+      for (const { functionCall: { name, args } } of calls) {
+        const lbl = TOOL_LABEL[name] || ['Executando ação…','Ação concluída'];
+        const line = appendAiMessage(lbl[0], 'tool');
+        let result;
+        try { result = await executeLocalTool(name, args || {}, apiKey); }
+        catch (e) { result = { erro: String(e.message || e) }; }
+        line.textContent = result.erro ? `Não foi possível concluir: ${lbl[1].toLowerCase()}` : lbl[1];
+        responses.push({ functionResponse: { name, response: result } });
+      }
+      turn.push({ role: "user", parts: responses });
+    }
+  } finally {
+    clearNotice();
+  }
+}
+
+function saveChatStorage() {
+  try {
+    storage.setItem(KEY_CHAT_HISTORY, JSON.stringify(conversationHistory));
+    const msgs = Array.from($('#ai-chat').querySelectorAll('.ai-msg:not(.notice):not(.tool)')).map(el => ({
+      html: el.innerHTML,
+      className: el.className
+    }));
+    storage.setItem(KEY_CHAT_UI_MSGS, JSON.stringify(msgs.slice(-40)));
+  } catch (e) {
+    console.warn('Falha ao salvar chat:', e);
+  }
+}
+
+function restoreChat() {
+  const chatEl = $('#ai-chat');
+  if (!chatEl) return;
+  chatEl.textContent = '';
+  try {
+    const rawHist = storage.getItem(KEY_CHAT_HISTORY);
+    const rawMsgs = storage.getItem(KEY_CHAT_UI_MSGS);
+    if (rawHist) {
+      const parsed = JSON.parse(rawHist);
+      if (Array.isArray(parsed) && parsed.length) {
+        conversationHistory.length = 0;
+        conversationHistory.push(...parsed);
+      }
+    }
+    if (rawMsgs) {
+      const parsedMsgs = JSON.parse(rawMsgs);
+      if (Array.isArray(parsedMsgs) && parsedMsgs.length > 0) {
+        parsedMsgs.forEach(m => {
+          const d = document.createElement('div');
+          d.className = m.className || 'ai-msg bot';
+          d.innerHTML = m.html;
+          chatEl.appendChild(d);
+        });
+        chatEl.scrollTop = chatEl.scrollHeight;
+        return;
+      }
+    }
+  } catch (e) {
+    console.warn('Falha ao restaurar chat:', e);
+  }
+  appendAiMessage('O assistente envia o conteúdo necessário para a API do Google. O contexto da conversa é preservado mesmo ao alternar de modelo ou recarregar.', 'notice');
+}
+
+function resetChat() {
+  conversationHistory.length = 0;
+  storage.removeItem(KEY_CHAT_HISTORY);
+  storage.removeItem(KEY_CHAT_UI_MSGS);
+  const chatEl = $('#ai-chat');
+  if (chatEl) {
+    chatEl.textContent = '';
+    appendAiMessage('Nova conversa iniciada. O contexto foi reiniciado.', 'notice');
+  }
+}
+
 
 // GESTÃO DE EVENTOS (CLIQUE GLOBAL)
 document.addEventListener('click',e=>{
@@ -1874,7 +3677,7 @@ document.addEventListener('click',e=>{
  const np=$('#notif-panel'),nw=$('#notif-wrap');
  if(np&&!e.target.closest('#notif-wrap')){np.hidden=true;$('#notif-btn')?.setAttribute('aria-expanded','false')}
 
- const t=e.target.closest('[data-a],[data-m],[data-e],[data-id],[data-x],[data-dlg]');
+ const t=e.target.closest('[data-a],[data-m],[data-e],[data-id],[data-x],[data-q],[data-dlg],[data-preset],[data-retry]');
  if(!t)return;
  const D=t.dataset,c=db.cards[st.open];
 
@@ -1912,22 +3715,57 @@ document.addEventListener('click',e=>{
      else st.sel.splice(idx,1);
      render();
    } else {
-     drawer(D.id);
+     if(st.open && hasDrawerUnsavedChanges()){
+       requestCloseDrawer().then(()=>{if(!st.open)drawer(D.id)});
+     } else {
+       drawer(D.id);
+     }
    }
  }
- else if(D.a==='toggle-bulk'){st.bulk=!st.bulk;if(!st.bulk)st.sel=[];render()}
+ else if(D.a==='save-card'){
+  if(saveDrawerCard()) drawer(null);
+ }
+  else if(D.a==='ai-confirm-yes')confirmPendingAiAction();
+  else if(D.a==='ai-confirm-no')cancelPendingAiAction();
+  else if(D.a==='dl-report')baixarRelatorioPdf(D.report);
+  else if(D.a==='view-report')visualizarRelatorioPdf(D.report);
+  else if(D.a==='toggle-bulk'){st.bulk=!st.bulk;if(!st.bulk)st.sel=[];render()}
  else if(D.a==='bulk-delete')bulkDeleteCards();
- else if(D.a==='new')newCard();
- else if(D.a==='home'){st.mes='*';st.et='ativos';st.q='';st.lb=[];st.lopen=false;$('#q').value='';drawer(null);render()}
+ else if(D.a==='new'){
+   if(st.open && hasDrawerUnsavedChanges()){
+     requestCloseDrawer().then(()=>{if(!st.open)newCard()});
+   } else {
+     newCard();
+   }
+ }
+ else if(D.a==='home'){
+   if(st.open && hasDrawerUnsavedChanges()){
+     requestCloseDrawer().then(()=>{if(!st.open){st.mes='*';st.et='ativos';st.q='';st.lb=[];st.lopen=false;$('#q').value='';$('#ai-window').hidden=true;render()}});
+   } else {
+     st.mes='*';st.et='ativos';st.q='';st.lb=[];st.lopen=false;$('#q').value='';drawer(null);$('#ai-window').hidden=true;render();
+   }
+ }
  else if(D.a==='dlg-close'){const dg=t.closest('dialog');if(dg)dg.close()}
+ else if(D.preset!==undefined){$(D.preset).value=D.v}
+ else if(D.a==='ai-new')resetChat();
+ else if(D.retry!==undefined){
+   const rp=D.retry;
+   t.closest('.ai-msg')?.remove();
+   if(rp){$('#ai-prompt').value=rp;$('#ai-form').dispatchEvent(new Event('submit'))}
+ }
+ else if(t.classList.contains('ai-contact-btn')&&D.id){drawer(D.id)}
+ else if(D.a==='dl-report'&&D.reportId){baixarRelatorioPdf(D.reportId)}
+ else if(D.a==='view-report'&&D.reportId){visualizarRelatorioPdf(D.reportId)}
  else if(D.a==='imp')$('#fi').click();
  else if(D.a==='cfg')openSettingsModal();
+ else if(D.a==='ai-close'){$('#ai-window').hidden=true}
  else if(D.a==='lbo'){st.lopen=!st.lopen;render()}
  else if(D.a==='lbt'){const i=st.lb.indexOf(D.l);i<0?st.lb.push(D.l):st.lb.splice(i,1);render()}
  else if(D.a==='lbm'){st.mode=D.v;render()}
  else if(D.a==='lbx'){st.lb=[];render()}
- else if(D.a==='csv')exportCsv();
- else if(D.x){document.execCommand(D.x);saveObs()}
+ else if(D.a==='csv')exportCsv(false);
+ else if(D.a==='csv-all')exportCsv(true);
+ else if(D.x){document.execCommand(D.x);}
  else if(D.a==='nm')openNewMonthModal();
  else if(D.a==='mm'){st.mm=!st.mm;render()}
  else if(D.a==='dmes')delMes(D.k);
@@ -1944,78 +3782,119 @@ document.addEventListener('click',e=>{
  else if(c&&D.a==='dh')delHist(c,+D.i);
  else if(c&&D.a==='eh')editHist(c,+D.i);
  else if(c&&D.a==='adv'){
-   const ix=si(c);
+   const etSelect=$('#f-et');
+   const curVal=etSelect?etSelect.value:(c.etapa||'triagem');
+   const ix=S.findIndex(s=>s[0]===curVal);
    if(ix>=0&&ix<S.length-1){
-     const n=S[ix+1];
-     log(c,`Etapa avançada: ${SN[c.etapa][1]} → ${n[1]}`);
-     c.etapa=n[0];
-     save();drawer(c.id);render();
-     toast(`Etapa avançada para "${n[1]}".`);
+     const next=S[ix+1];
+     if(etSelect)etSelect.value=next[0];
+     updateDrawerAdvCard(next[0]);
    }
  }
- else if(D.a==='close'){drawer(null)}
+ else if(D.a==='close'){requestCloseDrawer()}
  else if(D.dlg==='close'){$('#cfg-dlg').close()}
  else if(D.a==='exp'){db.bk=now();save();dl(JSON.stringify({app:'sm',v:1,...db}),'application/json','cantinho-backup-'+now().slice(0,10)+'.json');render()}
- else if(c&&D.a==='lab'){const i=c.labels.indexOf(D.l);i<0?c.labels.push(D.l):c.labels.splice(i,1);save();drawer(c.id);render()}
+ else if(D.a==='lab'){
+   if(!st.drawerDraftLabels){
+     const card=st.open==='new'?st.draft:(st.open?db.cards[st.open]:null);
+     st.drawerDraftLabels=[...(card?card.labels||[]:[])];
+   }
+   const idx=st.drawerDraftLabels.indexOf(D.l);
+   if(idx<0)st.drawerDraftLabels.push(D.l);
+   else st.drawerDraftLabels.splice(idx,1);
+   renderDrawerLabels();
+ }
  else if(c&&D.a==='q'){const i=$('#f-h');i.value=D.t;i.focus();if(!D.t.endsWith(': '))addh()}
  else if(c&&D.a==='addh')addh();
  else if(c&&D.a==='nl')addl();
- else if(c&&D.a==='arq'){c.arq=!c.arq;log(c,c.arq?'Contato arquivado':'Contato restaurado');save();drawer(c.id);render()}
+ else if(c&&D.a==='arq'){
+   c.arq=!c.arq;
+   log(c,c.arq?'Contato arquivado':'Contato restaurado');
+   save();
+   render();
+   queueCardEmbedding(c);
+   const arqBtn=t.closest('[data-a="arq"]');
+   if(arqBtn) arqBtn.textContent=c.arq?'Restaurar':'Arquivar';
+   toast(c.arq?'Contato arquivado.':'Contato restaurado.');
+ }
+ else if(D.q){$('#ai-prompt').value=D.q;$('#ai-form').dispatchEvent(new Event('submit'))}
 });
 
 function dl(txt,type,name){const a=document.createElement('a'),url=URL.createObjectURL(new Blob([txt],{type}));a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 
-function exportCsv(){
+function exportCsv(exportAll=false){
+ const target=exportAll?all():cur;
  const q=v=>{v=String(v??'');if(/^[=+@]/.test(v))v="'"+v;return'"'+v.replace(/"/g,'""')+'"'};
- const H=['Nome','Mês','Etapa','Labels','Data do parto','Data de pagamento','Anotações','Último registro','Histórico completo'];
- const L=cur.map(c=>[c.nome,mlabel(c.mes),(SN[c.etapa]||S[0])[1],c.labels.join(' | '),fx(c.parto),fx(c.saque),txt(c.obs),(hs(c)[0]||{h:{}}).h.t||'',hs(c).map(({h})=>(h.d?new Date(h.d).toLocaleString('pt-BR'):'Importado do Trello')+': '+h.t).join('\n')]);
- dl('\ufeff'+[H,...L].map(r=>r.map(q).join(';')).join('\r\n'),'text/csv;charset=utf-8',`cantinho-${st.mes==='*'?'todos':st.mes||'sem-data'}-${now().slice(0,10)}.csv`);
- toast(cur.length+' contatos exportados em CSV.');
+ const H=['Nome','Mês','Etapa','Labels','Data do parto','Data de pagamento','Anotações','Último registro','Histórico completo','Status'];
+ const L=target.map(c=>[c.nome,mlabel(c.mes),(SN[c.etapa]||S[0])[1],c.labels.join(' | '),fx(c.parto),fx(c.saque),txt(c.obs),(hs(c)[0]||{h:{}}).h.t||'',hs(c).map(({h})=>(h.d?new Date(h.d).toLocaleString('pt-BR'):'Importado do Trello')+': '+h.t).join('\n'),c.arq?'Arquivado':'Ativo']);
+ const fileName=exportAll?`cantinho-banco-completo-${now().slice(0,10)}.csv`:`cantinho-${st.mes==='*'?'todos':st.mes||'sem-data'}-${now().slice(0,10)}.csv`;
+ dl('\ufeff'+[H,...L].map(r=>r.map(q).join(';')).join('\r\n'),'text/csv;charset=utf-8',fileName);
+ toast(exportAll?`${target.length} contatos exportados (todo o banco).`:`${target.length} contatos exportados (visão atual).`);
 }
 
 function addl(){
- const c=db.cards[st.open],n=$('#f-nl').value.trim();if(!c||!n)return;
- const nome=Object.keys(db.labels).find(l=>norm(l)===norm(n))||n;
- if(!db.labels[nome])db.labels[nome]=$('#f-nc').value;
- if(!c.labels.includes(nome))c.labels.push(nome);
- save();drawer(c.id);render();
+  const c = st.open === 'new' ? st.draft : (st.open ? db.cards[st.open] : null);
+  const n = $('#f-nl')?.value.trim();
+  if(!c || !n) return;
+  const nome = Object.keys(db.labels).find(l => norm(l) === norm(n)) || n;
+  if(!db.labels[nome]) {
+    db.labels[nome] = $('#f-nc')?.value || 'black';
+    save();
+  }
+  if(!st.drawerDraftLabels) st.drawerDraftLabels = [...(c.labels || [])];
+  if(!st.drawerDraftLabels.includes(nome)) st.drawerDraftLabels.push(nome);
+  if($('#f-nl')) $('#f-nl').value = '';
+  renderDrawerLabels();
+  render();
 }
 
 function addh(){
- const c=db.cards[st.open],v=$('#f-h').value.trim(),dv=$('#f-hd').value;if(!c||!v)return;
- c.hist.unshift(dv?{d:new Date(dv+'T12:00:00').toISOString(),o:1,t:v}:{d:now(),t:v});
- save();drawer(c.id);render();
- toast('Ocorrência adicionada ao histórico.');
+  const c = db.cards[st.open], v = $('#f-h')?.value.trim(), dv = $('#f-hd')?.value;
+  if(!c || !v) return;
+  c.hist.unshift(dv ? { d: new Date(dv+'T12:00:00').toISOString(), o: 1, t: v } : { d: now(), t: v });
+  save();
+  render();
+  renderDrawerHistory(c);
+  queueCardEmbedding(c);
+  if($('#f-h')) $('#f-h').value = '';
+  if($('#f-hd')) $('#f-hd').value = '';
+  toast('Ocorrência adicionada ao histórico.');
 }
 
 async function editHist(c,i){
- const item=c.hist[i];if(!item)return;
- const newText=await ask(`Editar ocorrência (${fd(item.d,item.o)}):`,{input:true,ph:item.t,ok:'Salvar'});
- if(newText===null||newText===undefined)return;
- const trimmed=newText.trim();
- if(!trimmed)return toast('O texto não pode ser vazio.');
- item.t=trimmed;
- save();drawer(c.id);render();
- toast('Ocorrência atualizada.');
+  const item = c.hist[i];
+  if(!item) return;
+  const newText = await ask(`Editar ocorrência (${fd(item.d,item.o)}):`, { input: true, ph: item.t, ok: 'Salvar' });
+  if(newText === null || newText === undefined) return;
+  const trimmed = newText.trim();
+  if(!trimmed) return toast('O texto não pode ser vazio.');
+  item.t = trimmed;
+  save();
+  render();
+  renderDrawerHistory(c);
+  queueCardEmbedding(c);
+  toast('Ocorrência atualizada.');
 }
 
-let obsSaveTimer=null;
-function saveObs(immediate=true){
- const commit=()=>{const c=db.cards[st.open],el=$('#f-obs');if(c&&el){const html=clean(el.innerHTML);if(html!==c.obs){c.obs=html;save()}}};
- clearTimeout(obsSaveTimer);
- if(immediate)commit();else obsSaveTimer=setTimeout(commit,350);
+function saveObs(){
+  // Auto-save desativado: alterações no contato salvas exclusivamente pelo botão 'Salvar Alterações'.
 }
 
 async function delCard(c){
- if(!await ask(`Excluir definitivamente o contato "${c.nome}"?`,{ok:'Excluir',danger:true}))return;
- delete db.cards[c.id];
- if(!db.del.includes(c.id))db.del.push(c.id);
- save();drawer(null);render();toast('Contato excluído.');
+  if(!await ask(`Excluir definitivamente o contato "${c.nome}"?`,{ok:'Excluir',danger:true}))return;
+  delete db.cards[c.id];
+  if(!db.del.includes(c.id))db.del.push(c.id);
+  save();deleteVector(c.id);drawer(null);render();updateRagConfigStatus();toast('Contato excluído.');
 }
 
 async function delHist(c,i){
- if(!await ask('Apagar esta ocorrência do histórico?',{ok:'Apagar',danger:true}))return;
- c.hist.splice(i,1);save();drawer(c.id);render();toast('Ocorrência removida.');
+  if(!await ask('Apagar esta ocorrência do histórico?',{ok:'Apagar',danger:true}))return;
+  c.hist.splice(i,1);
+  save();
+  render();
+  renderDrawerHistory(c);
+  queueCardEmbedding(c);
+  toast('Ocorrência removida.');
 }
 
 function openNewMonthModal(){
@@ -2048,11 +3927,11 @@ async function delMes(k){
  else if(isNoDate)r=await ask(`"Sem data" possui ${n} contato${n>1?'s':''}. Deseja excluir definitivamente todos esses contatos?`,{ok:`Excluir ${n} contato${n>1?'s':''}`,danger:true});
  else r=await ask(`${mlabel(k)} possui ${n} contatos vinculados. O que deseja fazer?`,{ok:'Mover para "Sem data"',alt:'Excluir contatos e mês',danger:true});
  if(!r)return;
- if(r==='alt'||(isNoDate&&r===true))cs.forEach(c=>{delete db.cards[c.id];if(!db.del.includes(c.id))db.del.push(c.id)});
+ if(r==='alt'||(isNoDate&&r===true))cs.forEach(c=>{delete db.cards[c.id];deleteVector(c.id);if(!db.del.includes(c.id))db.del.push(c.id)});
  else if(!isNoDate)cs.forEach(c=>{log(c,`Mês alterado: ${mlabel(k)} → Sem data`);c.mes=''});
  if(!isNoDate)db.meses=db.meses.filter(m=>m!==k);
  delete db.mnotes[k];if(st.mes===k)st.mes='*';
- save();drawer(db.cards[st.open]?st.open:null);render();toast(isNoDate?'Contatos sem data excluídos.':'Mês excluído.');
+ save();drawer(db.cards[st.open]?st.open:null);render();updateRagConfigStatus();toast(isNoDate?'Contatos sem data excluídos.':'Mês excluído.');
 }
 
 async function bulkDeleteCards(){
@@ -2061,11 +3940,12 @@ async function bulkDeleteCards(){
  if(!await ask(`Excluir definitivamente os ${count} contatos selecionados?`,{ok:`Excluir ${count} contatos`,danger:true,title:'Exclusão em Lote'}))return;
  st.sel.forEach(id=>{
    delete db.cards[id];
+   deleteVector(id);
    if(!db.del.includes(id))db.del.push(id);
  });
  st.sel=[];
  st.bulk=false;
- save();drawer(null);render();
+ save();drawer(null);render();updateRagConfigStatus();
  toast(`${count} contato${count>1?'s':''} excluído${count>1?'s':''} com sucesso.`);
 }
 
@@ -2142,16 +4022,44 @@ document.addEventListener('change',e=>{
  if(e.target.id==='se'){st.et=e.target.value;render();return}
  if(e.target.id==='so'){st.sort=e.target.value;render();return}
  if(e.target.id==='mbv'){setMes($('#mb').dataset.k,m=>m.v=e.target.checked);render();return}
- const c=db.cards[st.open];if(!c)return;const v=e.target.value;if(e.target.id==='f-et'&&!SN[v])return;
- if(e.target.id==='f-nome')c.nome=up(v.trim())||c.nome;
- else if(e.target.id==='f-parto'){if(okd(v))c.parto=v}
- else if(e.target.id==='f-parto-ok'){c.parto_ok=e.target.checked;log(c,c.parto_ok?'Data do parto confirmada':'Confirmação do parto desmarcada');save();render();renderNotifications();drawer(c.id);toast(c.parto_ok?'Parto confirmado. Pendência removida!':'Confirmação do parto desmarcada.');return}
- else if(e.target.id==='f-pend'){c.pend=e.target.checked;log(c,c.pend?'Contato marcado como pendente':'Pendência do contato removida');save();render();renderNotifications();drawer(c.id);toast(c.pend?'Contato marcado como pendente.':'Pendência do contato removida.');return}
- else if(e.target.id==='f-saque'){if(okd(v))c.saque=v}
- else if(e.target.id==='f-mes'){log(c,`Mês alterado: ${mlabel(c.mes)} → ${mlabel(v)}`);c.mes=v}
- else if(e.target.id==='f-et'){log(c,`Etapa: ${SN[c.etapa][1]} → ${SN[v][1]}`);c.etapa=v}
+ if(e.target.id==='f-parto-ok'){
+   const isChecked=e.target.checked;
+   const lbl=e.target.closest('label');
+   if(lbl){
+     lbl.style.color=isChecked?'#16a34a':'var(--mut)';
+     const sp=lbl.querySelector('span');
+     if(sp) sp.textContent=isChecked?'✓ Confirmado':'Confirmar';
+   }
+   return;
+ }
+ else if(e.target.id==='f-pend'){
+   const isChecked=e.target.checked;
+   const lbl=e.target.closest('label');
+   if(lbl){
+     lbl.style.color=isChecked?'#b45309':'var(--mut)';
+     const sp=lbl.querySelector('span');
+     if(sp) sp.textContent=isChecked?'● Pendência marcada':'Marcar pendência';
+   }
+   const cardObs=$('#dr-card-obs');
+   if(cardObs){
+     cardObs.classList.toggle('pend',isChecked);
+     const titleSpan=cardObs.querySelector('.dr-card-title span');
+     if(titleSpan){
+       let mkEl=titleSpan.querySelector('.mk.pend');
+       if(isChecked&&!mkEl){
+         titleSpan.insertAdjacentHTML('beforeend','<span class="mk pend" role="img" aria-label="Contato com pendência" title="Contato com pendência">●</span>');
+       }else if(!isChecked&&mkEl){
+         mkEl.remove();
+       }
+     }
+   }
+   return;
+ }
+ else if(e.target.id==='f-et'){
+   updateDrawerAdvCard(e.target.value);
+   return;
+ }
  else return;
- save();render();if(/f-(mes|et)/.test(e.target.id))drawer(c.id);
 });
 
 document.addEventListener('keydown',e=>{
@@ -2166,25 +4074,28 @@ document.addEventListener('keydown',e=>{
  if(e.target.id==='f-nl'&&e.key==='Enter')addl();
  if(e.target.id==='lgn-name'&&e.key==='Enter')$('#lgn-add-btn').click();
  if(e.key==='Escape'&&!$('#dg').open&&!$('#cfg-dlg').open&&!$('#dlg-mes').open&&!$('#dlg-label').open){
-   if(st.open)drawer(null);
+   if(st.open){
+     e.preventDefault();
+     requestCloseDrawer();
+   }
+   $('#ai-window').hidden=true;
  }
 });
 
 const inEd=e=>e.target.closest&&e.target.closest('#f-obs');
 document.addEventListener('mousedown',e=>{if(e.target.closest('[data-x]'))e.preventDefault()});
 document.addEventListener('input',e=>{
- if(inEd(e))saveObs(false);
  if(e.target.id==='lgq'){st.lq=e.target.value;render()}
  if(e.target.id==='dlg-lgq'){st.lq=e.target.value;renderLabelsModal()}
  if(e.target.id==='mbx'){setMes($('#mb').dataset.k,m=>m.n=e.target.value);grow(e.target);render()}
 });
 document.addEventListener('focusout',e=>{
- if(inEd(e)){saveObs(true);render();}
  if(e.target.id==='f-parto'){
-   const c=db.cards[st.open];
-   if(c&&c.parto&&!c.mes){
-     c.mes=c.parto.slice(0,7);save();
-     const m=$('#f-mes');if(m)m.innerHTML=mopts(c.mes);render();
+   const m=$('#f-mes');
+   if(m&&!m.value&&e.target.value){
+     const suggested=e.target.value.slice(0,7);
+     m.innerHTML=mopts(suggested);
+     m.value=suggested;
    }
  }
 });
@@ -2197,9 +4108,94 @@ $('#dg').addEventListener('cancel',e=>{e.preventDefault();if(_a)_a(false)});
 $('#dg').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='dgi'){e.preventDefault();if(_a)_a(true)}});
 let qt;$('#q').addEventListener('input',e=>{clearTimeout(qt);const v=e.target.value;qt=setTimeout(()=>{st.q=v;render()},180)});
 
-// Limpeza de chaves legadas de IA se existirem no navegador
-['gemini_api_key_v1','gemini_chat_model_v1','gemini_embed_model_v1','gemini_chat_history_v1','gemini_chat_ui_msgs_v1','sm_ai_reports_v1','gemini_chat_model_migrated_v2'].forEach(k=>storage.removeItem(k));
-try{indexedDB.deleteDatabase('cantinho_vectors_db')}catch(e){}
+// Controle do Chat IA
+$('#ai-fab').addEventListener('click', () => {
+  const win = $('#ai-window');
+  win.hidden = !win.hidden;
+  if (!win.hidden) $('#ai-prompt').focus();
+});
+
+$('#ai-model-select')?.addEventListener('change', e => {
+  const newModel = e.target.value.trim();
+  if (newModel) {
+    storage.setItem(KEY_CHAT_MODEL, newModel);
+    storage.setItem('gemini_chat_model_migrated_v2', '1');
+    const cfgChat = $('#cfg-chat-model');
+    if (cfgChat) cfgChat.value = newModel;
+    toast(`Modelo alterado para ${newModel}. Histórico e contexto preservados.`);
+  }
+});
+
+$('#ai-prompt')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    if ($('#ai-form').requestSubmit) $('#ai-form').requestSubmit();
+    else $('#ai-form').dispatchEvent(new Event('submit'));
+  }
+});
+
+$('#ai-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const inp = $('#ai-prompt');
+  const txt = inp.value.trim();
+  if (!txt) return;
+
+  inp.value = '';
+  appendAiMessage(txt, 'user');
+  saveChatStorage();
+
+  try {
+    const resp = await chatWithGemini(txt);
+    appendAiMessage(resp || 'Sem resposta.', 'bot', true);
+    saveChatStorage();
+  } catch (err) {
+    const isRetry = err.isRetryable !== undefined ? err.isRetryable : isRetryableGeminiError(err.status, err.message);
+    const errDiv = appendAiMessage(`⚠️ ${err.message || 'Erro ao processar com a IA.'}`, 'bot');
+    if (isRetry) {
+      const retryBtn = document.createElement('button');
+      retryBtn.type = 'button';
+      retryBtn.className = 'ai-retry-btn';
+      retryBtn.dataset.retry = txt;
+      retryBtn.innerHTML = '🔄 Tentar novamente agora';
+      retryBtn.addEventListener('click', () => {
+        errDiv.remove();
+        inp.value = txt;
+        $('#ai-form').dispatchEvent(new Event('submit'));
+      });
+      errDiv.appendChild(document.createElement('br'));
+      errDiv.appendChild(retryBtn);
+    }
+    saveChatStorage();
+  }
+});
+
+// Eventos de Configurações
+$('#cfg-close-btn')?.addEventListener('click', () => $('#cfg-dlg').close());
+$('#cfg-key-toggle')?.addEventListener('click', () => {
+  const inp = $('#cfg-key');
+  if (inp) inp.type = inp.type === 'password' ? 'text' : 'password';
+});
+$('#cfg-save-btn')?.addEventListener('click', () => {
+  const key = $('#cfg-key')?.value.trim() || '';
+  const chatModel = $('#cfg-chat-model')?.value.trim() || '';
+  const embedModel = $('#cfg-embed-model')?.value.trim() || '';
+
+  if (key) storage.setItem(KEY_GEMINI, key);
+  else storage.removeItem(KEY_GEMINI);
+
+  if (chatModel) storage.setItem(KEY_CHAT_MODEL, chatModel);
+  if (embedModel) storage.setItem(KEY_EMBED_MODEL, embedModel);
+
+  toast('Configurações salvas.');
+  if (typeof updateRagConfigStatus === 'function') updateRagConfigStatus();
+  $('#cfg-dlg')?.close();
+  if (typeof syncEmbeddings === 'function') syncEmbeddings();
+});
+
+$('#cfg-reindex-btn')?.addEventListener('click', async () => {
+  toast('Atualizando a busca por significado…');
+  if (typeof syncEmbeddings === 'function') await syncEmbeddings(true);
+});
 
 // Inicialização
 Object.keys(db.cards).forEach(id=>{const c=normCard(db.cards[id]);if(c){c.nome=up(c.nome);db.cards[id]=c}});save();
@@ -2218,47 +4214,47 @@ render();
 
 function checkInitialAlerts(){
   const due = getPartoNotifications();
-  const tm = due.filter(x => x.status === 'tomorrow');
-  const otherPartos = due.filter(x => x.status !== 'tomorrow');
   const pendingCards = all().filter(c => !c.arq && c.pend);
   const pendingMonths = monthNotes().filter(([k, v]) => v.v);
 
-  const total = due.length + pendingCards.length + pendingMonths.length;
-  if (!total) return;
+  let delay = 0;
+  const step = 200;
 
-  if (tm.length > 0) {
-    const tmText = tm.length === 1
-      ? `Parto amanhã: ${tm[0].c.nome} (${fx(tm[0].c.parto)})`
-      : `${tm.length} contatos têm parto previsto para amanhã`;
-    const others = total - tm.length;
-    if (others > 0) {
-      toast(`🔔 ${tmText} (+ ${others} pendência${others > 1 ? 's' : ''}). Confira nas notificações.`);
-    } else {
-      toast(`🔔 ${tmText}. Confira nas notificações.`);
-    }
-    return;
-  }
+  due.forEach(p => {
+    setTimeout(() => {
+      if (p.status === 'tomorrow') {
+        toast(`🔔 Parto amanhã: ${p.c.nome} (${fx(p.c.parto)})`, 'warn', 7000);
+      } else {
+        toast(`⚠️ Parto pendente de confirmação: ${p.c.nome} (${fx(p.c.parto)})`, 'warn', 7000);
+      }
+    }, delay);
+    delay += step;
+  });
 
-  if (total === 1) {
-    if (pendingCards.length === 1) {
-      toast(`🔔 Contato com pendência: ${pendingCards[0].nome}. Confira nas notificações.`);
-    } else if (pendingMonths.length === 1) {
-      toast(`🔔 Mês com pendência: ${mlabel(pendingMonths[0][0])}. Confira nas notificações.`);
-    } else if (otherPartos.length === 1) {
-      toast(`🔔 Parto pendente de confirmação: ${otherPartos[0].c.nome} (${fx(otherPartos[0].c.parto)}).`);
-    }
-    return;
-  }
+  pendingCards.forEach(c => {
+    setTimeout(() => {
+      toast(`📌 Contato com pendência: ${c.nome}${c.mes ? ' (' + mlabel(c.mes) + ')' : ''}`, 'warn', 7000);
+    }, delay);
+    delay += step;
+  });
 
-  const parts = [];
-  if (due.length) parts.push(`${due.length} parto${due.length > 1 ? 's' : ''}`);
-  if (pendingCards.length) parts.push(`${pendingCards.length} cartão(ões)`);
-  if (pendingMonths.length) parts.push(`${pendingMonths.length} mês(es)`);
-
-  toast(`🔔 Atenção: você tem ${total} pendências ativas (${parts.join(', ')}). Confira nas notificações.`);
+  pendingMonths.forEach(([k]) => {
+    setTimeout(() => {
+      toast(`📅 Mês com pendência ativa: ${mlabel(k)}`, 'warn', 7000);
+    }, delay);
+    delay += step;
+  });
 }
 const checkInitialPartoAlerts = checkInitialAlerts;
 checkInitialAlerts();
+
+// Inicialização de IA e relatórios
+if (typeof initAiChat === 'function') initAiChat();
+if (typeof loadStoredReports === 'function') loadStoredReports();
+if (typeof syncEmbeddings === 'function') syncEmbeddings();
+if (typeof updateRagConfigStatus === 'function') updateRagConfigStatus();
+if (typeof checkInitialAlerts === 'function') checkInitialAlerts();
+
 </script>
 </body>
 </html>
