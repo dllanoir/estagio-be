@@ -404,8 +404,12 @@ dialog::backdrop{
   outline:none;background:var(--pn);border-color:var(--ac);box-shadow:0 0 0 3px rgba(15,92,110,.12);
 }
 .dgb{
-  display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:4px;
+  display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:2px;
 }
+.dgb .btn{height:32px;padding:0 12px;font-size:12.5px;border-radius:8px;justify-content:center;white-space:nowrap}
+.dg-wrap{padding:18px 20px;gap:14px}.dg-icon{width:38px;height:38px;font-size:19px}
+@media (max-width:520px){.dgb .btn{flex:1 1 auto}}
+@media (pointer:coarse){.dgb .btn{height:34px}}
 
 /* Modal de Adicionar Mês (#dlg-mes) */
 #dlg-mes{width:min(420px,92vw)}
@@ -545,8 +549,11 @@ dialog::backdrop{
 }
 .dr-footer-left{display:flex;align-items:center;gap:8px}
 .dr-footer-right{display:flex;align-items:center;gap:8px;margin-left:auto}
-.dr-footer .btn{font-size:13px;padding:7px 14px;height:36px;display:inline-flex;align-items:center;justify-content:center}
-.dr-footer .btn.p{padding:7px 18px;font-weight:600}
+.dr-footer .btn{font-size:12.5px;padding:0 12px;height:32px;gap:5px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center}
+.dr-footer .btn.p{padding:0 14px;font-weight:600}
+#dr .dr-footer{padding-top:9px;padding-bottom:max(9px,env(safe-area-inset-bottom))}
+#dr .add-hist-row .btn{height:32px;padding:0 12px;font-size:12.5px}
+@media (pointer:coarse){.dr-footer .btn,#dr .add-hist-row .btn{height:34px}}
 
 /* --- BARRA DE SINCRONIZAÇÃO DE IA --- */
 #ai-sync-bar{
@@ -971,7 +978,7 @@ button.lab.off{opacity:.38}
 .notif-panel{position:absolute;top:calc(100% + 9px);right:0;width:min(360px,calc(100vw - 24px));background:var(--pn);border:1px solid var(--ln);border-radius:14px;box-shadow:var(--shadow-lg);overflow:hidden;z-index:80}
 .notif-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 14px;border-bottom:1px solid var(--ln);background:#fbfcfe}
 .notif-head strong{font-size:13.5px}.notif-head span{color:var(--mut);font-size:11.5px;font-weight:600}
-.notif-list{display:flex;flex-direction:column;padding:6px}.notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px;border-radius:10px}.notif-item:hover{background:var(--ln-light)}
+.notif-panel{display:flex;flex-direction:column;max-height:min(70vh,520px);max-height:min(70dvh,520px)}.notif-panel[hidden]{display:none}.notif-head{flex:none}.notif-list{display:flex;flex-direction:column;padding:6px;flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}.notif-item{display:flex;align-items:flex-start;gap:10px;padding:10px;border-radius:10px}.notif-item:hover{background:var(--ln-light)}
 .notif-dot{width:8px;height:8px;margin-top:6px;border-radius:999px;background:var(--warning);flex:none}.notif-dot.danger{background:var(--danger)}.notif-dot.ok{background:var(--success)}
 .notif-body{min-width:0;flex:1}.notif-body strong{display:block;font-size:12.5px}.notif-body p{margin:2px 0 6px;color:var(--mut);font-size:11.5px;line-height:1.4}.notif-body .btn{font-size:11.5px;padding:5px 8px}
 
@@ -1134,6 +1141,26 @@ nav#rail .month-card.has-pending .month-note svg{color:var(--warning)}
   nav#rail{position:static;height:auto;max-height:300px;margin-bottom:8px}
   .rail-months-scroll{max-height:180px}
 }
+
+/* ===== Refino mobile (<=720px): rail compacto, lista em 1 coluna, filtros enxutos ===== */
+@media(max-width:720px){
+  main #list,.list-scroll #list,#list{grid-template-columns:1fr !important;gap:10px !important}
+  #main-content{padding-bottom:96px}
+  nav#rail{max-height:none !important;overflow:visible !important;padding:10px 12px !important}
+  nav#rail .rail-header{display:flex !important;flex-direction:row !important;flex-wrap:wrap;align-items:center;gap:8px}
+  nav#rail .rail-header .side-sec-title{display:none}
+  nav#rail .rail-header>button[data-m="*"]{flex:1 1 auto !important;height:auto !important;min-height:40px;width:auto !important}
+  nav#rail .side-actions-row{display:flex !important;flex-direction:row !important;gap:6px;flex:none;width:auto !important}nav#rail .side-actions-row .side-action-btn{white-space:nowrap}
+  nav#rail .rail-months-scroll{display:flex !important;flex-direction:row !important;gap:8px;max-height:none !important;overflow-x:auto !important;overflow-y:hidden !important;margin-top:8px;padding-bottom:6px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+  nav#rail .month-card{flex:0 0 auto !important;width:auto !important;min-width:138px;scroll-snap-align:start}
+  #lf .filter-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;margin-left:0}
+  #lf .filter-actions>*{min-width:0;width:100%}
+}
+
+/* Drawer no celular: linha da etiqueta rápida / histórico quebra em vez de estourar */
+#dr .add-hist-row{flex-wrap:wrap}
+#dr .add-hist-row>input{flex:1 1 140px;min-width:0}
+#dr .add-hist-row>select{flex:1 1 90px;min-width:0}
 </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
 </head>
@@ -1187,7 +1214,7 @@ nav#rail .month-card.has-pending .month-note svg{color:var(--warning)}
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
   </div>
-  <input type="file" id="fi" accept=".json,application/json" hidden>
+  <input type="file" id="fi" hidden>
 </header>
 
 <div class="app">
@@ -1701,7 +1728,7 @@ function mergeBackup(j){if(!j||typeof j!=='object')throw new Error('Backup invá
  Object.entries(j.mnotes||{}).forEach(([m,v])=>{if(!db.mnotes[m])db.mnotes[m]=v});
  save();toast(`Backup mesclado.`);syncEmbeddings()}
 
-function load(file){const r=new FileReader();r.onload=async()=>{try{const j=JSON.parse(r.result);
+function load(file){const r=new FileReader();r.onload=async()=>{try{const raw=String(r.result||'').replace(/^\ufeff/,'');if(!/^\s*[\[{]/.test(raw))throw new Error('o arquivo precisa ser o backup JSON do Cantinho ou o JSON do Trello.');const j=JSON.parse(raw);
  if(Array.isArray(j.cards)&&j.lists)importTrello(j);
  else if(j.app==='sm'){const r=await ask('Importar backup: "mesclar" mantém dados ou "substituir"?',{ok:'Mesclar',alt:'Substituir tudo'});
  if(r==='alt'){const cards={};Object.values(j.cards||{}).forEach(c=>{c=normCard(c);if(c)cards[c.id]=c});const prev=db;const labels=(j.labels&&typeof j.labels==='object')?j.labels:{};const safeLabels={};Object.keys(labels).forEach(l=>{if(l)safeLabels[String(l)]=safeLabelColor(labels[l])});Object.values(cards).forEach(c=>c.labels.forEach(l=>{if(l&&!safeLabels[l])safeLabels[l]='black'}));db={cards,labels:safeLabels,meses:(Array.isArray(j.meses)?j.meses:[]).filter(okm),mnotes:(j.mnotes&&typeof j.mnotes==='object')?j.mnotes:{},gone:Array.isArray(j.gone)?j.gone.map(String):[],del:Array.isArray(j.del)?j.del.map(String):[],bk:j.bk};if(save()){toast('Backup restaurado.');syncEmbeddings(true)}else db=prev}
@@ -2401,7 +2428,7 @@ function drawer(id){
           Cancelar
         </button>
         <button type="button" class="btn p" data-a="save-card">
-          💾 Salvar Contato
+          Salvar contato
         </button>
       </div>
     ` : `
@@ -2415,7 +2442,7 @@ function drawer(id){
       </div>
       <div class="dr-footer-right">
         <button type="button" class="btn p" data-a="save-card">
-          💾 Salvar Alterações
+          Salvar alterações
         </button>
       </div>
     `}
@@ -2598,6 +2625,7 @@ async function confirmPendingAiAction() {
   const res = await executeDbScript(action.code, true, action.descricao);
   if (res.sucesso) {
     appendAiMessage(`✓ **Confirmado e aplicado:** ${action.descricao}`, 'bot', true);
+    conversationHistory.push({role:'user',parts:[{text:`[Sistema] O usuário confirmou pelo botão e a alteração foi aplicada: ${action.descricao}`}]},{role:'model',parts:[{text:'Entendido.'}]});saveChatStorage();
     toast('Alteração aplicada com sucesso!');
   } else {
     appendAiMessage(`❌ Erro ao aplicar alteração: ${res.erro || 'Falha na execução'}`, 'bot');
@@ -2608,6 +2636,7 @@ function cancelPendingAiAction() {
   window._pendingAiAction = null;
   hideAiPendingConfirm();
   appendAiMessage('Operação cancelada. Nenhuma alteração foi realizada no sistema.', 'bot');
+  conversationHistory.push({role:'user',parts:[{text:'[Sistema] O usuário cancelou a alteração pendente; nada foi alterado.'}]},{role:'model',parts:[{text:'Entendido.'}]});saveChatStorage();
 }
 
 
@@ -2629,7 +2658,7 @@ async function executeDbScript(code, confirmado = false, descricao = '') {
     return {
       bloqueado_requer_confirmacao: true,
       descricao: descText,
-      aviso: "REGRA DE SEGURANÇA: Toda e qualquer alteração de dados requer confirmação prévia do usuário. NÃO execute ainda. Fale com o usuário explicando o que será alterado e pergunte: 'Posso confirmar e realizar esta alteração?'."
+      aviso: "REGRA DE SEGURANÇA: Toda e qualquer alteração de dados requer confirmação prévia do usuário. A alteração NÃO foi executada: o app exibiu ao usuário um card com o botão 'Confirmar e Aplicar'. Explique o que será alterado e peça que ele toque nesse botão. Não repita esta chamada e não diga que já foi feito."
     };
   }
 
@@ -2658,7 +2687,7 @@ async function executeDbScript(code, confirmado = false, descricao = '') {
       return {
         bloqueado_requer_confirmacao: true,
         descricao: descText,
-        aviso: "REGRA DE SEGURANÇA: Toda e qualquer alteração de dados requer confirmação prévia do usuário. O banco foi restaurado. Fale com o usuário explicando o que será alterado e peça a confirmação dele antes de aplicar."
+        aviso: "REGRA DE SEGURANÇA: Toda e qualquer alteração de dados requer confirmação prévia do usuário. O banco foi restaurado e o app exibiu o card de confirmação. Explique o que será alterado e peça que o usuário toque em 'Confirmar e Aplicar'. Não repita esta chamada."
       };
     }
 
@@ -2747,23 +2776,17 @@ async function clearAllVectors() {
   } catch(e) {}
 }
 
-async function deleteVector(id) {
-  try {
-    const idb = await openVecDB();
-    const tx = idb.transaction(IDB_STORE, 'readwrite');
-    tx.objectStore(IDB_STORE).delete(id);
-  } catch(e) {}
+async function deleteVector(id){
+  try{const idb=await openVecDB();const tx=idb.transaction(IDB_STORE,'readwrite');tx.objectStore(IDB_STORE).delete(id);
+    return new Promise(res=>{tx.oncomplete=res;tx.onerror=res})}catch(e){}
 }
 
-function cardToText(c) {
-  return `Nome: ${c.nome}
-Etapa: ${(SN[c.etapa]||[])[1]||c.etapa}
-Mês: ${mlabel(c.mes)}
-Parto: ${c.parto||'Não informado'}
-Pagamento: ${c.saque||'Não informado'}
-Labels: ${c.labels.join(', ')}
-Anotações: ${txt(c.obs)}
-Histórico: ${c.hist.map(h => h.t).join('; ')}`.trim();
+const EMBED_DIM=768,EMBED_BATCH=32,EMBED_IDLE_MS=30000,SEM_MARGIN=0.1;
+const embedTag=()=>getEmbedModel()+'|'+EMBED_DIM;
+function cardToText(c){
+  const hist=(c.hist||[]).slice(0,30).map(h=>h.t).join('; ');
+  const body=`Etapa: ${(SN[c.etapa]||[])[1]||c.etapa}\nMês: ${mlabel(c.mes)}\nParto: ${c.parto||'Não informado'}\nPagamento: ${c.saque||'Não informado'}\nLabels: ${c.labels.join(', ')}\nAnotações: ${txt(c.obs)}\nHistórico: ${hist}`;
+  return `title: ${c.nome} | text: ${body}`.slice(0,6000);
 }
 
 function simpleHash(str) {
@@ -2782,74 +2805,121 @@ function cosineSimilarity(vecA, vecB) {
   return dot / (Math.sqrt(mA) * Math.sqrt(mB) || 1);
 }
 
-async function geminiCallEmbed(text, apiKey) {
-  const model = getEmbedModel();
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:embedContent?key=${apiKey}`;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: `models/${model}`,
-      content: { parts: [{ text }] }
-    })
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(()=>({}));
-    throw new Error(err.error?.message || `Erro ${res.status} no modelo de embedding (${model})`);
-  }
-  const data = await res.json();
-  return data.embedding.values;
+// ---- Embeddings em lote (gemini-embedding-2: batchEmbedContents, 1 vetor por texto) ----
+const _sl=ms=>new Promise(r=>setTimeout(r,ms));
+const _norm=v=>{let n=0;for(let i=0;i<v.length;i++)n+=v[i]*v[i];n=Math.sqrt(n)||1;return Float32Array.from(v,x=>x/n)};
+const _dot=(a,b)=>{let s=0;for(let i=0;i<a.length;i++)s+=a[i]*b[i];return s};
+function embedReq(model,text,kind){
+  const r={model:`models/${model}`,content:{parts:[{text}]},outputDimensionality:EMBED_DIM};
+  if(!/embedding-2/.test(model))r.taskType=kind==='q'?'RETRIEVAL_QUERY':'RETRIEVAL_DOCUMENT';
+  return r;
 }
+async function embedChunk(chunk,kind,apiKey,model,attempt=1){
+  const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:batchEmbedContents`,{
+    method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':apiKey},
+    body:JSON.stringify({requests:chunk.map(t=>embedReq(model,t,kind))})});
+  if(!res.ok){
+    const err=await res.json().catch(()=>({}));
+    const msg=err.error?.message||`Erro ${res.status} no modelo de embedding (${model})`;
+    if((res.status===429||res.status>=500)&&attempt<4){await _sl(1000*2**attempt+Math.random()*400);return embedChunk(chunk,kind,apiKey,model,attempt+1)}
+    if(res.status===400&&chunk.length>1&&!/api key/i.test(msg)){const h=chunk.length>>1;
+      return[...await embedChunk(chunk.slice(0,h),kind,apiKey,model),...await embedChunk(chunk.slice(h),kind,apiKey,model)]}
+    const e=new Error(msg);e.status=res.status;throw e;
+  }
+  const embs=(await res.json()).embeddings||[];
+  if(embs.length!==chunk.length)throw new Error(`Embedding devolveu ${embs.length} vetores para ${chunk.length} textos`);
+  return embs.map(e=>_norm(e.values));
+}
+async function putVectors(items){
+  const idb=await openVecDB();const tx=idb.transaction(IDB_STORE,'readwrite');
+  items.forEach(it=>tx.objectStore(IDB_STORE).put(it));
+  return new Promise((res,rej)=>{tx.oncomplete=res;tx.onerror=()=>rej(tx.error)});
+}
+// ===== BUSCA HÍBRIDA: filtros exatos -> texto (local) -> semântica só se necessário; fusão por RRF =====
+const STOP=new Set('a o as os um uma de da do das dos em no na nos nas por para com sem e ou que quem qual quais me meu minha mais ja ainda tem tenho esta estao foi ser sao ao aos se'.split(' '));
+const _qCache=new Map();let _semCool=0;
+function lexRank(pool,q){
+ const tk=[...new Set(norm(q).split(/[^a-z0-9]+/).filter(t=>t.length>1&&!STOP.has(t)))];
+ if(!tk.length)return{list:[],nameHit:false};
+ const need=tk.length>2?Math.ceil(tk.length/2):1,out=[];
+ for(const c of pool){
+  const nm=norm(c.nome),lb=norm(c.labels.join(' ')),bd=norm([plain(c.obs),...c.hist.map(h=>h.t)].join(' '));
+  let m=0,sc=0,nameAll=true;
+  for(const t of tk){const a=nm.includes(t),b=lb.includes(t),d=bd.includes(t);if(a||b||d)m++;sc+=(a?3:0)+(b?2:0)+(d?1:0);if(!a)nameAll=false}
+  if(m>=need)out.push({c,s:sc,nameAll})}
+ out.sort((x,y)=>y.s-x.s||x.c.nome.localeCompare(y.c.nome));
+ return{list:out,nameHit:out.some(x=>x.nameAll)}}
+async function semanticRank(q,apiKey,pool){
+ if(!apiKey||Date.now()<_semCool)return null;
+ const model=getEmbedModel(),tag=embedTag();
+ const vecs=(await getAllVectors()).filter(v=>v.tag===tag&&db.cards[v.id]);
+ if(!vecs.length)return null;
+ const ck=tag+'|'+norm(q);let qv=_qCache.get(ck);
+ if(!qv){const qt=/embedding-2/.test(model)?`task: search result | query: ${q}`:q;
+  try{[qv]=await embedChunk([qt],'q',apiKey,model,4)}catch(e){if(e.status===429)_semCool=Date.now()+10*60e3;throw e}
+  _qCache.set(ck,qv);if(_qCache.size>60)_qCache.delete(_qCache.keys().next().value)}
+ const ids=new Set(pool.map(c=>c.id));
+ const sc=vecs.filter(v=>ids.has(v.id)).map(v=>({c:db.cards[v.id],s:_dot(qv,v.vector)})).sort((a,b)=>b.s-a.s);
+ const top=sc.length?sc[0].s:0;return sc.filter(x=>x.s>=top-SEM_MARGIN)}
+async function searchContacts(a,apiKey){
+ const max=Math.min(Math.max(1,Number(a.limite)||10),20),q=String(a.consulta||'').trim(),f=[];let pool=all();
+ if(a.etapa&&SN[a.etapa]){pool=pool.filter(c=>c.etapa===a.etapa);f.push('etapa')}
+ if(a.mes&&a.mes!=='*'){const m=a.mes==='sem_data'?'':String(a.mes);pool=pool.filter(c=>c.mes===m);f.push('mês')}
+ if(a.etiqueta){const e=norm(a.etiqueta);pool=pool.filter(c=>c.labels.some(l=>norm(l)===e));f.push('etiqueta')}
+ if(typeof a.arquivado==='boolean'){pool=pool.filter(c=>c.arq===a.arquivado);f.push('arquivado')}
+ if(typeof a.pendentes==='boolean'){pool=pool.filter(c=>!!isCardPend(c)===a.pendentes);f.push('pendentes')}
+ for(const[k,fl,ge]of[['parto_de','parto',1],['parto_ate','parto',0],['saque_de','saque',1],['saque_ate','saque',0]]){
+  const v=String(a[k]||'');if(/^\d{4}-\d{2}-\d{2}$/.test(v)){pool=pool.filter(c=>c[fl]&&(ge?c[fl]>=v:c[fl]<=v));f.push(k)}}
+ const total=pool.length,fl=f.length?'filtros ('+f.join(', ')+')':'';
+ if(!q)return{total_no_filtro:total,estrategia:fl||'sem filtros',contatos:[...pool].sort((x,y)=>x.nome.localeCompare(y.nome)).slice(0,max).map(c=>contactPayload(c))};
+ const lx=lexRank(pool,q),skip=lx.nameHit;let sem=null,aviso='';
+ if(!skip){try{sem=await semanticRank(q,apiKey,pool)}catch(e){aviso='Busca semântica indisponível ('+(e.status===429?'limite de cota do Gemini':'erro')+'); resultado só por texto e filtros.'}}
+ const sc=new Map(),K=60,add=(arr,get)=>arr.forEach((x,i)=>{const id=get(x).id;sc.set(id,(sc.get(id)||0)+1/(K+i+1))});
+ add(lx.list,x=>x.c);if(sem)add(sem,x=>x.c);
+ const byId=new Map(pool.map(c=>[c.id,c])),out=[...sc.entries()].sort((x,y)=>y[1]-x[1]).slice(0,max).map(([id])=>byId.get(id));
+ if(!out.length&&!sem&&!aviso)aviso='Nada encontrado por texto; índice semântico vazio, sem chave ou em pausa por cota.';
+ const est=[fl,'texto local',sem?'semântica (RRF)':skip?'semântica dispensada (nome encontrado)':''].filter(Boolean).join(' + ');
+ return{total_no_filtro:total,estrategia:est,...(aviso?{aviso}:{}),contatos:out.map(c=>contactPayload(c))}}
+
+const _dirty=new Set();let _dirtyT=0,_again=false;
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&_dirty.size){clearTimeout(_dirtyT);syncEmbeddings()}});
 
 let isSyncing = false;
-async function syncEmbeddings(forceAll = false) {
-  const key = localStorage.getItem(KEY_GEMINI);
-  if (!key || isSyncing) return;
-
-  const cards = Object.values(db.cards);
-  if (!cards.length) return;
-
-  if (forceAll) await clearAllVectors();
-
-  isSyncing = true;
-  const stored = await getAllVectors();
-  const map = new Map(stored.map(s => [s.id, s.hash]));
-  const missing = cards.filter(c => map.get(c.id) !== simpleHash(cardToText(c)));
-
-  if (missing.length > 0) {
-    const bar = $('#ai-sync-bar');
-    const cnt = $('#ai-sync-count');
-    bar.classList.add('on');
-    let done = 0;
-
-    for (const c of missing) {
-      cnt.textContent = `${done + 1} de ${missing.length}`;
-      try {
-        const text = cardToText(c);
-        const vector = await geminiCallEmbed(text, key);
-        await putVector(c.id, vector, simpleHash(text));
-        done++;
-        await new Promise(r => setTimeout(r, 220));
-      } catch (e) {
-        console.warn('Embed falhou:', c.nome, e);
-        if (e.message.includes('quota') || e.message.includes('429')) break;
+async function syncEmbeddings(forceAll=false){
+  const key=storage.getItem(KEY_GEMINI);
+  if(!key)return;
+  if(!forceAll&&Date.now()<_semCool)return;
+  if(isSyncing){_again=true;return}
+  const cards=Object.values(db.cards);
+  if(!cards.length)return;
+  isSyncing=true;clearTimeout(_dirtyT);
+  const bar=$('#ai-sync-bar'),cnt=$('#ai-sync-count');
+  try{
+    const have=new Map((await getAllVectors()).map(v=>[v.id,v])),tag=embedTag();
+    have.forEach((v,id)=>{if(!db.cards[id])deleteVector(id)});
+    const todo=cards.map(c=>({c,text:cardToText(c)})).filter(x=>{const v=have.get(x.c.id);return forceAll||!v||v.tag!==tag||v.hash!==simpleHash(x.text)});
+    _dirty.clear();
+    if(todo.length){
+      bar.classList.add('on');
+      for(let i=0;i<todo.length;i+=EMBED_BATCH){
+        const part=todo.slice(i,i+EMBED_BATCH);
+        cnt.textContent=`${Math.min(i+part.length,todo.length)} de ${todo.length}`;
+        const vecs=await embedChunk(part.map(x=>x.text),'d',key,getEmbedModel());
+        await putVectors(part.map((x,j)=>({id:x.c.id,vector:vecs[j],hash:simpleHash(x.text),tag})));
       }
     }
-    bar.classList.remove('on');
+  }catch(e){
+    console.warn('Indexação falhou:',e);
+    if(e.status===429){_semCool=Date.now()+10*60e3;toast('Limite do Gemini atingido; a indexação continua depois.')}
+  }finally{
+    bar.classList.remove('on');isSyncing=false;updateRagConfigStatus();
+    if(_again){_again=false;setTimeout(syncEmbeddings,1500)}
   }
-  isSyncing = false;
-  updateRagConfigStatus();
 }
 
-async function queueCardEmbedding(c) {
-  const key = localStorage.getItem(KEY_GEMINI);
-  if (!key || !c) return;
-  try {
-    const text = cardToText(c);
-    const vector = await geminiCallEmbed(text, key);
-    await putVector(c.id, vector, simpleHash(text));
-    updateRagConfigStatus();
-  } catch (e) { console.error('Erro ao gerar embedding:', e); }
+function queueCardEmbedding(c){
+  if(!c||!storage.getItem(KEY_GEMINI))return;
+  _dirty.add(c.id);clearTimeout(_dirtyT);_dirtyT=setTimeout(syncEmbeddings,EMBED_IDLE_MS);
 }
 
 
@@ -2857,10 +2927,10 @@ async function queueCardEmbedding(c) {
 
 const GEMINI_TOOLS = [
   { functionDeclarations: [
-    { name:"executar_no_banco", description:"Executa consultas ou operações no banco de dados 'db' da aplicação. REGRA OBRIGATÓRIA DE CONFIRMAÇÃO: Para QUALQUER ação que modifique, crie, edite, mova ou exclua dados no sistema (seja de 1 contato, etiquetas, etapas ou múltiplos contatos), você NUNCA deve executar a alteração no primeiro turno! Você DEVE primeiro responder ao usuário em linguagem natural explicando exatamente o que será feito e perguntando: 'Posso confirmar e realizar esta alteração?'. Defina 'confirmado_pelo_usuario: true' SOMENTE quando o usuário já tiver respondido confirmando explicitamente ('sim', 'confirmo', 'pode fazer', 'prosseguir' ou pelo botão). Para consultas de leitura (consultar dados, contar, buscar, calcular métricas sem alterar dados), execute diretamente com 'confirmado_pelo_usuario: false'.", parameters:{type:"OBJECT",properties:{codigo_js:{type:"STRING",description:"Código JavaScript a executar com acesso direto a db, all(), cur, st, S, SN, ML, save(), render(), toast(), normCard(). Retorne dados com return quando for consulta de leitura."},descricao:{type:"STRING",description:"Descrição clara e resumida da alteração que será feita."},confirmado_pelo_usuario:{type:"BOOLEAN",description:"Defina como true SOMENTE SE o usuário já tiver confirmado a realização desta alteração expressamente."}},required:["codigo_js","descricao"]} },
+    { name:"executar_no_banco", description:"Executa consultas ou operações no banco de dados 'db' da aplicação. REGRA DE CONFIRMAÇÃO: qualquer alteração de dados (criar, editar, mover, excluir) NÃO é aplicada pela chamada: o app mostra ao usuário um card com o botão 'Confirmar e Aplicar', e só o clique dele executa a mudança. Chame a ferramenta UMA vez, com 'descricao' clara do que será alterado, depois explique ao usuário e peça que toque no botão; não repita a chamada nem diga que foi feito antes disso. Consultas de leitura (consultar, contar, buscar, calcular) executam direto.", parameters:{type:"OBJECT",properties:{codigo_js:{type:"STRING",description:"Código JavaScript a executar com acesso direto a db, all(), cur, st, S, SN, ML, save(), render(), toast(), normCard(). Retorne dados com return quando for consulta de leitura."},descricao:{type:"STRING",description:"Descrição clara e resumida da alteração que será feita."}},required:["codigo_js","descricao"]} },
     { name:"gerar_relatorio_pdf", description:"Gera e disponibiliza no chat um card interativo para baixar um relatório em PDF profissional e personalizado a partir do banco de dados ('db'). Use esta ferramenta sempre que o usuário pedir qualquer relatório, listagem em PDF, resumo executivo ou documento para baixar. Como você tem acesso total ao banco, consulte, filtre e estruture exatamente as colunas, linhas e indicadores (KPIs) pertinentes.", parameters:{type:"OBJECT",properties:{titulo:{type:"STRING",description:"Título principal do relatório (ex.: 'Relatório de Previsão de Partos - Outubro/2026', 'Acompanhamento Financeiro - Deferidos')."},subtitulo:{type:"STRING",description:"Subtítulo explicativo com período ou filtros aplicados."},periodo:{type:"STRING",description:"Referência temporal (ex.: 'Outubro de 2026', 'Últimos 90 dias', 'Todos os contatos')."},kpis:{type:"ARRAY",description:"Indicadores e estatísticas resumidas calculadas por você a partir do banco.",items:{type:"OBJECT",properties:{rotulo:{type:"STRING",description:"Nome do indicador (ex.: 'Total de Contatos', 'Partos Confirmados')"},valor:{type:"STRING",description:"Valor formatado (ex.: '12', 'R$ 35.000', '80%')"},destaque:{type:"STRING",enum:["padrao","sucesso","alerta","perigo"]}},required:["rotulo","valor"]}},colunas:{type:"ARRAY",description:"Colunas da tabela do relatório adaptadas ao pedido do usuário.",items:{type:"OBJECT",properties:{chave:{type:"STRING",description:"Chave do campo na linha (ex.: 'nome', 'etapa', 'parto', 'obs')"},rotulo:{type:"STRING",description:"Cabeçalho visível da coluna (ex.: 'Contato', 'Etapa Atual', 'Data do Parto')"},alinhamento:{type:"STRING",enum:["left","center","right"]}},required:["chave","rotulo"]}},linhas:{type:"ARRAY",description:"Lista de objetos com os dados formatados de cada linha da tabela.",items:{type:"OBJECT"}},resumo_executivo:{type:"STRING",description:"Análise textual elaborada por você com destaques, conclusões ou orientações sobre os dados do relatório."},nome_arquivo:{type:"STRING",description:"Nome do arquivo .pdf para download (ex.: 'relatorio_partos_outubro_2026.pdf')."}},required:["titulo","colunas","linhas"]} },
     { name:"estado_sistema", description:"Lê o estado completo e atual do aplicativo: contatos, etapas, meses, etiquetas, filtros atuais, pendências do mês e status do backup.", parameters:{type:"OBJECT",properties:{}} },
-    { name:"buscar_contatos", description:"Busca contatos por significado, texto, nome, etapa, mês, etiquetas, datas, anotações ou histórico. Use esta ferramenta quando o usuário não fornecer um ID exato.", parameters:{type:"OBJECT",properties:{consulta:{type:"STRING",description:"Consulta em linguagem natural"},limite:{type:"INTEGER",description:"Quantidade máxima de resultados, de 1 a 20"}},required:["consulta"]} },
+    { name:"buscar_contatos", description:"Busca HÍBRIDA de contatos: combina FILTROS EXATOS (etapa, mes, etiqueta, datas, arquivado, pendentes) com uma consulta opcional por texto/significado (nome, assunto, anotações, histórico). Use filtros para perguntas estruturadas ('quem está em análise em outubro?', 'partos até 30/11') e 'consulta' para nomes e assuntos; pode usar os dois juntos. 'total_no_filtro' traz a contagem real mesmo quando 'limite' corta a lista. A busca semântica só é acionada quando necessário.", parameters:{type:"OBJECT",properties:{consulta:{type:"STRING",description:"Nome ou assunto em linguagem natural (opcional se usar filtros)"},limite:{type:"INTEGER",description:"Máximo de resultados, de 1 a 20"},etapa:{type:"STRING",description:"Código: triagem, docs, guia, entrada, inss, deferido, fim, indef"},mes:{type:"STRING",description:"'AAAA-MM' ou 'sem_data'"},etiqueta:{type:"STRING",description:"Nome exato da etiqueta"},arquivado:{type:"BOOLEAN"},pendentes:{type:"BOOLEAN"},parto_de:{type:"STRING",description:"AAAA-MM-DD"},parto_ate:{type:"STRING",description:"AAAA-MM-DD"},saque_de:{type:"STRING",description:"AAAA-MM-DD"},saque_ate:{type:"STRING",description:"AAAA-MM-DD"}}} },
     { name:"ler_contato", description:"Retorna todos os dados de um contato, incluindo etiquetas, anotações e histórico completo. Pode localizar por ID ou nome.", parameters:{type:"OBJECT",properties:{id:{type:"STRING"},nome:{type:"STRING"}}} },
     { name:"navegar_sistema", description:"Altera a visão da tela (mês selecionado ou filtro de etapa) para mostrar o que o usuário quer ver.", parameters:{type:"OBJECT",properties:{mes:{type:"STRING",description:"'AAAA-MM' para um mês específico ou '*' para todos os meses"},etapa:{type:"STRING",description:"'ativos', 'todos', 'arq', ou código da etapa: 'triagem', 'coleta', 'exigencia', 'analise', 'deferido', 'indeferido', 'pagamento'"},termo_busca:{type:"STRING",description:"Termo para preencher no campo de busca"}}} }
   ] }
@@ -2878,7 +2948,7 @@ const TOOL_LABEL = {
 
 async function executeLocalTool(name, args, apiKey) {
   if (name === 'executar_no_banco') {
-    return await executeDbScript(args.codigo_js, !!args.confirmado_pelo_usuario, args.descricao);
+    return await executeDbScript(args.codigo_js, false, args.descricao);
   }
   if (name === 'gerar_relatorio_pdf') {
     const rep = registrarRelatorio(args);
@@ -2909,16 +2979,7 @@ async function executeLocalTool(name, args, apiKey) {
     };
   }
   if (name === 'buscar_contatos') {
-    const q = String(args.consulta || '').trim();
-    if (!q) return { contatos: [] };
-    const max = Math.min(Math.max(1, Number(args.limite) || 10), 20);
-    const sem = await searchSimilarCards(q, apiKey, max);
-    if (sem && sem.length) {
-      return { contatos: sem.map(c => contactPayload(c)) };
-    }
-    const txt = norm(q);
-    const matches = all().filter(c => norm([c.nome, plain(c.obs), ...c.hist.map(h => h.t)].join(' ')).includes(txt)).slice(0, max);
-    return { contatos: matches.map(c => contactPayload(c)) };
+    return await searchContacts(args, apiKey);
   }
   if (name === 'ler_contato') {
     const c = resolveContact(args);
@@ -3531,11 +3592,19 @@ MODELO DE DADOS
 - Visão: filtros por mês, etapa, busca, etiquetas (modo "e" = todas, "o" = qualquer) e ordenação (etapa, nome, parto, atividade).
 - Também existem: backup JSON, exportação CSV da visão filtrada, importação de backup ou Trello JSON, configurações (modelos de chat/busca) e índice semântico local.
 
+ESTRATÉGIA DE CONSULTA (siga nesta ordem)
+1) Perguntas estruturadas (etapa, mês, etiqueta, datas, pendências, contagens): use buscar_contatos com FILTROS; confie em total_no_filtro para contar. Nunca use busca semântica para isso.
+2) Nome de pessoa: buscar_contatos com consulta=nome (a busca é local e instantânea).
+3) Assunto ou ideia vaga (ex.: "quem teve problema com documento"): buscar_contatos com consulta em linguagem natural; pode combinar com filtros.
+4) Visão geral: estado_sistema. Use executar_no_banco para leituras só quando precisar de cálculo que as outras não fazem.
+5) Se o retorno trouxer "aviso" (semântica indisponível), diga isso ao usuário e deixe claro que o resultado veio só de texto/filtros. Nunca afirme que algo não existe sem ter consultado.
+
 COMO TRABALHAR
 - Na dúvida sobre o estado atual, comece por estado_sistema. Sem ID, localize o contato com buscar_contatos ou ler_contato antes de alterar ou excluir; nunca invente IDs, etiquetas ou meses.
 - Pedidos com vários itens (ex.: "crie 5 contatos", "mova todos de outubro para novembro"): execute todos, um por um, e só então responda. Se faltar uma informação essencial, pergunte uma única vez; se for opcional, use um padrão sensato e diga qual usou.
 - Se o mês pedido não existir, crie-o com criar_mes antes de usá-lo.
 - Nunca diga que fez algo sem ter chamado a ferramenta correspondente e conferido que retornou sucesso. Se uma ferramenta retornar erro, explique o motivo e tente corrigir.
+- Alterações de dados feitas por executar_no_banco só valem depois que o usuário toca em 'Confirmar e Aplicar' no card do app; dizer "sim" no chat não basta. Chame a ferramenta uma única vez e oriente o toque no botão.
 - Ações destrutivas (excluir contato, histórico, mês, etiqueta; substituir dados) exibem confirmação na interface: não tente contornar. Se o usuário cancelar, informe que nada foi alterado.
 - Limites por segurança: você não vê nem altera a chave de API (o usuário gerencia nas Configurações).
 - Datas: AAAA-MM-DD. Meses: AAAA-MM. Etiquetas: use o nome exato retornado pelo sistema.
