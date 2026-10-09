@@ -2318,7 +2318,7 @@ function load(file) {
           };
           if (save()) {
             toast('Backup restaurado.');
-            syncEmbeddings(true);
+            syncEmbeddings();
           } else {
             db = prev;
             toast('Falha ao salvar substituição de backup. Operação revertida.', 'danger');
@@ -3728,7 +3728,7 @@ async function confirmPendingAiAction() {
         db = JSON.parse(JSON.stringify(snap.db));
         save();
         render();
-        syncEmbeddings(true);
+        syncEmbeddings();
         toast('Alteração desfeita com sucesso!', 'ok');
       }
     } : null);
@@ -3846,7 +3846,7 @@ async function restoreSnapshot(id) {
     db = JSON.parse(JSON.stringify(snap.db));
     if (save()) {
       render();
-      syncEmbeddings(true);
+      syncEmbeddings();
       toast('Banco de dados restaurado do snapshot com sucesso!', 'ok');
       return true;
     } else {
@@ -3992,6 +3992,41 @@ window.hashText = hashText;
 
 // ---- Embeddings em lote (gemini-embedding-2: batchEmbedContents, 1 vetor por texto) ----
 const _sl=ms=>new Promise(r=>setTimeout(r,ms));
+// ---- Orçamento de cota local (Gemini free: 100 RPM / 30k TPM / 1000 RPD; usamos margem). Cada texto do lote conta como 1 requisição. ----
+const EMBED_LIMITS={rpm:90,tpm:25000,rpd:900};
+const EMBED_BATCH_TOK=8000;
+const _estTok=t=>Math.ceil(String(t).length/3);
+const _ptDay=()=>new Date().toLocaleDateString('en-CA',{timeZone:'America/Los_Angeles'});
+function _msToPTMidnight(){
+  const p=new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',hour:'numeric',minute:'numeric',second:'numeric',hour12:false}).formatToParts(new Date());
+  const g=t=>(+p.find(x=>x.type===t).value)%24;
+  return Math.max(60000,((24-g('hour'))*3600-g('minute')*60-g('second'))*1000);
+}
+function _usageLoad(){
+  try{const u=JSON.parse(storage.getItem(KEY_EMBED_USAGE)||'null');
+    if(u&&u.day===_ptDay())return{day:u.day,rpd:u.rpd||0,log:Array.isArray(u.log)?u.log:[]}}catch(e){}
+  return{day:_ptDay(),rpd:0,log:[]};
+}
+function embedUsage(){const u=_usageLoad(),now=Date.now(),l=u.log.filter(x=>now-x[0]<60000);
+  return{rpm:l.reduce((a,x)=>a+x[1],0),tpm:l.reduce((a,x)=>a+x[2],0),rpd:u.rpd,limits:EMBED_LIMITS}}
+window.embedUsage=embedUsage;
+async function embedAcquire(units,tokens,{share=1,maxWait=Infinity}={}){
+  const lim={rpm:EMBED_LIMITS.rpm*share,tpm:EMBED_LIMITS.tpm*share},t0=Date.now();
+  for(;;){
+    const u=_usageLoad(),now=Date.now();
+    u.log=u.log.filter(x=>now-x[0]<60000);
+    if(u.rpd+units>EMBED_LIMITS.rpd){const e=new Error('Cota diária de embeddings atingida (margem de segurança)');e.status=429;e.daily=true;throw e}
+    const rpm=u.log.reduce((a,x)=>a+x[1],0),tpm=u.log.reduce((a,x)=>a+x[2],0);
+    if((rpm+units<=lim.rpm&&tpm+tokens<=lim.tpm)||!u.log.length){
+      u.log.push([now,units,tokens]);u.rpd+=units;
+      try{storage.setItem(KEY_EMBED_USAGE,JSON.stringify(u))}catch(e){}
+      return;
+    }
+    const wait=Math.max(500,60000-(now-u.log[0][0])+200);
+    if(Date.now()-t0+wait>maxWait){const e=new Error('Fila de embeddings cheia; tente de novo em instantes');e.status=429;e.local=true;throw e}
+    await _sl(wait);
+  }
+}
 const _norm=v=>{let n=0;for(let i=0;i<v.length;i++)n+=v[i]*v[i];n=Math.sqrt(n)||1;return Float32Array.from(v,x=>x/n)};
 const _dot=(a,b)=>{let s=0;for(let i=0;i<a.length;i++)s+=a[i]*b[i];return s};
 function embedReq(model,text,kind){
@@ -3999,7 +4034,8 @@ function embedReq(model,text,kind){
   if(!/embedding-2/.test(model))r.taskType=kind==='q'?'RETRIEVAL_QUERY':'RETRIEVAL_DOCUMENT';
   return r;
 }
-async function embedChunk(chunk,kind,apiKey,model,attempt=1){
+async function embedChunk(chunk,kind,apiKey,model,attempt=1,opts={}){
+  await embedAcquire(chunk.length,chunk.reduce((a,t)=>a+_estTok(t),0),{share:kind==='q'?1:0.7,maxWait:kind==='q'?4000:Infinity});
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(new Error("demorou demais")), 30000);
   try {
@@ -4011,9 +4047,21 @@ async function embedChunk(chunk,kind,apiKey,model,attempt=1){
     if(!res.ok){
       const err=await res.json().catch(()=>({}));
       const msg=err.error?.message||`Erro ${res.status} no modelo de embedding (${model})`;
-      if((res.status===429||res.status>=500)&&attempt<4){await _sl(1000*2**attempt+Math.random()*400);return embedChunk(chunk,kind,apiKey,model,attempt+1)}
-      if(res.status===400&&chunk.length>1&&!/api key/i.test(msg)){const h=chunk.length>>1;
-        return[...await embedChunk(chunk.slice(0,h),kind,apiKey,model),...await embedChunk(chunk.slice(h),kind,apiKey,model)]}
+      if(res.status===429){
+        // Não reenvia na hora: cada reenvio gasta mais cota. Quem chamou decide quando tentar de novo.
+        const raw=JSON.stringify(err),m=/"retryDelay"\s*:\s*"(\d+(?:\.\d+)?)s"/.exec(raw);
+        const e=new Error(msg);e.status=429;e.daily=/PerDay/i.test(raw);e.retryAfter=m?Math.ceil(+m[1])*1000+1000:65000;throw e;
+      }
+      if(res.status>=500&&attempt<3){await _sl(1500*2**attempt+Math.random()*400);return embedChunk(chunk,kind,apiKey,model,attempt+1,opts)}
+      if(res.status===400&&!/api key/i.test(msg)){
+        if(chunk.length>1){
+          const h=chunk.length>>1,o={bisect:true};
+          const out=[...await embedChunk(chunk.slice(0,h),kind,apiKey,model,1,o),...await embedChunk(chunk.slice(h),kind,apiKey,model,1,o)];
+          if(out.every(v=>!v)){const e=new Error(msg);e.status=400;throw e}
+          return out;
+        }
+        if(opts.bisect&&kind!=='q'){console.warn('Embedding ignorou 1 item (400):',msg);return[null]}
+      }
       const e=new Error(msg);e.status=res.status;throw e;
     }
     const embs=(await res.json()).embeddings||[];
@@ -4030,7 +4078,11 @@ async function putVectors(items){
 }
 // ===== BUSCA HÍBRIDA: filtros exatos -> texto (local) -> semântica só se necessário; fusão por RRF =====
 const STOP=new Set('a o as os um uma de da do das dos em no na nos nas por para com sem e ou que quem qual quais me meu minha mais ja ainda tem tenho esta estao foi ser sao ao aos se'.split(' '));
-const _qCache=new Map();let _semCool=0;
+const _qCache=new Map();
+const KEY_EMBED_COOL='gemini_embed_cool_v1',KEY_EMBED_USAGE='gemini_embed_usage_v1';
+let _semCool=Number(storage.getItem(KEY_EMBED_COOL))||0;
+function setSemCool(ts){_semCool=ts;try{storage.setItem(KEY_EMBED_COOL,String(ts))}catch(e){}}
+const _badHash=new Map();
 function lexRank(pool,q){
  const tk=[...new Set(norm(q).split(/[^a-z0-9]+/).filter(t=>t.length>1&&!STOP.has(t)))];
  if(!tk.length)return{list:[],nameHit:false};
@@ -4049,7 +4101,7 @@ async function semanticRank(q,apiKey,pool){
  if(!vecs.length)return null;
  const ck=tag+'|'+norm(q);let qv=_qCache.get(ck);
  if(!qv){const qt=/embedding-2/.test(model)?`task: search result | query: ${q}`:q;
-  try{[qv]=await embedChunk([qt],'q',apiKey,model,4)}catch(e){if(e.status===429)_semCool=Date.now()+10*60e3;throw e}
+  try{[qv]=await embedChunk([qt],'q',apiKey,model,4)}catch(e){if(e.status===429&&!e.local)setSemCool(Date.now()+(e.daily?_msToPTMidnight():Math.max(e.retryAfter||0,65e3)));throw e}
   _qCache.set(ck,qv);if(_qCache.size>60)_qCache.delete(_qCache.keys().next().value)}
  const ids=new Set(pool.map(c=>c.id));
  const sc=vecs.filter(v=>ids.has(v.id)).map(v=>({c:db.cards[v.id],s:_dot(qv,v.vector)})).sort((a,b)=>b.s-a.s);
@@ -4097,21 +4149,43 @@ async function syncEmbeddings(forceAll=false){
     }));
     const todo = itemsWithHash.filter(x => {
       const v = have.get(x.c.id);
+      if(_badHash.get(x.c.id)===x.hash)return false;
       return forceAll || !v || v.tag !== tag || v.hash !== x.hash;
     });
     _dirty.clear();
     if(todo.length){
       bar.classList.add('on');
-      for(let i=0;i<todo.length;i+=EMBED_BATCH){
-        const part=todo.slice(i,i+EMBED_BATCH);
-        cnt.textContent=`${Math.min(i+part.length,todo.length)} de ${todo.length}`;
-        const vecs=await embedChunk(part.map(x=>x.text),'d',key,getEmbedModel());
-        await putVectors(part.map((x,j)=>({id:x.c.id,vector:vecs[j],hash:x.hash,tag})));
+      let i=0,done=0,rl=0;
+      while(i<todo.length){
+        const part=[];let tk=0;
+        while(i+part.length<todo.length&&part.length<EMBED_BATCH){
+          const x=todo[i+part.length],t=_estTok(x.text);
+          if(part.length&&tk+t>EMBED_BATCH_TOK)break;
+          part.push(x);tk+=t;
+        }
+        cnt.textContent=`${done+part.length} de ${todo.length}`;
+        let vecs;
+        try{vecs=await embedChunk(part.map(x=>x.text),'d',key,getEmbedModel())}
+        catch(e){
+          if(e.status===429&&!e.daily&&rl<2){rl++;cnt.textContent=`aguardando cota (${Math.round((e.retryAfter||65000)/1000)}s)…`;await _sl(e.retryAfter||65000);continue}
+          throw e;
+        }
+        rl=0;
+        const okItems=[];
+        part.forEach((x,j)=>{if(vecs[j])okItems.push({id:x.c.id,vector:vecs[j],hash:x.hash,tag});else _badHash.set(x.c.id,x.hash)});
+        if(okItems.length)await putVectors(okItems);
+        i+=part.length;done+=part.length;
       }
     }
   }catch(e){
     console.warn('Indexação falhou:',e);
-    if(e.status===429){_semCool=Date.now()+10*60e3;toast('Limite do Gemini atingido; a indexação continua depois.')}
+    if(e.status===429){
+      const wait=e.daily?_msToPTMidnight():Math.max(e.retryAfter||0,65e3);
+      setSemCool(Date.now()+wait);
+      toast(e.daily?'Cota diária de embeddings esgotada; a indexação continua amanhã.':'Limite por minuto do Gemini atingido; a indexação continua em instantes.');
+      clearTimeout(window._embRetryT);
+      if(!e.daily)window._embRetryT=setTimeout(syncEmbeddings,wait+1000);
+    }
   }finally{
     bar.classList.remove('on');isSyncing=false;updateRagConfigStatus();
     if(_again){_again=false;setTimeout(syncEmbeddings,1500)}
@@ -5801,7 +5875,7 @@ async function delCard(c){
     label: 'Desfazer',
     onClick: () => {
       db = JSON.parse(JSON.stringify(snap.db));
-      save();render();syncEmbeddings(true);toast('Exclusão desfeita!', 'ok');
+      save();render();syncEmbeddings();toast('Exclusão desfeita!', 'ok');
     }
   } : null);
 }
@@ -5875,7 +5949,7 @@ async function delMes(k){
    label: 'Desfazer',
    onClick: () => {
      db = JSON.parse(JSON.stringify(snap.db));
-     save();render();syncEmbeddings(true);toast('Exclusão do mês desfeita!', 'ok');
+     save();render();syncEmbeddings();toast('Exclusão do mês desfeita!', 'ok');
    }
  } : null);
 }
@@ -5897,7 +5971,7 @@ async function bulkDeleteCards(){
    label: 'Desfazer',
    onClick: () => {
      db = JSON.parse(JSON.stringify(snap.db));
-     save();render();syncEmbeddings(true);toast('Exclusão em lote desfeita!', 'ok');
+     save();render();syncEmbeddings();toast('Exclusão em lote desfeita!', 'ok');
    }
  } : null);
 }
@@ -5913,7 +5987,7 @@ async function delLabels(a){
    label: 'Desfazer',
    onClick: () => {
      db = JSON.parse(JSON.stringify(snap.db));
-     save();render();syncEmbeddings(true);toast('Exclusão de etiquetas desfeita!', 'ok');
+     save();render();syncEmbeddings();toast('Exclusão de etiquetas desfeita!', 'ok');
    }
  } : null);
 }
@@ -6228,7 +6302,8 @@ $('#cfg-snapshots-list')?.addEventListener('click', e => {
 });
 
 $('#cfg-reindex-btn')?.addEventListener('click', async () => {
-  toast('Atualizando a busca por significado…');
+  const nCards=Object.keys(db.cards).length;
+  toast(`Reindexando ${nCards} contatos (conta ${nCards} requisições da cota diária)…`);
   await syncEmbeddings(true);
 });
 
