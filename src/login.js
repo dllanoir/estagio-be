@@ -48,14 +48,19 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('form-login')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearAlert();
-    const email = document.getElementById('login-email').value.trim();
+    let email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     const remember = document.getElementById('login-remember').checked;
     const btn = document.getElementById('btn-login');
 
     if (!email || !password) {
-      showAlert('Preencha seu e-mail e sua senha.');
+      showAlert('Preencha seu usuário/e-mail e sua senha.');
       return;
+    }
+
+    // Se o usuário digitou apenas um nome de usuário (ex: admin), anexa o domínio interno padrão
+    if (!email.includes('@')) {
+      email = `${email.toLowerCase()}@cantinho.local`;
     }
 
     btn.disabled = true;

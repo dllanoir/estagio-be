@@ -12,12 +12,14 @@ export function updateUserSessionUI(user) {
   if (!user) return;
   const emailEl = document.getElementById('user-email-text');
   const avatarEl = document.getElementById('user-avatar');
+  const rawEmail = user.email || 'Usuário';
+  const displayName = rawEmail.replace(/@cantinho\.local$/i, '');
   if (emailEl) {
-    emailEl.textContent = user.email || 'Usuário';
-    emailEl.title = user.email || '';
+    emailEl.textContent = displayName;
+    emailEl.title = rawEmail;
   }
-  if (avatarEl && user.email) {
-    avatarEl.textContent = user.email.charAt(0).toUpperCase();
+  if (avatarEl && displayName) {
+    avatarEl.textContent = displayName.charAt(0).toUpperCase();
   }
 }
 
