@@ -6,7 +6,7 @@ import { normCard } from './domain/card.js';
 import { safeLabelColor, colorOpts } from './domain/label.js';
 import { storage, logError, checkVolatileStorage, isStoragePersisted, initStoragePersistence } from './services/storage.service.js';
 import { openVecDB, saveDbToIdb, loadDbFromIdb, IDB_NAME, IDB_STORE, IDB_STORE_SNAPSHOTS, IDB_STORE_CHAT, IDB_STORE_APP_DATA } from './services/indexeddb.service.js';
-import { sb, getAuthToken, getAuthHeaders } from './services/supabase.service.js';
+import { sb, getAuthToken, getAuthHeaders, invokeEdgeFunction } from './services/supabase.service.js';
 import { checkAuthSession, doLogout, updateUserSessionUI, setupAuthListener } from './services/auth.service.js';
 import { SYNC_ENGINE, loadSyncQueue, saveSyncQueue, enqueueMutation, updateSyncBadge, syncHybrid } from './services/sync.service.js';
 import { syncEmbeddings, queueCardEmbedding, deleteVector, updateRagConfigStatus } from './services/rag.service.js';
@@ -23,7 +23,7 @@ import { renderContactList, renderContext, bulkDeleteCards, hit, matchScore, SOR
 import { drawer, saveDrawerCard, saveNewCard, newCard, delCard, editHist, delHist, addl, addh, hasDrawerUnsavedChanges, requestCloseDrawer, updateDrawerAdvCard, renderDrawerLabels, renderDrawerHistory, readCardForm, log, mopts } from './ui/components/contact-drawer.js';
 import { openNewMonthModal, initMonthModal, delMes } from './ui/components/month-modal.js';
 import { openLabelsModal, renderLabelsModal, delLabels, editLabelName } from './ui/components/labels-modal.js';
-import { openSettingsModal, updatePersistenceUI, exportBackup, exportCsv, load, createSnapshot, getSnapshots, restoreSnapshot, downloadSnapshot, renderSnapshotsList } from './ui/components/settings-modal.js';
+import { openSettingsModal, updatePersistenceUI, updateServerKeyStatus, exportBackup, exportCsv, load, createSnapshot, getSnapshots, restoreSnapshot, downloadSnapshot, renderSnapshotsList } from './ui/components/settings-modal.js';
 import { loadStoredReports, saveReportsStorage, baixarRelatorioPdf, visualizarRelatorioPdf } from './ui/components/reports-modal.js';
 import { initAiChat, toggleAiChat, resetChat, stopAiChat, chatWithGemini, appendAiMessage, confirmPendingAiAction, cancelPendingAiAction, saveChatStorage } from './ui/components/ai-chat.js';
 
@@ -481,16 +481,34 @@ $('#cfg-save-btn')?.addEventListener('click', async () => {
   const pDays = parseInt($('#cfg-parto-days')?.value, 10);
   const inDays = parseInt($('#cfg-inactive-days')?.value, 10);
 
-  if (key && chatModel) {
-    const valid = await validateGeminiModel(chatModel, key);
-    if (!valid) {
-      toast(`O modelo "${chatModel}" não foi encontrado na API Gemini. Verifique o nome.`, 'danger');
-      return;
+  if (key) {
+    const saveBtn = $('#cfg-save-btn');
+    if (saveBtn) {
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Blindando chave no servidor...';
     }
+    try {
+      await invokeEdgeFunction('gemini', { action: 'setKey', key });
+      storage.removeItem(STORAGE_KEYS.GEMINI_API_KEY);
+      storage.setItem(STORAGE_KEYS.GEMINI_VAULT_ACTIVE, '1');
+      if ($('#cfg-key')) $('#cfg-key').value = '';
+      await updateServerKeyStatus();
+    } catch (err) {
+      toast(`Erro ao blindar chave no servidor: ${err.message}`, 'danger');
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Salvar';
+      }
+      return;
+    } finally {
+      if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Salvar';
+      }
+    }
+  } else {
+    storage.removeItem(STORAGE_KEYS.GEMINI_API_KEY);
   }
-
-  if (key) storage.setItem(STORAGE_KEYS.GEMINI_API_KEY, key);
-  else storage.removeItem(STORAGE_KEYS.GEMINI_API_KEY);
 
   if (chatModel) storage.setItem(STORAGE_KEYS.CHAT_MODEL, chatModel);
   if (embedModel) storage.setItem(STORAGE_KEYS.EMBED_MODEL, embedModel);
@@ -634,6 +652,7 @@ checkAuthSession().then(async session => {
   await syncHybrid(false);
   render();
   updatePersistenceUI();
+  await updateServerKeyStatus();
   syncEmbeddings();
   updateRagConfigStatus();
   checkInitialAlerts();

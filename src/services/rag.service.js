@@ -1,6 +1,6 @@
 import { storage, logError } from './storage.service.js';
 import { openVecDB, IDB_STORE } from './indexeddb.service.js';
-import { sb } from './supabase.service.js';
+import { sb, invokeEdgeFunction } from './supabase.service.js';
 import { db, all } from '../ui/state.js';
 import { STORAGE_KEYS, STAGE_MAP } from '../config/constants.js';
 import { getEmbedModel } from '../config/gemini.js';
@@ -157,41 +157,35 @@ async function embedChunk(chunk, kind, apiKey, model, attempt = 1, opts = {}) {
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(new Error("demorou demais")), 30000);
   try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:batchEmbedContents`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-      body: JSON.stringify({ requests: chunk.map(t => embedReq(model, t, kind)) }),
-      signal: ctrl.signal
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      const msg = err.error?.message || `Erro ${res.status} no modelo de embedding (${model})`;
-      if (res.status === 429) {
-        const raw = JSON.stringify(err), m = /"retryDelay"\s*:\s*"(\d+(?:\.\d+)?)s"/.exec(raw);
-        const e = new Error(msg);
-        e.status = 429;
-        e.daily = /PerDay/i.test(raw);
-        e.retryAfter = m ? Math.ceil(+m[1]) * 1000 + 1000 : 65000;
-        throw e;
-      }
-      if (res.status >= 500 && attempt < 3) {
-        await _sl(1500 * 2 ** attempt + Math.random() * 400);
-        return embedChunk(chunk, kind, apiKey, model, attempt + 1, opts);
-      }
-      if (res.status === 400 && !/api key/i.test(msg)) {
-        if (chunk.length > 1) {
-          const h = chunk.length >> 1, o = { bisect: true };
-          const out = [...await embedChunk(chunk.slice(0, h), kind, apiKey, model, 1, o), ...await embedChunk(chunk.slice(h), kind, apiKey, model, 1, o)];
-          if (out.every(v => !v)) { const e = new Error(msg); e.status = 400; throw e; }
-          return out;
+    let resData;
+    try {
+      resData = await invokeEdgeFunction('gemini', {
+        action: 'batchEmbedContents',
+        model,
+        requests: chunk.map(t => embedReq(model, t, kind))
+      }, { signal: ctrl.signal });
+    } catch (edgeErr) {
+      if (apiKey && (edgeErr.status === 404 || edgeErr.status === 502 || edgeErr.message?.includes('Failed to fetch'))) {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:batchEmbedContents`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+          body: JSON.stringify({ requests: chunk.map(t => embedReq(model, t, kind)) }),
+          signal: ctrl.signal
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          const msg = err.error?.message || `Erro ${res.status} no modelo de embedding (${model})`;
+          const e = new Error(msg);
+          e.status = res.status;
+          throw e;
         }
-        if (opts.bisect && kind !== 'q') { console.warn('Embedding ignorou 1 item (400):', msg); return [null]; }
+        resData = await res.json();
+      } else {
+        throw edgeErr;
       }
-      const e = new Error(msg);
-      e.status = res.status;
-      throw e;
     }
-    const embs = (await res.json()).embeddings || [];
+
+    const embs = resData?.embeddings || [];
     if (embs.length !== chunk.length) throw new Error(`Embedding devolveu ${embs.length} vetores para ${chunk.length} textos`);
     return embs.map(e => _norm(e.values));
   } finally {
@@ -253,7 +247,7 @@ export function lexRank(pool, q) {
 }
 
 export async function semanticRank(q, apiKey, pool) {
-  if (!apiKey || Date.now() < _semCool) return null;
+  if (Date.now() < _semCool) return null;
   const model = getEmbedModel(), tag = embedTag();
   const ck = tag + '|' + norm(q);
   let qv = _qCache.get(ck);
@@ -349,7 +343,8 @@ let isSyncing = false;
 
 export async function syncEmbeddings(forceAll = false) {
   const key = storage.getItem(KEY_GEMINI);
-  if (!key) return;
+  const vaultActive = storage.getItem(STORAGE_KEYS.GEMINI_VAULT_ACTIVE) === '1';
+  if (!key && !vaultActive) return;
   if (!forceAll && Date.now() < _semCool) return;
   if (isSyncing) { _again = true; return; }
   const cards = Object.values(db.cards);
@@ -423,15 +418,17 @@ export async function syncEmbeddings(forceAll = false) {
 }
 
 export function queueCardEmbedding(c) {
-  if (!c || !storage.getItem(KEY_GEMINI)) return;
+  if (!c) return;
+  const hasKey = storage.getItem(KEY_GEMINI) || storage.getItem(STORAGE_KEYS.GEMINI_VAULT_ACTIVE) === '1';
+  if (!hasKey) return;
   _dirty.add(c.id);
   clearTimeout(_dirtyT);
   _dirtyT = setTimeout(syncEmbeddings, EMBED_IDLE_MS);
 }
 
 export async function getRagStatusInfo() {
-  const key = storage.getItem(KEY_GEMINI);
-  if (!key) return { status: 'desligada', label: 'desligada' };
+  const hasKey = storage.getItem(KEY_GEMINI) || storage.getItem(STORAGE_KEYS.GEMINI_VAULT_ACTIVE) === '1';
+  if (!hasKey) return { status: 'desligada', label: 'desligada' };
   if (_semCool && Date.now() < _semCool) {
     const d = new Date(_semCool);
     const hh = String(d.getHours()).padStart(2, '0');

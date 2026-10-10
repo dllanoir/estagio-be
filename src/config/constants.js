@@ -54,5 +54,6 @@ export const STORAGE_KEYS = {
   REPORTS: 'sm_ai_reports_v1',
   OFFLINE_QUEUE: 'sm_offline_sync_queue_v1',
   EMBED_COOL: 'gemini_embed_cool_v1',
-  EMBED_USAGE: 'gemini_embed_usage_v1'
+  EMBED_USAGE: 'gemini_embed_usage_v1',
+  GEMINI_VAULT_ACTIVE: 'gemini_vault_active_v1'
 };

@@ -6,7 +6,7 @@ import { safeLabelColor } from '../../domain/label.js';
 import { normCard } from '../../domain/card.js';
 import { storage, logError, isStoragePersisted } from '../../services/storage.service.js';
 import { openVecDB, IDB_STORE_SNAPSHOTS } from '../../services/indexeddb.service.js';
-import { sb } from '../../services/supabase.service.js';
+import { sb, invokeEdgeFunction } from '../../services/supabase.service.js';
 import { SYNC_ENGINE, syncHybrid, getPendingQueueSummary } from '../../services/sync.service.js';
 import { ask } from './confirm-modal.js';
 import { toast } from '../toast.js';
@@ -335,14 +335,46 @@ export async function updatePersistenceUI() {
   }
 }
 
+export async function updateServerKeyStatus() {
+  const statusEl = document.getElementById('cfg-key-server-status');
+  const keyInput = document.getElementById('cfg-key');
+  try {
+    const res = await invokeEdgeFunction('gemini', { action: 'checkStatus' });
+    if (res?.hasKey) {
+      storage.setItem(STORAGE_KEYS.GEMINI_VAULT_ACTIVE, '1');
+      if (statusEl) {
+        statusEl.innerHTML = '<span style="color:var(--good,#16a34a);font-weight:700">🟢 Chave Blindada & Ativa no Servidor (Supabase Vault)</span>';
+      }
+      if (keyInput && !keyInput.value) {
+        keyInput.placeholder = 'Chave ativa no servidor (digite apenas para alterar)';
+      }
+    } else {
+      if (!storage.getItem(STORAGE_KEYS.GEMINI_API_KEY)) {
+        storage.removeItem(STORAGE_KEYS.GEMINI_VAULT_ACTIVE);
+      }
+      if (statusEl) {
+        statusEl.innerHTML = '<span style="color:var(--warn,#d97706);font-weight:700">🟡 Nenhuma chave configurada. Digite abaixo para blindar no servidor.</span>';
+      }
+    }
+  } catch (err) {
+    if (statusEl) {
+      statusEl.innerHTML = '<span style="color:var(--mut);font-size:12px">⚪ Status seguro do servidor offline</span>';
+    }
+  }
+}
+
 export function openSettingsModal({ onUpdateRag, onSyncEmbeddings, onRender } = {}) {
   const dlg = document.getElementById('cfg-dlg');
-  if ($('#cfg-key')) $('#cfg-key').value = storage.getItem(STORAGE_KEYS.GEMINI_API_KEY) || '';
+  if ($('#cfg-key')) {
+    $('#cfg-key').value = '';
+    $('#cfg-key').placeholder = 'Verificando chave no servidor...';
+  }
   if ($('#cfg-backup-days')) $('#cfg-backup-days').value = getBackupReminderDays();
   if ($('#cfg-parto-days')) $('#cfg-parto-days').value = getPartoAlertDays();
   if ($('#cfg-inactive-days')) $('#cfg-inactive-days').value = getInactiveDaysThreshold();
   if (typeof onUpdateRag === 'function') onUpdateRag();
   updatePersistenceUI();
+  updateServerKeyStatus();
   renderSnapshotsList({ onRender, onSyncEmbeddings });
   if (dlg && !dlg.open) {
     dlg.showModal();

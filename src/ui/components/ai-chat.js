@@ -1,6 +1,6 @@
 import { storage, logError } from '../../services/storage.service.js';
 import { openVecDB, IDB_STORE_CHAT } from '../../services/indexeddb.service.js';
-import { sb } from '../../services/supabase.service.js';
+import { sb, invokeEdgeFunction } from '../../services/supabase.service.js';
 import { st, db, setDb, save, all } from '../state.js';
 import { STORAGE_KEYS, STAGES, COLORS } from '../../config/constants.js';
 import { GEMINI_MODELS, getChatModel, populateAiModelSelect } from '../../config/gemini.js';
@@ -323,28 +323,45 @@ export async function fetchGeminiWithRetry({ apiKey, primaryModel, contents, too
       const callTimer = setTimeout(() => callController.abort(new Error('demorou demais')), 30000);
 
       try {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent`;
-        const body = { contents, systemInstruction };
-        if (tools && tools.length) body.tools = tools;
+        let data;
+        try {
+          data = await invokeEdgeFunction('gemini', {
+            action: 'generateContent',
+            model: currentModel,
+            contents,
+            systemInstruction,
+            tools: (tools && tools.length) ? tools : undefined
+          }, { signal: callController.signal });
+        } catch (edgeErr) {
+          if (apiKey && (edgeErr.status === 404 || edgeErr.status === 502 || edgeErr.message?.includes('Failed to fetch'))) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${currentModel}:generateContent`;
+            const body = { contents, systemInstruction };
+            if (tools && tools.length) body.tools = tools;
 
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-          body: JSON.stringify(body),
-          signal: callController.signal
-        });
+            const res = await fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+              body: JSON.stringify(body),
+              signal: callController.signal
+            });
 
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
-          const msg = errData.error?.message || `Erro ${res.status} no modelo ${currentModel}`;
-          const err = new Error(msg);
-          err.status = res.status;
-          err.model = currentModel;
-          err.isRetryable = isRetryableGeminiError(res.status, msg);
-          throw err;
+            if (!res.ok) {
+              const errData = await res.json().catch(() => ({}));
+              const msg = errData.error?.message || `Erro ${res.status} no modelo ${currentModel}`;
+              const err = new Error(msg);
+              err.status = res.status;
+              err.model = currentModel;
+              err.isRetryable = isRetryableGeminiError(res.status, msg);
+              throw err;
+            }
+            data = await res.json();
+          } else {
+            edgeErr.model = currentModel;
+            edgeErr.isRetryable = isRetryableGeminiError(edgeErr.status, edgeErr.message);
+            throw edgeErr;
+          }
         }
 
-        const data = await res.json();
         return { data, modelUsed: currentModel, isFallback: !isPrimary };
       } catch (err) {
         lastError = err;
@@ -377,8 +394,7 @@ export async function fetchGeminiWithRetry({ apiKey, primaryModel, contents, too
 }
 
 export async function chatWithGemini(userPrompt, { onRender } = {}) {
-  const apiKey = storage.getItem(KEY_GEMINI);
-  if (!apiKey) throw new Error("Chave de API não configurada. Abra Configurações e informe a chave.");
+  const apiKey = storage.getItem(KEY_GEMINI) || '';
   const primaryModel = getChatModel();
   const turn = [{ role: "user", parts: [{ text: userPrompt }] }];
   const hoje = new Date();

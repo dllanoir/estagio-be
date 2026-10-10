@@ -20,6 +20,34 @@ export function getAuthHeaders() {
   };
 }
 
+export async function invokeEdgeFunction(functionName, body = {}, options = {}) {
+  const token = getAuthToken() || SUPABASE_CONFIG.anonKey;
+  const url = `${SUPABASE_CONFIG.url}/functions/v1/${functionName}`;
+  const signal = options.signal;
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: SUPABASE_CONFIG.anonKey,
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(body),
+    signal
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const rawError = data.error || data.message;
+    const msg = (typeof rawError === 'object' ? rawError?.message : rawError) || `Erro ${res.status} na Edge Function (${functionName})`;
+    const err = new Error(msg);
+    err.status = res.status;
+    err.data = data;
+    throw err;
+  }
+  return data;
+}
+
 export const sb = (typeof window !== 'undefined' && (window.supabase?.createClient || createClient))
   ? (createClient || window.supabase.createClient)(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {
       auth: {
@@ -111,7 +139,32 @@ export const sb = (typeof window !== 'undefined' && (window.supabase?.createClie
           const d = await r.json();
           return { data: r.ok ? d : null, error: r.ok ? null : d };
         } catch (e) { return { data: null, error: e }; }
+      },
+      functions: {
+        invoke: async (fn, opts = {}) => {
+          try {
+            const data = await invokeEdgeFunction(fn, opts.body, opts);
+            return { data, error: null };
+          } catch (error) {
+            return { data: null, error };
+          }
+        }
       }
     };
+
+if (sb && typeof sb === 'object') {
+  if (!sb.functions) {
+    sb.functions = {
+      invoke: async (fn, opts = {}) => {
+        try {
+          const data = await invokeEdgeFunction(fn, opts.body, opts);
+          return { data, error: null };
+        } catch (error) {
+          return { data: null, error };
+        }
+      }
+    };
+  }
+}
 
 if (typeof window !== 'undefined') window.sb = sb;
