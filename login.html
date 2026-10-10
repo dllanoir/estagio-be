@@ -4,7 +4,37 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Entrar - Meu cantinho Gestão & INSS</title>
-  <link rel="stylesheet" href="/src/styles/login.css">
+  
+  <script>
+    try {
+      const raw = localStorage.getItem('cantinho_sb_auth_v1');
+      if (raw) {
+        const sess = JSON.parse(raw);
+        const token = sess?.access_token || sess?.currentSession?.access_token;
+        if (token) {
+          const exp = sess?.expires_at || sess?.currentSession?.expires_at;
+          if (!exp || exp > (Date.now() / 1000) - 30 || sess?.refresh_token || sess?.currentSession?.refresh_token) {
+            window.location.replace('./app.html');
+          }
+        }
+      }
+    } catch(e) {}
+  </script>
+
+  <link rel="stylesheet" href="./src/styles/login.css">
+
+  <script type="importmap">
+  {
+    "imports": {
+      "@supabase/supabase-js": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm"
+    }
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 102 104' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M 19 58 C 18.5 73, 26.5 86, 45 92.5' stroke='%23cbd5e1' stroke-width='2.5'/%3E%3Cpath d='M 31 25.5 L 50.5 4.5 L 70 25.5' stroke='%23e1326d' stroke-width='5.5' stroke-linejoin='round'/%3E%3Cpath d='M 8.5 16 C 12 28, 14 50, 15.2 67 C 16.5 83, 29 97.5, 50.5 98' stroke='%23e1326d' stroke-width='5.5'/%3E%3Cpath d='M 8.5 16 C 22 25, 40 42, 47.5 58 C 50.2 64, 50.5 76, 50.5 98' stroke='%23e1326d' stroke-width='5.5'/%3E%3Cpath d='M 92.5 16 C 89 28, 87 50, 85.8 67 C 84.5 83, 72 97.5, 50.5 98' stroke='%23e1326d' stroke-width='5.5'/%3E%3Cpath d='M 92.5 16 C 79 25, 61 42, 53.5 58 C 51.5 62, 50.5 64.5, 50.5 65' stroke='%23e1326d' stroke-width='5.5'/%3E%3C/svg%3E">
 </head>
 <body>
   <div class="auth-container">
@@ -57,6 +87,6 @@
     </div>
   </div>
 
-  <script type="module" src="/src/login.js"></script>
+  <script type="module" src="./src/login.js"></script>
 </body>
 </html>

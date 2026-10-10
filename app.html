@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Meu cantinho - Gestão de Atendimentos</title>
   <meta name="robots" content="noindex,nofollow">
+  
+  <!-- CSS DE PROTEÇÃO DE AUTENTICAÇÃO (Oculta tela enquanto valida sessão) -->
   <style id="auth-guard-css">
     body {
       visibility: hidden !important;
@@ -12,7 +14,22 @@
       pointer-events: none !important;
     }
   </style>
-  <script type="module" src="/src/auth-guard.js"></script>
+
+  <!-- ESTILOS DO SISTEMA -->
+  <link rel="stylesheet" href="./src/styles/app.css">
+
+  <!-- IMPORT MAP PARA NAVEGADORES NATIVOS (Execução direta sem bundler) -->
+  <script type="importmap">
+  {
+    "imports": {
+      "@supabase/supabase-js": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.1/+esm"
+    }
+  }
+  </script>
+
+  <!-- GUARDA DE AUTENTICAÇÃO -->
+  <script type="module" src="./src/auth-guard.js"></script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
@@ -260,7 +277,7 @@
           </div>
           <div class="cfg-stat-card">
             <small>Contatos Gerenciados</small>
-            <strong id="cfg-sb-cards-txt">508 contatos</strong>
+            <strong id="cfg-sb-cards-txt">Carregando contatos...</strong>
           </div>
           <div class="cfg-stat-card">
             <small>Fila Offline</small>
@@ -346,7 +363,7 @@
               <span style="font-size:11.5px;color:var(--mut)">Restaura um backup anterior ou importa quadro completo do Trello com opção de mesclagem.</span>
             </div>
             <button type="button" class="btn" data-a="imp" style="flex:none">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
               Importar Arquivo
             </button>
           </div>
@@ -588,6 +605,7 @@
 <!-- TOAST FLUTUANTE -->
 <div id="tt" role="status" aria-live="polite"></div>
 
-  <script type="module" src="/src/main.js"></script>
+  <!-- ORQUESTRADOR PRINCIPAL MODULAR DA APLICAÇÃO -->
+  <script type="module" src="./src/app.js"></script>
 </body>
 </html>

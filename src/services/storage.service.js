@@ -58,6 +58,22 @@ export const storage = (() => {
   };
 })();
 
+export let isStoragePersisted = false;
+
+export async function initStoragePersistence(onUpdateUI) {
+  try {
+    if (navigator.storage && navigator.storage.persisted) {
+      isStoragePersisted = await navigator.storage.persisted();
+      if (!isStoragePersisted && navigator.storage.persist) {
+        isStoragePersisted = await navigator.storage.persist();
+      }
+    }
+  } catch (e) {
+    isStoragePersisted = false;
+  }
+  if (typeof onUpdateUI === 'function') onUpdateUI();
+}
+
 export function checkVolatileStorage() {
   let banner = document.getElementById('volatile-storage-banner');
   if (storage.isVolatile) {
@@ -76,3 +92,4 @@ export function checkVolatileStorage() {
     banner.remove();
   }
 }
+

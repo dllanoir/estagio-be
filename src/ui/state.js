@@ -42,6 +42,8 @@ export let db = {
 
 export let curCards = [];
 
+export const all = () => Object.values(db.cards || {});
+
 export function setCurCards(list) {
   curCards = list;
 }

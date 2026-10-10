@@ -27,8 +27,8 @@ export async function checkAuthSession() {
       const { data: { session }, error } = await sb.auth.getSession();
       if (error || !session) {
         console.warn('Sessão inexistente ou expirada. Redirecionando...');
-        const curPage = encodeURIComponent(window.location.pathname.split('/').pop() || 'index.html');
-        window.location.replace('login.html?redirect=' + curPage);
+        const curPage = encodeURIComponent(window.location.pathname.split('/').pop() || 'app.html');
+        window.location.replace('./index.html?redirect=' + curPage);
         return null;
       }
       CURRENT_USER = session.user;
@@ -43,8 +43,8 @@ export async function checkAuthSession() {
     } else {
       const token = getAuthToken();
       if (!token) {
-        const curPage = encodeURIComponent(window.location.pathname.split('/').pop() || 'index.html');
-        window.location.replace('login.html?redirect=' + curPage);
+        const curPage = encodeURIComponent(window.location.pathname.split('/').pop() || 'app.html');
+        window.location.replace('./index.html?redirect=' + curPage);
         return null;
       }
       const guard = document.getElementById('auth-guard-css');
@@ -56,8 +56,8 @@ export async function checkAuthSession() {
     }
   } catch (err) {
     console.error('Erro na validação de sessão:', err);
-    const curPage = encodeURIComponent(window.location.pathname.split('/').pop() || 'index.html');
-    window.location.replace('login.html?redirect=' + curPage);
+    const curPage = encodeURIComponent(window.location.pathname.split('/').pop() || 'app.html');
+    window.location.replace('./index.html?redirect=' + curPage);
     return null;
   }
 }
@@ -73,8 +73,8 @@ export async function doLogout() {
   } finally {
     localStorage.removeItem(SUPABASE_CONFIG.authStorageKey);
     localStorage.removeItem(STORAGE_KEYS.DB);
-    const curPage = encodeURIComponent(window.location.pathname.split('/').pop() || 'index.html');
-    window.location.replace('login.html?redirect=' + curPage);
+    const curPage = encodeURIComponent(window.location.pathname.split('/').pop() || 'app.html');
+    window.location.replace('./index.html?redirect=' + curPage);
   }
 }
 
@@ -84,7 +84,7 @@ export function setupAuthListener() {
       if (event === 'SIGNED_OUT' || (!session && event !== 'INITIAL_SESSION')) {
         localStorage.removeItem(SUPABASE_CONFIG.authStorageKey);
         localStorage.removeItem(STORAGE_KEYS.DB);
-        window.location.replace('login.html');
+        window.location.replace('./index.html');
       } else if (session?.user) {
         CURRENT_USER = session.user;
         updateUserSessionUI(session.user);

@@ -21,3 +21,8 @@ export const mkey = t => {
   const m = normText.match(/(janeiro|fevereiro|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro).*?(\d{4})/);
   return m ? m[2] + '-' + String(MONTH_NAMES.indexOf(m[1]) + 1).padStart(2, '0') : '';
 };
+
+export const fs = s => s ? s.split('-').reverse().map((x, i) => i === 2 ? x.slice(2) : x).join('/') : '';
+
+export const fd = (iso, o) => iso ? new Date(iso).toLocaleString('pt-BR', o ? { day: '2-digit', month: '2-digit', year: '2-digit' } : { day: '2-digit', month: '2-digit', year: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'Importado do Trello';
+

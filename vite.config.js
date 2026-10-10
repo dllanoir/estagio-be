@@ -9,7 +9,8 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.supabase.html'),
+        main: resolve(__dirname, 'index.html'),
+        app: resolve(__dirname, 'app.html'),
         login: resolve(__dirname, 'login.html')
       }
     }
