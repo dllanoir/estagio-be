@@ -7,7 +7,7 @@
   
   <script>
     try {
-      const raw = localStorage.getItem('cantinho_sb_auth_v1');
+      const raw = localStorage.getItem('sb-nujdhpwumuagkhsnhnzn-auth-token') || localStorage.getItem('cantinho_sb_auth_v1');
       if (raw) {
         const sess = JSON.parse(raw);
         const token = sess?.access_token || sess?.currentSession?.access_token;
