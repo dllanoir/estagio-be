@@ -1,6 +1,7 @@
 import { sb, getAuthToken } from './supabase.service.js';
 import { STORAGE_KEYS } from '../config/constants.js';
 import { SUPABASE_CONFIG } from '../config/supabase.js';
+import { ask } from '../ui/components/confirm-modal.js';
 
 let CURRENT_USER = null;
 
@@ -65,7 +66,13 @@ export async function checkAuthSession() {
 }
 
 export async function doLogout() {
-  if (!confirm('Deseja realmente sair da sua conta e encerrar a sessão?')) return;
+  const confirmed = await ask('Deseja realmente sair da sua conta e encerrar a sessão neste dispositivo?', {
+    title: 'Encerrar Sessão',
+    ok: 'Sair da Conta',
+    cancel: 'Permanecer conectado',
+    danger: true
+  });
+  if (!confirmed) return;
   try {
     if (sb && sb.auth && typeof sb.auth.signOut === 'function') {
       await sb.auth.signOut();
