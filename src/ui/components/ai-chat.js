@@ -472,16 +472,29 @@ Regra de segurança: Qualquer alteração de dados (criar, editar, mover, arquiv
   }
 }
 
+let _aiChatInitialized = false;
+
+export function toggleAiChat(forceOpen) {
+  const win = $('#ai-window');
+  if (!win) return;
+  const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : win.hidden;
+  win.hidden = !shouldOpen;
+  if (shouldOpen) {
+    setTimeout(() => $('#ai-prompt')?.focus(), 50);
+  }
+}
+
 export function initAiChat({ onRender } = {}) {
+  if (_aiChatInitialized) return;
+  _aiChatInitialized = true;
+
   populateAiModelSelect();
   restoreChat();
 
-  $('#ai-fab')?.addEventListener('click', () => {
-    const win = $('#ai-window');
-    if (win) {
-      win.hidden = !win.hidden;
-      if (!win.hidden) $('#ai-prompt')?.focus();
-    }
+  $('#ai-fab')?.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleAiChat();
   });
 
   $('#ai-model-select')?.addEventListener('change', e => {
@@ -532,6 +545,7 @@ export function initAiChat({ onRender } = {}) {
 
 if (typeof window !== 'undefined') {
   window.initAiChat = initAiChat;
+  window.toggleAiChat = toggleAiChat;
   window.confirmPendingAiAction = confirmPendingAiAction;
   window.cancelPendingAiAction = cancelPendingAiAction;
 }

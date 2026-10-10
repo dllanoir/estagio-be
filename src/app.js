@@ -25,7 +25,7 @@ import { openNewMonthModal, initMonthModal, delMes } from './ui/components/month
 import { openLabelsModal, renderLabelsModal, delLabels, editLabelName } from './ui/components/labels-modal.js';
 import { openSettingsModal, updatePersistenceUI, exportBackup, exportCsv, load, createSnapshot, getSnapshots, restoreSnapshot, downloadSnapshot, renderSnapshotsList } from './ui/components/settings-modal.js';
 import { loadStoredReports, saveReportsStorage, baixarRelatorioPdf, visualizarRelatorioPdf } from './ui/components/reports-modal.js';
-import { initAiChat, resetChat, stopAiChat, chatWithGemini, appendAiMessage, confirmPendingAiAction, cancelPendingAiAction, saveChatStorage } from './ui/components/ai-chat.js';
+import { initAiChat, toggleAiChat, resetChat, stopAiChat, chatWithGemini, appendAiMessage, confirmPendingAiAction, cancelPendingAiAction, saveChatStorage } from './ui/components/ai-chat.js';
 
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
@@ -172,6 +172,7 @@ export const ACTIONS = {
     if (dg) dg.close();
   },
   'ai-new': () => resetChat(),
+  'ai-toggle': () => toggleAiChat(),
   'imp': () => $('#fi')?.click(),
   'cfg': () => openSettingsModal(),
   'ai-close': () => { const win = $('#ai-window'); if (win) win.hidden = true; },
@@ -466,23 +467,6 @@ $('#lgn-add-btn')?.addEventListener('click', () => {
   toast(`Etiqueta "${name}" criada.`);
 });
 
-$('#ai-fab')?.addEventListener('click', () => {
-  const win = $('#ai-window');
-  if (win) {
-    win.hidden = !win.hidden;
-    if (!win.hidden) $('#ai-prompt')?.focus();
-  }
-});
-
-$('#ai-model-select')?.addEventListener('change', e => {
-  const newModel = e.target.value.trim();
-  if (newModel) {
-    storage.setItem(STORAGE_KEYS.CHAT_MODEL, newModel);
-    const cfgChat = $('#cfg-chat-model');
-    if (cfgChat) cfgChat.value = newModel;
-    toast(`Modelo alterado para ${newModel}. Contexto preservado.`);
-  }
-});
 
 $('#cfg-close-btn')?.addEventListener('click', () => $('#cfg-dlg')?.close());
 $('#cfg-key-toggle')?.addEventListener('click', () => {
@@ -617,6 +601,7 @@ initMonthModal({ onRender: render });
 initHeader({ onRender: render, onHome: () => ACTIONS.home() });
 initStoragePersistence(updatePersistenceUI);
 checkVolatileStorage();
+initAiChat({ onRender: render });
 
 // Carregamento IDB de segurança (recupera contatos caso IDB tenha base mais volumosa)
 loadDbFromIdb().then(idbDb => {
