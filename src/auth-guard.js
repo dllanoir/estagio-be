@@ -18,9 +18,23 @@ import { SUPABASE_CONFIG } from './config/supabase.js';
     if (exp && exp < (Date.now() / 1000) - 30) {
       if (!sess?.refresh_token && !sess?.currentSession?.refresh_token) {
         window.location.replace('./index.html?redirect=' + curPage);
-        return;
       }
     }
+    const removeGuard = () => {
+      const g = document.getElementById('auth-guard-css');
+      if (g) g.remove();
+      if (document.body) {
+        document.body.style.visibility = 'visible';
+        document.body.style.opacity = '1';
+        document.body.style.pointerEvents = 'auto';
+      }
+    };
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', removeGuard);
+    } else {
+      removeGuard();
+    }
+    setTimeout(removeGuard, 1500);
   } catch (e) {
     window.location.replace('./index.html');
   }

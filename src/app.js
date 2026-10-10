@@ -1,4 +1,3 @@
-import './styles/app.css';
 import { STAGES, STAGE_MAP, QUICK_HISTORY_TAGS, MONTH_NAMES, MONTH_LABELS, COLORS, COLOR_HEX, STORAGE_KEYS } from './config/constants.js';
 import { now, okd, okm, fx, mlabel, mkey, fs } from './utils/date.js';
 import { esc, norm, up, toHtml, plain, txt, clean, hs } from './utils/text.js';
