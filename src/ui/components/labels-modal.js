@@ -46,11 +46,11 @@ export function renderLabelsModal() {
     const colorKey = (db.labels[l] || 'black').split('_')[0];
     return `
       <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--pn)">
-        <input type="checkbox" ${sel ? 'checked' : ''} data-a="lsel" data-l="${esc(l)}" title="Selecionar para exclusão em lote">
+        <input type="checkbox" id="lsel-${esc(l)}" name="label_sel_${esc(l)}" ${sel ? 'checked' : ''} data-a="lsel" data-l="${esc(l)}" title="Selecionar para exclusão em lote">
         <span class="lab" style="${ls(l)};flex:none;margin:0">${esc(l)}</span>
         <small style="color:var(--mut);margin-right:auto">${count} contato${count === 1 ? '' : 's'}</small>
 
-        <select data-a="ch-col" data-l="${esc(l)}" style="padding:4px 8px;border:1px solid var(--ln);border-radius:6px;font-size:12px;background:var(--pn)">
+        <select id="lcol-${esc(l)}" name="label_color_${esc(l)}" data-a="ch-col" data-l="${esc(l)}" aria-label="Cor da etiqueta ${esc(l)}" style="padding:4px 8px;border:1px solid var(--ln);border-radius:6px;font-size:12px;background:var(--pn)">
           ${colorOpts(colorKey)}
         </select>
 

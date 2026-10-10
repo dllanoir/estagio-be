@@ -228,8 +228,10 @@ export async function restoreChat() {
   let sessionData = null;
   if (sb) {
     try {
-      const { data, error } = await sb.from('chat_messages').select('parts').eq('id', 'active_session').single();
-      if (!error && data && data.parts) sessionData = data.parts;
+      const { data, error } = await sb.from('chat_messages').select('parts').eq('id', 'active_session').limit(1);
+      if (!error && Array.isArray(data) && data.length > 0 && data[0]?.parts) {
+        sessionData = data[0].parts;
+      }
     } catch (e) { logError('sb_restoreChat', e); }
   }
   if (!sessionData) {

@@ -61,7 +61,32 @@ if (typeof window !== 'undefined') window.enqueueMutation = enqueueMutation;
 
 export function updateSyncBadge() {
   const modalBadge = document.getElementById('cfg-modal-sync-badge');
+  const sbStatusEl = document.getElementById('cfg-sb-status-txt');
+  const sbQueueEl = document.getElementById('cfg-sb-queue-txt');
+  const sbLastEl = document.getElementById('cfg-sb-last-txt');
   const count = SYNC_ENGINE.pendingQueue.length;
+
+  if (sbStatusEl) {
+    if (!SYNC_ENGINE.isOnline) {
+      sbStatusEl.innerHTML = '<span style="color:var(--warn,#d97706);font-weight:700">🔴 Offline (Operando localmente)</span>';
+    } else if (SYNC_ENGINE.isSyncing) {
+      sbStatusEl.innerHTML = '<span style="color:var(--ac,#0f5c6e);font-weight:700">🔄 Sincronizando com Supabase...</span>';
+    } else {
+      sbStatusEl.innerHTML = '<span style="color:var(--good,#16a34a);font-weight:700">🟢 Supabase Conectado (meu-cantinho)</span>';
+    }
+  }
+
+  if (sbQueueEl) {
+    sbQueueEl.textContent = count === 0
+      ? '0 pendências (100% em dia)'
+      : `${count} alteração(ões) pendente(s) aguardando conexão`;
+    sbQueueEl.style.color = count === 0 ? 'var(--good,#16a34a)' : 'var(--warn,#d97706)';
+  }
+
+  if (sbLastEl && SYNC_ENGINE.lastSyncTime) {
+    sbLastEl.textContent = new Date(SYNC_ENGINE.lastSyncTime).toLocaleTimeString('pt-BR');
+  }
+
   if (modalBadge) {
     if (!SYNC_ENGINE.isOnline) {
       modalBadge.className = 'badge-pill warn';
@@ -269,6 +294,9 @@ export async function syncHybrid(manual = false) {
   } finally {
     SYNC_ENGINE.isSyncing = false;
     updateSyncBadge();
+    if (typeof window.updatePersistenceUI === 'function') {
+      window.updatePersistenceUI();
+    }
   }
 }
 

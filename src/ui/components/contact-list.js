@@ -117,8 +117,8 @@ export function renderContactList({ onOpenDrawer, onRender }) {
     </div>
     <div class="filter-actions">
       <button type="button" class="chip ${st.bulk ? 'on' : ''}" data-a="toggle-bulk" title="Selecionar múltiplos contatos para exclusão em lote">${st.bulk ? '✕ Cancelar seleção' : '☑ Selecionar em lote'}</button>
-      <select id="se" class="${st.et !== 'ativos' ? 'active-filter' : ''}" aria-label="Filtrar por etapa">${ch.map(x => `<option value="${x[0]}" ${st.et === x[0] ? 'selected' : ''}>Etapa: ${x[1]} (${x[2]})</option>`).join('')}</select>
-      <select id="so" aria-label="Ordenar">${[['relevancia', 'Relevância da busca'], ['etapa', 'Ordenar: Etapa'], ['nome', 'Nome (A–Z)'], ['parto', 'Data do parto'], ['ativ', 'Atividade recente']].map(o => `<option value="${o[0]}" ${st.sort === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select>
+      <select id="se" name="filter-etapa" class="${st.et !== 'ativos' ? 'active-filter' : ''}" aria-label="Filtrar por etapa">${ch.map(x => `<option value="${x[0]}" ${st.et === x[0] ? 'selected' : ''}>Etapa: ${x[1]} (${x[2]})</option>`).join('')}</select>
+      <select id="so" name="sort-order" aria-label="Ordenar">${[['relevancia', 'Relevância da busca'], ['etapa', 'Ordenar: Etapa'], ['nome', 'Nome (A–Z)'], ['parto', 'Data do parto'], ['ativ', 'Atividade recente']].map(o => `<option value="${o[0]}" ${st.sort === o[0] ? 'selected' : ''}>${o[1]}</option>`).join('')}</select>
     </div>`;
   }
 
@@ -132,7 +132,7 @@ export function renderContactList({ onOpenDrawer, onRender }) {
   }
 
   const TRASH_ICON = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14M10 11v5M14 11v5"/></svg>';
-  const bulkBarHtml = (st.bulk && rows.length) ? `<div class="bulk-toolbar" role="region" aria-label="Ações em lote"><div class="bulk-toolbar-left"><label class="bulk-all-label"><input type="checkbox" id="bulk-toggle-all" ${rows.length > 0 && rows.every(c => st.sel.includes(c.id)) ? 'checked' : ''}><span>Selecionar todos da lista (${rows.length})</span></label><span class="bulk-count-badge">${st.sel.length} selecionado(s)</span></div><div class="bulk-toolbar-right"><button type="button" class="bulk-action-btn bulk-del-btn" data-a="bulk-delete" ${st.sel.length === 0 ? 'disabled' : ''}>${TRASH_ICON} Excluir selecionados (${st.sel.length})</button><button type="button" class="bulk-action-btn" data-a="toggle-bulk">Fechar</button></div></div>` : '';
+  const bulkBarHtml = (st.bulk && rows.length) ? `<div class="bulk-toolbar" role="region" aria-label="Ações em lote"><div class="bulk-toolbar-left"><label class="bulk-all-label"><input type="checkbox" id="bulk-toggle-all" name="bulk-toggle-all" ${rows.length > 0 && rows.every(c => st.sel.includes(c.id)) ? 'checked' : ''}><span>Selecionar todos da lista (${rows.length})</span></label><span class="bulk-count-badge">${st.sel.length} selecionado(s)</span></div><div class="bulk-toolbar-right"><button type="button" class="bulk-action-btn bulk-del-btn" data-a="bulk-delete" ${st.sel.length === 0 ? 'disabled' : ''}>${TRASH_ICON} Excluir selecionados (${st.sel.length})</button><button type="button" class="bulk-action-btn" data-a="toggle-bulk">Fechar</button></div></div>` : '';
 
   const listEl = $('#list');
   if (listEl) {
@@ -142,7 +142,7 @@ export function renderContactList({ onOpenDrawer, onRender }) {
         const isSel = st.bulk && st.sel.includes(c.id);
         const pend = isCardPend(c);
         const mkr = pend ? '<span class="mk pend" role="img" aria-label="Contato com pendência" title="Contato com pendência">●</span>' : '';
-        const cbHtml = st.bulk ? `<span class="row-cb-wrap"><input type="checkbox" class="row-cb" data-cb-id="${esc(c.id)}" ${isSel ? 'checked' : ''} aria-label="Selecionar ${esc(c.nome)}"></span>` : '';
+        const cbHtml = st.bulk ? `<span class="row-cb-wrap"><input type="checkbox" id="cb-${esc(c.id)}" name="select-card-${esc(c.id)}" class="row-cb" data-cb-id="${esc(c.id)}" ${isSel ? 'checked' : ''} aria-label="Selecionar ${esc(c.nome)}"></span>` : '';
         return `<button type="button" class="row ${pend ? 'has-pending' : ''} ${st.bulk ? 'bulk-mode' : ''} ${isSel ? 'selected-for-bulk' : ''}" style="--sc:${s[2]}" data-id="${esc(c.id)}" aria-label="Abrir atendimento de ${esc(c.nome)}">
           ${cbHtml}
           <span class="row-main">

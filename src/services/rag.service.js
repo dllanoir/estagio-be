@@ -76,7 +76,7 @@ export async function deleteVector(id) {
 }
 
 const _sl = ms => new Promise(r => setTimeout(r, ms));
-const EMBED_LIMITS = { rpm: 90, tpm: 25000, rpd: 900 };
+const EMBED_LIMITS = { rpm: 100, tpm: 100000, rpd: 50000 };
 const EMBED_BATCH_TOK = 8000;
 const _estTok = t => Math.ceil(String(t).length / 3);
 const _ptDay = () => new Date().toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' });
@@ -87,7 +87,7 @@ function _msToPTMidnight() {
   return Math.max(60000, ((24 - g('hour')) * 3600 - g('minute') * 60 - g('second')) * 1000);
 }
 
-const KEY_EMBED_USAGE = 'gemini_embed_usage_v1';
+const KEY_EMBED_USAGE = 'gemini_embed_usage_v2';
 const KEY_EMBED_COOL = 'gemini_embed_cool_v1';
 let _semCool = Number(storage.getItem(KEY_EMBED_COOL)) || 0;
 
@@ -153,7 +153,7 @@ function embedReq(model, text, kind) {
 }
 
 async function embedChunk(chunk, kind, apiKey, model, attempt = 1, opts = {}) {
-  await embedAcquire(chunk.length, chunk.reduce((a, t) => a + _estTok(t), 0), { share: kind === 'q' ? 1 : 0.7, maxWait: kind === 'q' ? 4000 : Infinity });
+  await embedAcquire(chunk.length, chunk.reduce((a, t) => a + _estTok(t), 0), { share: 1, maxWait: kind === 'q' ? 4000 : Infinity });
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(new Error("demorou demais")), 30000);
   try {
@@ -401,7 +401,10 @@ export async function syncEmbeddings(forceAll = false) {
           else _badHash.set(x.c.id, x.hash);
         });
         if (okItems.length) await putVectors(okItems);
-        i += part.length; done += part.length;
+        i += part.length;
+        done += part.length;
+        updateRagConfigStatus();
+        await _sl(1200);
       }
     }
   } catch (e) {

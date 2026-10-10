@@ -103,9 +103,9 @@ export function renderRail() {
       mb.dataset.k = sk;
       mb.innerHTML = `<div class="mbh">
         <b>${mlabel(sk)}</b>
-        <label><input type="checkbox" id="mbv"${sn.v ? ' checked' : ''}> Marcar como pendente</label>
+        <label><input type="checkbox" id="mbv" name="mes_pendente"${sn.v ? ' checked' : ''}> Marcar como pendente</label>
       </div>
-      <textarea id="mbx" rows="1" placeholder="Pendência ou anotação deste mês..." aria-label="Nota de ${mlabel(sk)}">${esc(sn.n)}</textarea>`;
+      <textarea id="mbx" name="mes_anotacao" rows="1" placeholder="Pendência ou anotação deste mês..." aria-label="Nota de ${mlabel(sk)}">${esc(sn.n)}</textarea>`;
       grow($('#mbx'));
     }
   }

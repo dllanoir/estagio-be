@@ -288,7 +288,7 @@ export function drawer(id) {
 
   d.innerHTML = `
    <div class="dr-header">
-     <input id="f-nome" value="${esc(c.nome)}" placeholder="NOME DO CONTATO" aria-label="Nome do contato">
+     <input id="f-nome" name="nome_contato" value="${esc(c.nome)}" placeholder="NOME DO CONTATO" aria-label="Nome do contato">
      <button class="dr-close" data-a="close" aria-label="Fechar detalhes" title="Fechar">✕</button>
    </div>
 
@@ -305,23 +305,23 @@ export function drawer(id) {
      <div class="dr-card">
        <div class="dr-card-title">Dados do Atendimento</div>
        <div class="dr-grid">
-         <label>Mês de Atendimento<select id="f-mes">${mopts(c.mes)}</select></label>
-         <label>Etapa Atual<select id="f-et">${S.map(s => `<option value="${s[0]}" ${s[0] === c.etapa ? 'selected' : ''}>${s[1]}</option>`).join('')}</select></label>
+         <label>Mês de Atendimento<select id="f-mes" name="mes_atendimento">${mopts(c.mes)}</select></label>
+         <label>Etapa Atual<select id="f-et" name="etapa_atendimento">${S.map(s => `<option value="${s[0]}" ${s[0] === c.etapa ? 'selected' : ''}>${s[1]}</option>`).join('')}</select></label>
          <div>
            <div style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;min-height:22px;margin-bottom:6px;gap:6px">
              <span style="font-size:11.5px;font-weight:600;color:var(--mut);line-height:1.2">Data Prevista do Parto</span>
              <label class="dr-inline-label" style="display:inline-flex !important;flex-direction:row !important;align-items:center !important;gap:5px !important;font-size:11px;font-weight:600;color:${c.parto_ok ? '#16a34a' : 'var(--mut)'};cursor:pointer;margin:0 !important;line-height:1;white-space:nowrap" title="Marcar como parto confirmado">
-               <input type="checkbox" id="f-parto-ok" ${c.parto_ok ? 'checked' : ''} style="accent-color:#16a34a;cursor:pointer;width:14px;height:14px;margin:0 !important;flex-shrink:0">
+               <input type="checkbox" id="f-parto-ok" name="parto_confirmado" ${c.parto_ok ? 'checked' : ''} style="accent-color:#16a34a;cursor:pointer;width:14px;height:14px;margin:0 !important;flex-shrink:0">
                <span style="user-select:none">${c.parto_ok ? '✓ Confirmado' : 'Confirmar'}</span>
              </label>
            </div>
-           <input type="date" id="f-parto" value="${c.parto || ''}" style="width:100%">
+           <input type="date" id="f-parto" name="data_parto" value="${c.parto || ''}" style="width:100%">
          </div>
          <div>
            <div style="display:flex;flex-direction:row;align-items:center;justify-content:space-between;min-height:22px;margin-bottom:6px">
              <span style="font-size:11.5px;font-weight:600;color:var(--mut);line-height:1.2">Data de Pagamento (Saque)</span>
            </div>
-           <input type="date" id="f-saque" value="${c.saque || ''}" style="width:100%">
+           <input type="date" id="f-saque" name="data_saque" value="${c.saque || ''}" style="width:100%">
          </div>
        </div>
      </div>
@@ -335,8 +335,8 @@ export function drawer(id) {
          ${Object.keys(db.labels).map(l => `<button class="lab ${st.drawerDraftLabels.includes(l) ? '' : 'off'}" data-a="lab" data-l="${esc(l)}" style="${ls(l)}">${st.drawerDraftLabels.includes(l) ? '✓ ' : ''}${esc(l)}</button>`).join('')}
        </div>
        <div class="add-hist-row" style="margin-top:8px">
-         <input id="f-nl" placeholder="Nova etiqueta rápida...">
-         <select id="f-nc" style="width:auto;padding:7px 8px;border:1px solid var(--ln);border-radius:8px;background:var(--pn)">
+         <input id="f-nl" name="nova_etiqueta_nome" placeholder="Nova etiqueta rápida...">
+         <select id="f-nc" name="nova_etiqueta_cor" aria-label="Cor da nova etiqueta" style="width:auto;padding:7px 8px;border:1px solid var(--ln);border-radius:8px;background:var(--pn)">
            ${colorOpts('')}
          </select>
          <button class="btn" data-a="nl">+ Criar</button>
@@ -347,7 +347,7 @@ export function drawer(id) {
        <div class="dr-card-title" style="display:flex;align-items:center;justify-content:space-between">
          <span style="display:inline-flex;align-items:center;gap:4px">Anotações do Contato${c.pend ? '<span class="mk pend" role="img" aria-label="Contato com pendência" title="Contato com pendência">●</span>' : ''}</span>
          <label class="dr-inline-label" style="display:inline-flex !important;flex-direction:row !important;align-items:center !important;gap:6px !important;font-size:12px;font-weight:600;color:${c.pend ? '#b45309' : 'var(--mut)'};cursor:pointer;margin:0 !important;white-space:nowrap" title="Marcar este contato como pendente">
-           <input type="checkbox" id="f-pend" ${c.pend ? 'checked' : ''} style="accent-color:#f59e0b;cursor:pointer;width:15px;height:15px;margin:0 !important;flex-shrink:0">
+           <input type="checkbox" id="f-pend" name="pendencia_marcada" ${c.pend ? 'checked' : ''} style="accent-color:#f59e0b;cursor:pointer;width:15px;height:15px;margin:0 !important;flex-shrink:0">
            <span style="user-select:none">${c.pend ? '● Pendência marcada' : 'Marcar pendência'}</span>
          </label>
        </div>
@@ -363,12 +363,12 @@ export function drawer(id) {
          ${QK.map(q => `<button data-a="q" data-t="${esc(q)}">${esc(q.replace(/: $/, ''))}</button>`).join('')}
        </div>
        <div class="add-hist-row">
-         <input id="f-h" placeholder="Registrar nova ocorrência...">
+         <input id="f-h" name="novo_historico_texto" placeholder="Registrar nova ocorrência...">
          <button class="btn sm p" data-a="addh">Salvar</button>
        </div>
        <label style="margin-top:8px;display:block;font-size:12px;color:var(--mut);font-weight:600">
          Data do registro (opcional):
-         <input type="date" id="f-hd" style="margin-top:3px;padding:6px 9px;border:1px solid var(--ln);border-radius:8px;width:100%">
+         <input type="date" id="f-hd" name="data_historico" style="margin-top:3px;padding:6px 9px;border:1px solid var(--ln);border-radius:8px;width:100%">
        </label>
        ${isNew ? `
          <p style="font-size:12px;color:var(--mut);margin:4px 0 0">O histórico será iniciado automaticamente após salvar o novo contato.</p>

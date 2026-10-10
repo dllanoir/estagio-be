@@ -641,17 +641,17 @@ setInterval(() => {
 }, 45000);
 
 // Validação final de autenticação antes de inicializar serviços de nuvem e IA
-checkAuthSession().then(session => {
+checkAuthSession().then(async session => {
   if (!session) return;
   initAiChat({ onRender: render });
   loadStoredReports();
   populateAiModelSelect();
-  syncHybrid(false).finally(() => {
-    render();
-    syncEmbeddings();
-    updateRagConfigStatus();
-    checkInitialAlerts();
-  });
+  await syncHybrid(false);
+  render();
+  updatePersistenceUI();
+  syncEmbeddings();
+  updateRagConfigStatus();
+  checkInitialAlerts();
 });
 
 // Exportações globais para compatibilidade e console debugging
@@ -660,6 +660,7 @@ window.all = all;
 window.toast = toast;
 window.drawer = drawer;
 window.syncHybrid = syncHybrid;
+window.updatePersistenceUI = updatePersistenceUI;
 window.exportBackup = () => exportBackup({ onRender: render });
 window.exportCsv = exportCsv;
 window.openNewMonthModal = openNewMonthModal;
