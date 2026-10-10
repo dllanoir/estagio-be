@@ -7,7 +7,7 @@ import { normCard } from '../../domain/card.js';
 import { storage, logError, isStoragePersisted } from '../../services/storage.service.js';
 import { openVecDB, IDB_STORE_SNAPSHOTS } from '../../services/indexeddb.service.js';
 import { sb } from '../../services/supabase.service.js';
-import { SYNC_ENGINE, syncHybrid } from '../../services/sync.service.js';
+import { SYNC_ENGINE, syncHybrid, getPendingQueueSummary } from '../../services/sync.service.js';
 import { ask } from './confirm-modal.js';
 import { toast } from '../toast.js';
 import { getBackupReminderDays, getPartoAlertDays, getInactiveDaysThreshold } from './alerts.js';
@@ -324,9 +324,7 @@ export async function updatePersistenceUI() {
   }
 
   if (sbQueueEl) {
-    sbQueueEl.textContent = pendingCount === 0
-      ? '0 pendências (100% em dia)'
-      : `${pendingCount} alteração(ões) pendente(s) aguardando conexão`;
+    sbQueueEl.textContent = getPendingQueueSummary();
     sbQueueEl.style.color = pendingCount === 0 ? 'var(--good,#16a34a)' : 'var(--warn,#d97706)';
   }
 

@@ -366,7 +366,7 @@ dialog::backdrop{
 
 /* Modal de Configuração (#cfg-dlg) */
 #cfg-dlg {
-  width: min(680px, 95vw);
+  width: min(720px, 95vw);
   max-height: 85vh;
   max-height: 85dvh;
 }
@@ -374,25 +374,33 @@ dialog::backdrop{
   display: flex;
   background: var(--pn-alt);
   border-bottom: 1px solid var(--ln);
-  padding: 0 16px;
-  gap: 6px;
+  padding: 0 8px;
+  gap: 4px;
   flex: 0 0 auto;
-  overflow-x: auto;
+  overflow: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.cfg-tabs-nav::-webkit-scrollbar {
+  display: none;
 }
 .cfg-tab-btn {
+  flex: 1 1 0;
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  padding: 11px 14px;
+  justify-content: center;
+  gap: 6px;
+  padding: 11px 6px;
   background: none;
   border: none;
   border-bottom: 2px solid transparent;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
   color: var(--mut);
   cursor: pointer;
   transition: all .15s ease;
   white-space: nowrap;
+  text-align: center;
 }
 .cfg-tab-btn:hover {
   color: var(--ink);
@@ -400,6 +408,26 @@ dialog::backdrop{
 .cfg-tab-btn.active {
   color: var(--ac);
   border-bottom-color: var(--ac);
+}
+@media (max-width: 580px) {
+  .cfg-tabs-nav {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    padding: 6px 8px;
+    gap: 6px;
+  }
+  .cfg-tab-btn {
+    border-bottom: none;
+    border-radius: 6px;
+    padding: 8px 6px;
+    font-size: 12px;
+    background: transparent;
+  }
+  .cfg-tab-btn.active {
+    background: var(--pn);
+    border-bottom: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
 }
 .cfg-tab-pane {
   display: none;

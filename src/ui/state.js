@@ -67,6 +67,12 @@ export function setDb(newVal) {
   return db;
 }
 
+let _lastMetaSynced = {
+  app_state: null,
+  labels: null,
+  meses: null
+};
+
 export function initLocalDb() {
   try {
     const raw = storage.getItem(STORAGE_KEYS.DB);
@@ -74,10 +80,13 @@ export function initLocalDb() {
   } catch (e) {
     logError('init_parse_db', e);
   }
+  _lastMetaSynced.app_state = JSON.stringify({ snooze: db.snooze, gone: db.gone, del: db.del, bk: db.bk });
+  _lastMetaSynced.labels = JSON.stringify(db.labels);
+  _lastMetaSynced.meses = JSON.stringify({ meses: db.meses, mnotes: db.mnotes });
   return db;
 }
 
-export function save() {
+export function save(skipSyncEnqueue = false) {
   const json = JSON.stringify(db);
   try {
     storage.setItem(STORAGE_KEYS.DB, json);
@@ -87,10 +96,30 @@ export function save() {
   }
   saveDbToIdb(db);
 
+  const curAppState = JSON.stringify({ snooze: db.snooze, gone: db.gone, del: db.del, bk: db.bk });
+  const curLabels = JSON.stringify(db.labels);
+  const curMeses = JSON.stringify({ meses: db.meses, mnotes: db.mnotes });
+
+  if (skipSyncEnqueue) {
+    _lastMetaSynced.app_state = curAppState;
+    _lastMetaSynced.labels = curLabels;
+    _lastMetaSynced.meses = curMeses;
+    return true;
+  }
+
   if (typeof window.enqueueMutation === 'function') {
-    window.enqueueMutation({ type: 'app_state', state: { snooze: db.snooze, gone: db.gone, del: db.del, bk: db.bk } });
-    window.enqueueMutation({ type: 'labels', labels: db.labels });
-    window.enqueueMutation({ type: 'meses', meses: db.meses, mnotes: db.mnotes });
+    if (_lastMetaSynced.app_state !== curAppState) {
+      window.enqueueMutation({ type: 'app_state', state: { snooze: db.snooze, gone: db.gone, del: db.del, bk: db.bk } });
+      _lastMetaSynced.app_state = curAppState;
+    }
+    if (_lastMetaSynced.labels !== curLabels) {
+      window.enqueueMutation({ type: 'labels', labels: db.labels });
+      _lastMetaSynced.labels = curLabels;
+    }
+    if (_lastMetaSynced.meses !== curMeses) {
+      window.enqueueMutation({ type: 'meses', meses: db.meses, mnotes: db.mnotes });
+      _lastMetaSynced.meses = curMeses;
+    }
   }
   return true;
 }

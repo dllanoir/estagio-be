@@ -59,6 +59,35 @@ export function enqueueMutation(action) {
 
 if (typeof window !== 'undefined') window.enqueueMutation = enqueueMutation;
 
+export function getPendingQueueSummary() {
+  if (!SYNC_ENGINE.pendingQueue || SYNC_ENGINE.pendingQueue.length === 0) {
+    return '0 pendências (100% em dia)';
+  }
+  const items = [];
+  let cardCount = 0;
+  let delCount = 0;
+  let hasLabels = false;
+  let hasMeses = false;
+  let hasAppState = false;
+
+  for (const q of SYNC_ENGINE.pendingQueue) {
+    if (q.type === 'upsert_card') cardCount++;
+    else if (q.type === 'delete_card') delCount++;
+    else if (q.type === 'labels') hasLabels = true;
+    else if (q.type === 'meses') hasMeses = true;
+    else if (q.type === 'app_state') hasAppState = true;
+  }
+
+  if (cardCount > 0) items.push(`${cardCount} contato(s)`);
+  if (delCount > 0) items.push(`${delCount} exclusão(ões)`);
+  if (hasLabels) items.push('etiquetas');
+  if (hasMeses) items.push('meses');
+  if (hasAppState) items.push('estado geral');
+
+  const detail = items.length ? ` (${items.join(', ')})` : '';
+  return `${SYNC_ENGINE.pendingQueue.length} alteração(ões) pendente(s)${detail}`;
+}
+
 export function updateSyncBadge() {
   const modalBadge = document.getElementById('cfg-modal-sync-badge');
   const sbStatusEl = document.getElementById('cfg-sb-status-txt');
@@ -77,9 +106,7 @@ export function updateSyncBadge() {
   }
 
   if (sbQueueEl) {
-    sbQueueEl.textContent = count === 0
-      ? '0 pendências (100% em dia)'
-      : `${count} alteração(ões) pendente(s) aguardando conexão`;
+    sbQueueEl.textContent = getPendingQueueSummary();
     sbQueueEl.style.color = count === 0 ? 'var(--good,#16a34a)' : 'var(--warn,#d97706)';
   }
 
@@ -275,7 +302,7 @@ export async function syncHybrid(manual = false) {
     }
 
     if (localModified) {
-      save();
+      save(true);
       if (typeof window.render === 'function') window.render();
     }
 
