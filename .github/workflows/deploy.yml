@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
   pages: write
   id-token: write
 
@@ -36,12 +36,6 @@ jobs:
 
       - name: Build production bundle
         run: npm run build
-
-      - name: Deploy to gh-pages branch (Fallback para Source: Deploy from branch)
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./dist
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v5

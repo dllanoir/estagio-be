@@ -1,9 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import { SUPABASE_CONFIG } from './config/supabase.js';
 
-let targetApp = new URLSearchParams(window.location.search).get('redirect') || './app.html';
+let targetApp = new URLSearchParams(window.location.search).get('redirect') || './app.html?v=2.0.2';
 if (targetApp === 'index.html' || targetApp === 'login.html') {
-  targetApp = './app.html';
+  targetApp = './app.html?v=2.0.2';
 }
 
 const sb = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {

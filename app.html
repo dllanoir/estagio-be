@@ -14,6 +14,17 @@
       pointer-events: none !important;
     }
   </style>
+  <script>
+    setTimeout(function() {
+      var g = document.getElementById('auth-guard-css');
+      if (g) g.remove();
+      if (document.body) {
+        document.body.style.visibility = 'visible';
+        document.body.style.opacity = '1';
+        document.body.style.pointerEvents = 'auto';
+      }
+    }, 1200);
+  </script>
 
   <!-- ESTILOS DO SISTEMA -->
   <link rel="stylesheet" href="./src/styles/app.css">
@@ -28,7 +39,7 @@
   </script>
 
   <!-- GUARDA DE AUTENTICAÇÃO -->
-  <script type="module" src="./src/auth-guard.js"></script>
+  <script type="module" src="./src/auth-guard.js?v=2.0.2"></script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -612,6 +623,6 @@
 <div id="tt" role="status" aria-live="polite"></div>
 
   <!-- ORQUESTRADOR PRINCIPAL MODULAR DA APLICAÇÃO -->
-  <script type="module" src="./src/app.js"></script>
+  <script type="module" src="./src/app.js?v=2.0.2"></script>
 </body>
 </html>

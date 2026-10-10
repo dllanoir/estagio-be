@@ -15,7 +15,7 @@
         if (token) {
           const exp = sess?.expires_at || sess?.currentSession?.expires_at;
           if (!exp || exp > (Date.now() / 1000) - 30 || sess?.refresh_token || sess?.currentSession?.refresh_token) {
-            window.location.replace('./app.html');
+            window.location.replace('./app.html?v=2.0.2');
           }
         }
       }
